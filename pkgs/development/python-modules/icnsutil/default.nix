@@ -1,9 +1,9 @@
-{ lib
-, python
-, fetchFromGitHub
-, buildPythonPackage
+{
+  lib,
+  python,
+  fetchFromGitHub,
+  buildPythonPackage,
 }:
-
 buildPythonPackage rec {
   pname = "icnsutil";
   version = "1.0.1";
@@ -26,6 +26,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/relikd/icnsutil";
     description = "Create and extract .icns files.";
     license = lib.licenses.mit;
-    maintainers = [ lib.maintainers.reckenrode ];
+    maintainers = [lib.maintainers.reckenrode];
   };
 }

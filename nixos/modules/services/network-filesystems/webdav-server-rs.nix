@@ -1,17 +1,20 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.webdav-server-rs;
-  format = pkgs.formats.toml { };
-  settings = recursiveUpdate
+  format = pkgs.formats.toml {};
+  settings =
+    recursiveUpdate
     {
       server.uid = config.users.users."${cfg.user}".uid;
       server.gid = config.users.groups."${cfg.group}".gid;
     }
     cfg.settings;
-in
-{
+in {
   options = {
     services.webdav-server-rs = {
       enable = mkEnableOption "WebDAV server";
@@ -30,7 +33,7 @@ in
 
       settings = mkOption {
         type = format.type;
-        default = { };
+        default = {};
         description = ''
           Attrset that is converted and passed as config file. Available
           options can be found at
@@ -108,8 +111,8 @@ in
 
     systemd.services.webdav-server-rs = {
       description = "WebDAV server";
-      after = [ "network.target" ];
-      wantedBy = [ "multi-user.target" ];
+      after = ["network.target"];
+      wantedBy = ["multi-user.target"];
       serviceConfig = {
         ExecStart = "${pkgs.webdav-server-rs}/bin/webdav-server -c ${cfg.configFile}";
 
@@ -118,8 +121,8 @@ in
           "CAP_SETGID"
         ];
 
-        NoExecPaths = [ "/" ];
-        ExecPaths = [ "/nix/store" ];
+        NoExecPaths = ["/"];
+        ExecPaths = ["/nix/store"];
 
         # This program actively detects if it is running in root user account
         # when it starts and uses root privilege to switch process uid to
@@ -140,5 +143,5 @@ in
     };
   };
 
-  meta.maintainers = with maintainers; [ pmy ];
+  meta.maintainers = with maintainers; [pmy];
 }

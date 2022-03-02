@@ -1,21 +1,21 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, pytestCheckHook
-, pythonOlder
-, google-auth
-, google-auth-oauthlib
-, google-cloud-storage
-, requests
-, decorator
-, fsspec
-, ujson
-, aiohttp
-, crcmod
-, pytest-vcr
-, vcrpy
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  pytestCheckHook,
+  pythonOlder,
+  google-auth,
+  google-auth-oauthlib,
+  google-cloud-storage,
+  requests,
+  decorator,
+  fsspec,
+  ujson,
+  aiohttp,
+  crcmod,
+  pytest-vcr,
+  vcrpy,
 }:
-
 buildPythonPackage rec {
   pname = "gcsfs";
   version = "2022.01.0";
@@ -55,7 +55,7 @@ buildPythonPackage rec {
     "gcsfs/tests/test_retry.py"
   ];
 
-  pytestFlagsArray = [ "-x" ];
+  pytestFlagsArray = ["-x"];
 
   pythonImportsCheck = [
     "gcsfs"
@@ -65,6 +65,6 @@ buildPythonPackage rec {
     description = "Convenient Filesystem interface over GCS";
     homepage = "https://github.com/fsspec/gcsfs";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ nbren12 ];
+    maintainers = with maintainers; [nbren12];
   };
 }

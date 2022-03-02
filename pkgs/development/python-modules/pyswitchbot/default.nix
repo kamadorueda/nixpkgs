@@ -1,10 +1,10 @@
-{ lib
-, bluepy
-, buildPythonPackage
-, fetchFromGitHub
-, pythonOlder
+{
+  lib,
+  bluepy,
+  buildPythonPackage,
+  fetchFromGitHub,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "pyswitchbot";
   version = "0.13.3";
@@ -33,8 +33,8 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python library to control Switchbot IoT devices";
     homepage = "https://github.com/Danielhiversen/pySwitchbot";
-    license = with licenses; [ mit ];
-    maintainers = with maintainers; [ fab ];
+    license = with licenses; [mit];
+    maintainers = with maintainers; [fab];
     platforms = platforms.linux;
   };
 }

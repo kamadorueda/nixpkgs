@@ -1,5 +1,14 @@
-{ lib, stdenv, fetchFromGitHub, qmake, qttools, qttranslations, qtlocation, wrapQtAppsHook, substituteAll }:
-
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  qmake,
+  qttools,
+  qttranslations,
+  qtlocation,
+  wrapQtAppsHook,
+  substituteAll,
+}:
 stdenv.mkDerivation rec {
   pname = "gpxsee";
   version = "10.4";
@@ -11,15 +20,15 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-3AwUfx8IIWJO4uVAhXJE5Oola+60VUpXUwmALqJo2vw=";
   };
 
-  patches = (substituteAll {
+  patches = substituteAll {
     # See https://github.com/NixOS/nixpkgs/issues/86054
     src = ./fix-qttranslations-path.diff;
     inherit qttranslations;
-  });
+  };
 
-  buildInputs = [ qtlocation ];
+  buildInputs = [qtlocation];
 
-  nativeBuildInputs = [ qmake qttools wrapQtAppsHook ];
+  nativeBuildInputs = [qmake qttools wrapQtAppsHook];
 
   preConfigure = ''
     lrelease gpxsee.pro
@@ -39,7 +48,7 @@ stdenv.mkDerivation rec {
     homepage = "https://www.gpxsee.org/";
     changelog = "https://build.opensuse.org/package/view_file/home:tumic:GPXSee/gpxsee/gpxsee.changes";
     license = licenses.gpl3Only;
-    maintainers = with maintainers; [ womfoo sikmir ];
+    maintainers = with maintainers; [womfoo sikmir];
     platforms = platforms.unix;
   };
 }

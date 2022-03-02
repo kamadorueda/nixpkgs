@@ -1,11 +1,10 @@
-{ buildPythonPackage
-, fetchFromGitHub
-, lib
-
-# pythonPackages
-, pytest
+{
+  buildPythonPackage,
+  fetchFromGitHub,
+  lib,
+  # pythonPackages
+  pytest,
 }:
-
 buildPythonPackage rec {
   pname = "names";
   version = "0.3.0";

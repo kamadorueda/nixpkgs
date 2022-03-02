@@ -1,13 +1,18 @@
-{ lib, stdenv, fetchurl, bundlerEnv, ruby, makeWrapper }:
-
-let
+{
+  lib,
+  stdenv,
+  fetchurl,
+  bundlerEnv,
+  ruby,
+  makeWrapper,
+}: let
   version = "4.2.4";
   rubyEnv = bundlerEnv {
     name = "redmine-env-${version}";
 
     inherit ruby;
     gemdir = ./.;
-    groups = [ "development" "ldap" "markdown" "minimagick" "openid" "test" ];
+    groups = ["development" "ldap" "markdown" "minimagick" "openid" "test"];
   };
 in
   stdenv.mkDerivation rec {
@@ -21,12 +26,12 @@ in
       sha256 = "7f50fd4a6cf1c1e48091a87696b813ba264e11f04dec67fb006858a1b49a5c7d";
     };
 
-    nativeBuildInputs = [ makeWrapper ];
-    buildInputs = [ rubyEnv rubyEnv.wrappedRuby rubyEnv.bundler ];
+    nativeBuildInputs = [makeWrapper];
+    buildInputs = [rubyEnv rubyEnv.wrappedRuby rubyEnv.bundler];
 
     # taken from https://www.redmine.org/issues/33784
     # can be dropped when the upstream bug is closed and the fix is present in the upstream release
-    patches = [ ./0001-python3.patch ];
+    patches = [./0001-python3.patch];
 
     buildPhase = ''
       mv config config.dist
@@ -47,7 +52,7 @@ in
     meta = with lib; {
       homepage = "https://www.redmine.org/";
       platforms = platforms.linux;
-      maintainers = [ maintainers.aanderse ];
+      maintainers = [maintainers.aanderse];
       license = licenses.gpl2;
     };
   }

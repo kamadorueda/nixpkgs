@@ -1,35 +1,40 @@
-{ lib, stdenv, fetchurl, jre, makeWrapper
-, mysqlSupport ? true, mysql_jdbc
-, postgresqlSupport ? true, postgresql_jdbc }:
-
-let
+{
+  lib,
+  stdenv,
+  fetchurl,
+  jre,
+  makeWrapper,
+  mysqlSupport ? true,
+  mysql_jdbc,
+  postgresqlSupport ? true,
+  postgresql_jdbc,
+}: let
   extraJars =
     lib.optional mysqlSupport mysql_jdbc
     ++ lib.optional postgresqlSupport postgresql_jdbc;
 in
+  stdenv.mkDerivation rec {
+    pname = "liquibase";
+    version = "4.8.0";
 
-stdenv.mkDerivation rec {
-  pname = "liquibase";
-  version = "4.8.0";
+    src = fetchurl {
+      url = "https://github.com/liquibase/liquibase/releases/download/v${version}/${pname}-${version}.tar.gz";
+      sha256 = "sha256-dGK26S9wd+GFiGXEA9UvDc4b1m0DsfrpB4FcEIJf6zM=";
+    };
 
-  src = fetchurl {
-    url = "https://github.com/liquibase/liquibase/releases/download/v${version}/${pname}-${version}.tar.gz";
-    sha256 = "sha256-dGK26S9wd+GFiGXEA9UvDc4b1m0DsfrpB4FcEIJf6zM=";
-  };
+    nativeBuildInputs = [makeWrapper];
+    buildInputs = [jre];
 
-  nativeBuildInputs = [ makeWrapper ];
-  buildInputs = [ jre ];
-
-  unpackPhase = ''
-    tar xfz ${src}
-  '';
-
-  installPhase =
-    let addJars = dir: ''
-      for jar in ${dir}/*.jar; do
-        CP="\$CP":"\$jar"
-      done
+    unpackPhase = ''
+      tar xfz ${src}
     '';
+
+    installPhase = let
+      addJars = dir: ''
+        for jar in ${dir}/*.jar; do
+          CP="\$CP":"\$jar"
+        done
+      '';
     in ''
       mkdir -p $out
       mv ./{lib,licenses,liquibase.jar} $out/
@@ -54,14 +59,14 @@ stdenv.mkDerivation rec {
         liquibase.integration.commandline.Main \''${1+"\$@"}
       EOF
       chmod +x $out/bin/liquibase
-  '';
+    '';
 
-  meta = with lib; {
-    description = "Version Control for your database";
-    homepage = "https://www.liquibase.org/";
-    changelog = "https://raw.githubusercontent.com/liquibase/liquibase/v${version}/changelog.txt";
-    license = licenses.asl20;
-    maintainers = with maintainers; [ ];
-    platforms = with platforms; unix;
-  };
-}
+    meta = with lib; {
+      description = "Version Control for your database";
+      homepage = "https://www.liquibase.org/";
+      changelog = "https://raw.githubusercontent.com/liquibase/liquibase/v${version}/changelog.txt";
+      license = licenses.asl20;
+      maintainers = with maintainers; [];
+      platforms = with platforms; unix;
+    };
+  }

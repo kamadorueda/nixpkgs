@@ -1,34 +1,34 @@
-{ stdenv
-, fetchurl
-, meson
-, ninja
-, gettext
-, gtk-doc
-, pkg-config
-, vala
-, networkmanager
-, gnome
-, isocodes
-, libxml2
-, docbook_xsl
-, docbook_xml_dtd_43
-, mobile-broadband-provider-info
-, gobject-introspection
-, gtk3
-, withGtk4 ? false
-, gtk4
-, withGnome ? true
-, gcr
-, glib
-, substituteAll
-, lib
+{
+  stdenv,
+  fetchurl,
+  meson,
+  ninja,
+  gettext,
+  gtk-doc,
+  pkg-config,
+  vala,
+  networkmanager,
+  gnome,
+  isocodes,
+  libxml2,
+  docbook_xsl,
+  docbook_xml_dtd_43,
+  mobile-broadband-provider-info,
+  gobject-introspection,
+  gtk3,
+  withGtk4 ? false,
+  gtk4,
+  withGnome ? true,
+  gcr,
+  glib,
+  substituteAll,
+  lib,
 }:
-
 stdenv.mkDerivation rec {
   pname = "libnma";
   version = "1.8.34";
 
-  outputs = [ "out" "dev" "devdoc" ];
+  outputs = ["out" "dev" "devdoc"];
 
   src = fetchurl {
     url = "mirror://gnome/sources/${pname}/${lib.versions.majorMinor version}/${pname}-${version}.tar.xz";
@@ -53,17 +53,20 @@ stdenv.mkDerivation rec {
     vala
   ];
 
-  buildInputs = [
-    gtk3
-    networkmanager
-    isocodes
-    mobile-broadband-provider-info
-  ] ++ lib.optionals withGtk4 [
-    gtk4
-  ] ++ lib.optionals withGnome [
-    # advanced certificate chooser
-    gcr
-  ];
+  buildInputs =
+    [
+      gtk3
+      networkmanager
+      isocodes
+      mobile-broadband-provider-info
+    ]
+    ++ lib.optionals withGtk4 [
+      gtk4
+    ]
+    ++ lib.optionals withGnome [
+      # advanced certificate chooser
+      gcr
+    ];
 
   mesonFlags = [
     "-Dgcr=${lib.boolToString withGnome}"

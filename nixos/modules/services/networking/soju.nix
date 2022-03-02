@@ -1,14 +1,18 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.soju;
   stateDir = "/var/lib/soju";
   listenCfg = concatMapStringsSep "\n" (l: "listen ${l}") cfg.listen;
-  tlsCfg = optionalString (cfg.tlsCertificate != null)
+  tlsCfg =
+    optionalString (cfg.tlsCertificate != null)
     "tls ${cfg.tlsCertificate} ${cfg.tlsCertificateKey}";
-  logCfg = optionalString cfg.enableMessageLogging
+  logCfg =
+    optionalString cfg.enableMessageLogging
     "log fs ${stateDir}/logs";
 
   configFile = pkgs.writeText "soju.conf" ''
@@ -22,8 +26,7 @@ let
 
     ${cfg.extraConfig}
   '';
-in
-{
+in {
   ###### interface
 
   options.services.soju = {
@@ -31,7 +34,7 @@ in
 
     listen = mkOption {
       type = types.listOf types.str;
-      default = [ ":6697" ];
+      default = [":6697"];
       description = ''
         Where soju should listen for incoming connections. See the
         <literal>listen</literal> directive in
@@ -99,8 +102,8 @@ in
   config = mkIf cfg.enable {
     systemd.services.soju = {
       description = "soju IRC bouncer";
-      wantedBy = [ "multi-user.target" ];
-      after = [ "network-online.target" ];
+      wantedBy = ["multi-user.target"];
+      after = ["network-online.target"];
       serviceConfig = {
         DynamicUser = true;
         Restart = "always";
@@ -110,5 +113,5 @@ in
     };
   };
 
-  meta.maintainers = with maintainers; [ malvo ];
+  meta.maintainers = with maintainers; [malvo];
 }

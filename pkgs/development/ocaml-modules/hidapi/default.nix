@@ -1,7 +1,12 @@
-{ pkgs, lib, fetchurl, buildDunePackage, pkg-config, dune-configurator
-, bigstring,
+{
+  pkgs,
+  lib,
+  fetchurl,
+  buildDunePackage,
+  pkg-config,
+  dune-configurator,
+  bigstring,
 }:
-
 buildDunePackage rec {
   pname = "hidapi";
   version = "1.1.1";
@@ -17,9 +22,9 @@ buildDunePackage rec {
 
   minimumOCamlVersion = "4.03";
 
-  nativeBuildInputs = [ pkg-config ];
-  buildInputs = [ pkgs.hidapi dune-configurator ];
-  propagatedBuildInputs = [ bigstring ];
+  nativeBuildInputs = [pkg-config];
+  buildInputs = [pkgs.hidapi dune-configurator];
+  propagatedBuildInputs = [bigstring];
 
   doCheck = true;
 
@@ -27,6 +32,6 @@ buildDunePackage rec {
     homepage = "https://github.com/vbmithr/ocaml-hidapi";
     description = "Bindings to Signal11's hidapi library";
     license = licenses.isc;
-    maintainers = [ maintainers.alexfmpe ];
+    maintainers = [maintainers.alexfmpe];
   };
 }

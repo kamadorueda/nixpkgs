@@ -1,31 +1,33 @@
-{ fetchgit, fetchurl, lib, runCommand, cargo, jq }:
-
 {
+  fetchgit,
+  fetchurl,
+  lib,
+  runCommand,
+  cargo,
+  jq,
+}: {
   # Cargo lock file
-  lockFile ? null
-
+  lockFile ? null,
   # Cargo lock file contents as string
-, lockFileContents ? null
-
+  lockFileContents ? null,
   # Hashes for git dependencies.
-, outputHashes ? {}
+  outputHashes ? {},
 } @ args:
-
-assert (lockFile == null) != (lockFileContents == null);
-
-let
+assert (lockFile == null) != (lockFileContents == null); let
   # Parse a git source into different components.
-  parseGit = src:
-    let
-      parts = builtins.match ''git\+([^?]+)(\?(rev|tag|branch)=(.*))?#(.*)'' src;
-      type = builtins.elemAt parts 2; # rev, tag or branch
-      value = builtins.elemAt parts 3;
-    in
-      if parts == null then null
-      else {
+  parseGit = src: let
+    parts = builtins.match ''git\+([^?]+)(\?(rev|tag|branch)=(.*))?#(.*)'' src;
+    type = builtins.elemAt parts 2; # rev, tag or branch
+    value = builtins.elemAt parts 3;
+  in
+    if parts == null
+    then null
+    else
+      {
         url = builtins.elemAt parts 0;
         sha = builtins.elemAt parts 4;
-      } // lib.optionalAttrs (type != null) { inherit type value; };
+      }
+      // lib.optionalAttrs (type != null) {inherit type value;};
 
   # shadows args.lockFileContents
   lockFileContents =
@@ -38,21 +40,21 @@ let
   # There is no source attribute for the source package itself. But
   # since we do not want to vendor the source package anyway, we can
   # safely skip it.
-  depPackages = (builtins.filter (p: p ? "source") packages);
+  depPackages = builtins.filter (p: p ? "source") packages;
 
   # Create dependent crates from packages.
   #
   # Force evaluation of the git SHA -> hash mapping, so that an error is
   # thrown if there are stale hashes. We cannot rely on gitShaOutputHash
   # being evaluated otherwise, since there could be no git dependencies.
-  depCrates = builtins.deepSeq (gitShaOutputHash) (builtins.map mkCrate depPackages);
+  depCrates = builtins.deepSeq gitShaOutputHash (builtins.map mkCrate depPackages);
 
   # Map package name + version to git commit SHA for packages with a git source.
-  namesGitShas = builtins.listToAttrs (
-    builtins.map nameGitSha (builtins.filter (pkg: lib.hasPrefix "git+" pkg.source) depPackages)
-  );
+  namesGitShas = builtins.listToAttrs (builtins.map nameGitSha (builtins.filter (pkg: lib.hasPrefix "git+" pkg.source) depPackages));
 
-  nameGitSha = pkg: let gitParts = parseGit pkg.source; in {
+  nameGitSha = pkg: let
+    gitParts = parseGit pkg.source;
+  in {
     name = "${pkg.name}-${pkg.version}";
     value = gitParts.sha;
   };
@@ -65,13 +67,15 @@ let
   # workspace). By using the git commit SHA as a universal identifier,
   # the user does not have to specify the output hash for every package
   # individually.
-  gitShaOutputHash = lib.mapAttrs' (nameVer: hash:
-    let
+  gitShaOutputHash =
+    lib.mapAttrs' (nameVer: hash: let
       unusedHash = throw "A hash was specified for ${nameVer}, but there is no corresponding git dependency.";
-      rev = namesGitShas.${nameVer} or unusedHash; in {
+      rev = namesGitShas.${nameVer} or unusedHash;
+    in {
       name = rev;
       value = hash;
-    }) outputHashes;
+    })
+    outputHashes;
 
   # We can't use the existing fetchCrate function, since it uses a
   # recursive hash of the unpacked crate.
@@ -83,47 +87,48 @@ let
       If that is the case, running `cargo update` with a recent toolchain will
       automatically update the format along with the crate's depenendencies.
     '';
-    fetchurl {
-      name = "crate-${pkg.name}-${pkg.version}.tar.gz";
-      url = "https://crates.io/api/v1/crates/${pkg.name}/${pkg.version}/download";
-      sha256 = pkg.checksum;
-    };
+      fetchurl {
+        name = "crate-${pkg.name}-${pkg.version}.tar.gz";
+        url = "https://crates.io/api/v1/crates/${pkg.name}/${pkg.version}/download";
+        sha256 = pkg.checksum;
+      };
 
   # Fetch and unpack a crate.
-  mkCrate = pkg:
-    let
-      gitParts = parseGit pkg.source;
+  mkCrate = pkg: let
+    gitParts = parseGit pkg.source;
+  in
+    if pkg.source == "registry+https://github.com/rust-lang/crates.io-index"
+    then let
+      crateTarball = fetchCrate pkg;
     in
-      if pkg.source == "registry+https://github.com/rust-lang/crates.io-index" then
-      let
-        crateTarball = fetchCrate pkg;
-      in runCommand "${pkg.name}-${pkg.version}" {} ''
+      runCommand "${pkg.name}-${pkg.version}" {} ''
         mkdir $out
         tar xf "${crateTarball}" -C $out --strip-components=1
 
         # Cargo is happy with largely empty metadata.
         printf '{"files":{},"package":"${pkg.checksum}"}' > "$out/.cargo-checksum.json"
       ''
-      else if gitParts != null then
-      let
-        missingHash = throw ''
-          No hash was found while vendoring the git dependency ${pkg.name}-${pkg.version}. You can add
-          a hash through the `outputHashes` argument of `importCargoLock`:
+    else if gitParts != null
+    then let
+      missingHash = throw ''
+        No hash was found while vendoring the git dependency ${pkg.name}-${pkg.version}. You can add
+        a hash through the `outputHashes` argument of `importCargoLock`:
 
-          outputHashes = {
-            "${pkg.name}-${pkg.version}" = "<hash>";
-          };
-
-          If you use `buildRustPackage`, you can add this attribute to the `cargoLock`
-          attribute set.
-        '';
-        sha256 = gitShaOutputHash.${gitParts.sha} or missingHash;
-        tree = fetchgit {
-          inherit sha256;
-          inherit (gitParts) url;
-          rev = gitParts.sha; # The commit SHA is always available.
+        outputHashes = {
+          "${pkg.name}-${pkg.version}" = "<hash>";
         };
-      in runCommand "${pkg.name}-${pkg.version}" {} ''
+
+        If you use `buildRustPackage`, you can add this attribute to the `cargoLock`
+        attribute set.
+      '';
+      sha256 = gitShaOutputHash.${gitParts.sha} or missingHash;
+      tree = fetchgit {
+        inherit sha256;
+        inherit (gitParts) url;
+        rev = gitParts.sha; # The commit SHA is always available.
+      };
+    in
+      runCommand "${pkg.name}-${pkg.version}" {} ''
         tree=${tree}
 
         # If the target package is in a workspace, or if it's the top-level
@@ -164,42 +169,43 @@ let
         replace-with = "vendored-sources"
         EOF
       ''
-      else throw "Cannot handle crate source: ${pkg.source}";
+    else throw "Cannot handle crate source: ${pkg.source}";
 
-  vendorDir = runCommand "cargo-vendor-dir" (lib.optionalAttrs (lockFile == null) {
-    inherit lockFileContents;
-    passAsFile = [ "lockFileContents" ];
-  }) ''
-    mkdir -p $out/.cargo
+  vendorDir =
+    runCommand "cargo-vendor-dir" (lib.optionalAttrs (lockFile == null) {
+      inherit lockFileContents;
+      passAsFile = ["lockFileContents"];
+    }) ''
+      mkdir -p $out/.cargo
 
-    ${
-      if lockFile != null
-      then "ln -s ${lockFile} $out/Cargo.lock"
-      else "cp $lockFileContentsPath $out/Cargo.lock"
-    }
+      ${
+        if lockFile != null
+        then "ln -s ${lockFile} $out/Cargo.lock"
+        else "cp $lockFileContentsPath $out/Cargo.lock"
+      }
 
-    cat > $out/.cargo/config <<EOF
-    [source.crates-io]
-    replace-with = "vendored-sources"
+      cat > $out/.cargo/config <<EOF
+      [source.crates-io]
+      replace-with = "vendored-sources"
 
-    [source.vendored-sources]
-    directory = "cargo-vendor-dir"
-    EOF
+      [source.vendored-sources]
+      directory = "cargo-vendor-dir"
+      EOF
 
-    declare -A keysSeen
+      declare -A keysSeen
 
-    for crate in ${toString depCrates}; do
-      # Link the crate directory, removing the output path hash from the destination.
-      ln -s "$crate" $out/$(basename "$crate" | cut -c 34-)
+      for crate in ${toString depCrates}; do
+        # Link the crate directory, removing the output path hash from the destination.
+        ln -s "$crate" $out/$(basename "$crate" | cut -c 34-)
 
-      if [ -e "$crate/.cargo-config" ]; then
-        key=$(sed 's/\[source\."\(.*\)"\]/\1/; t; d' < "$crate/.cargo-config")
-        if [[ -z ''${keysSeen[$key]} ]]; then
-          keysSeen[$key]=1
-          cat "$crate/.cargo-config" >> $out/.cargo/config
+        if [ -e "$crate/.cargo-config" ]; then
+          key=$(sed 's/\[source\."\(.*\)"\]/\1/; t; d' < "$crate/.cargo-config")
+          if [[ -z ''${keysSeen[$key]} ]]; then
+            keysSeen[$key]=1
+            cat "$crate/.cargo-config" >> $out/.cargo/config
+          fi
         fi
-      fi
-    done
-  '';
+      done
+    '';
 in
   vendorDir

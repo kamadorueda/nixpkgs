@@ -1,9 +1,22 @@
-{ lib, stdenv, fetchFromGitHub, cmake, pkg-config
-, gtk, glib, pcre, libappindicator, libpthreadstubs, libXdmcp
-, libxkbcommon, libepoxy, at-spi2-core, dbus, libdbusmenu
-, wrapGAppsHook
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  gtk,
+  glib,
+  pcre,
+  libappindicator,
+  libpthreadstubs,
+  libXdmcp,
+  libxkbcommon,
+  libepoxy,
+  at-spi2-core,
+  dbus,
+  libdbusmenu,
+  wrapGAppsHook,
 }:
-
 stdenv.mkDerivation rec {
   pname = "gromit-mpx";
   version = "1.4.2";
@@ -15,11 +28,19 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-2inmcKSdvHs7WaU095liH12Og9ezsNSs2qygltWOclw=";
   };
 
-  nativeBuildInputs = [ cmake pkg-config wrapGAppsHook ];
+  nativeBuildInputs = [cmake pkg-config wrapGAppsHook];
   buildInputs = [
-    gtk glib pcre libappindicator libpthreadstubs
-    libXdmcp libxkbcommon libepoxy at-spi2-core
-    dbus libdbusmenu
+    gtk
+    glib
+    pcre
+    libappindicator
+    libpthreadstubs
+    libXdmcp
+    libxkbcommon
+    libepoxy
+    at-spi2-core
+    dbus
+    libdbusmenu
   ];
 
   meta = with lib; {
@@ -31,7 +52,7 @@ stdenv.mkDerivation rec {
     '';
 
     homepage = "https://github.com/bk138/gromit-mpx";
-    maintainers = with maintainers; [ pjones ];
+    maintainers = with maintainers; [pjones];
     platforms = platforms.linux;
     license = licenses.gpl2Plus;
   };

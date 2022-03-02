@@ -1,30 +1,30 @@
-{ stdenv
-, lib
-, autoreconfHook
-, gitUpdater
-, gnome
-, which
-, fetchgit
-, libgtop
-, libwnck
-, glib
-, vala
-, pkg-config
-, libstartup_notification
-, gobject-introspection
-, gtk-doc
-, docbook_xsl
-, xorgserver
-, dbus
-, python3
-, wrapGAppsHook
+{
+  stdenv,
+  lib,
+  autoreconfHook,
+  gitUpdater,
+  gnome,
+  which,
+  fetchgit,
+  libgtop,
+  libwnck,
+  glib,
+  vala,
+  pkg-config,
+  libstartup_notification,
+  gobject-introspection,
+  gtk-doc,
+  docbook_xsl,
+  xorgserver,
+  dbus,
+  python3,
+  wrapGAppsHook,
 }:
-
 stdenv.mkDerivation rec {
   pname = "bamf";
   version = "0.5.6";
 
-  outputs = [ "out" "dev" "devdoc" ];
+  outputs = ["out" "dev" "devdoc"];
 
   src = fetchgit {
     url = "https://git.launchpad.net/~unity-team/bamf";
@@ -33,7 +33,7 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [
-    (python3.withPackages (ps: with ps; [ lxml ])) # Tests
+    (python3.withPackages (ps: with ps; [lxml])) # Tests
     autoreconfHook
     dbus
     docbook_xsl
@@ -92,6 +92,6 @@ stdenv.mkDerivation rec {
     homepage = "https://launchpad.net/bamf";
     license = licenses.lgpl3;
     platforms = platforms.linux;
-    maintainers = with maintainers; [ davidak ] ++ teams.pantheon.members;
+    maintainers = with maintainers; [davidak] ++ teams.pantheon.members;
   };
 }

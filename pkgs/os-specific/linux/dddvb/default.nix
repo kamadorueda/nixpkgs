@@ -1,9 +1,9 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, kernel
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  kernel,
 }:
-
 stdenv.mkDerivation rec {
   pname = "dddvb";
   version = "0.9.33-404-ge9ccab3";
@@ -33,7 +33,7 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/DigitalDevices/dddvb";
     description = "ddbridge linux driver";
     license = licenses.gpl2Only;
-    maintainers = with maintainers; [ hexa ];
+    maintainers = with maintainers; [hexa];
     platforms = platforms.linux;
   };
 }

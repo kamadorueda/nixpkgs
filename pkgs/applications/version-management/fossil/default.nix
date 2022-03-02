@@ -1,19 +1,20 @@
-{ lib, stdenv
-, installShellFiles
-, tcl
-, libiconv
-, fetchurl
-, zlib
-, openssl
-, readline
-, withInternalSqlite ? true
-, sqlite
-, ed
-, which
-, tcllib
-, withJson ? true
+{
+  lib,
+  stdenv,
+  installShellFiles,
+  tcl,
+  libiconv,
+  fetchurl,
+  zlib,
+  openssl,
+  readline,
+  withInternalSqlite ? true,
+  sqlite,
+  ed,
+  which,
+  tcllib,
+  withJson ? true,
 }:
-
 stdenv.mkDerivation rec {
   pname = "fossil";
   version = "2.18";
@@ -23,9 +24,10 @@ stdenv.mkDerivation rec {
     sha256 = "0iimdzfdl5687xyqxfadbn640x45n3933q1nfx7b32rl4v3vk778";
   };
 
-  nativeBuildInputs = [ installShellFiles tcl tcllib ];
+  nativeBuildInputs = [installShellFiles tcl tcllib];
 
-  buildInputs = [ zlib openssl readline which ed ]
+  buildInputs =
+    [zlib openssl readline which ed]
     ++ lib.optional stdenv.isDarwin libiconv
     ++ lib.optional (!withInternalSqlite) sqlite;
 
@@ -60,7 +62,7 @@ stdenv.mkDerivation rec {
     '';
     homepage = "https://www.fossil-scm.org/";
     license = licenses.bsd2;
-    maintainers = with maintainers; [ maggesi viric ];
+    maintainers = with maintainers; [maggesi viric];
     platforms = platforms.all;
   };
 }

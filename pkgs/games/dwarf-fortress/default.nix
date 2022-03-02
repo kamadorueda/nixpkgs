@@ -1,5 +1,16 @@
-{ stdenv, stdenvNoCC, gccStdenv, lib, recurseIntoAttrs, libsForQt5, newScope, texlive, perlPackages, jdk8, jre8 }:
-
+{
+  stdenv,
+  stdenvNoCC,
+  gccStdenv,
+  lib,
+  recurseIntoAttrs,
+  libsForQt5,
+  newScope,
+  texlive,
+  perlPackages,
+  jdk8,
+  jre8,
+}:
 # To whomever it may concern:
 #
 # This directory menaces with spikes of Nix code. It is terrifying.
@@ -31,10 +42,7 @@
 # you un-symlink them and edit, then the scripts will avoid overwriting your
 # changes on later launches, but consider extending the wrapper with your
 # desired options instead.
-
-with lib;
-
-let
+with lib; let
   callPackage = newScope self;
 
   # The latest Dwarf Fortress version. Maintainers: when a new version comes
@@ -55,32 +63,32 @@ let
   df-games = lib.listToAttrs (map
     (dfVersion: {
       name = versionToName dfVersion;
-      value =
-        let
-          # I can't believe this syntax works. Spikes of Nix code indeed...
-          dwarf-fortress = callPackage ./game.nix {
-            inherit dfVersion;
-            inherit dwarf-fortress-unfuck;
-          };
+      value = let
+        # I can't believe this syntax works. Spikes of Nix code indeed...
+        dwarf-fortress = callPackage ./game.nix {
+          inherit dfVersion;
+          inherit dwarf-fortress-unfuck;
+        };
 
-          # unfuck is linux-only right now, we will only use it there.
-          dwarf-fortress-unfuck =
-            if stdenv.isLinux then callPackage ./unfuck.nix { inherit dfVersion; }
-            else null;
+        # unfuck is linux-only right now, we will only use it there.
+        dwarf-fortress-unfuck =
+          if stdenv.isLinux
+          then callPackage ./unfuck.nix {inherit dfVersion;}
+          else null;
 
-          twbt = callPackage ./twbt { inherit dfVersion; };
+        twbt = callPackage ./twbt {inherit dfVersion;};
 
-          dfhack = callPackage ./dfhack {
-            inherit (perlPackages) XMLLibXML XMLLibXSLT;
-            inherit dfVersion twbt;
-            stdenv = gccStdenv;
-          };
+        dfhack = callPackage ./dfhack {
+          inherit (perlPackages) XMLLibXML XMLLibXSLT;
+          inherit dfVersion twbt;
+          stdenv = gccStdenv;
+        };
 
-          dwarf-therapist = libsForQt5.callPackage ./dwarf-therapist/wrapper.nix {
-            inherit dwarf-fortress;
-            dwarf-therapist = dwarf-therapist-original;
-          };
-        in
+        dwarf-therapist = libsForQt5.callPackage ./dwarf-therapist/wrapper.nix {
+          inherit dwarf-fortress;
+          dwarf-therapist = dwarf-therapist-original;
+        };
+      in
         callPackage ./wrapper {
           inherit (self) themes;
 
@@ -107,7 +115,7 @@ let
       inherit df-games versionToName latestVersion;
     };
 
-    soundSense = callPackage ./soundsense.nix { };
+    soundSense = callPackage ./soundsense.nix {};
 
     legends-browser = callPackage ./legends-browser {
       jre = jre8; # TODO: remove override https://github.com/NixOS/nixpkgs/pull/89731
@@ -121,6 +129,5 @@ let
     phoebus-theme = themes.phoebus;
     cla-theme = themes.cla;
   };
-
 in
-self // df-games
+  self // df-games

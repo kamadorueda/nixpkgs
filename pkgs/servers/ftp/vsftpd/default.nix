@@ -1,5 +1,13 @@
-{ lib, stdenv, fetchurl, libcap, libseccomp, openssl, pam, nixosTests }:
-
+{
+  lib,
+  stdenv,
+  fetchurl,
+  libcap,
+  libseccomp,
+  openssl,
+  pam,
+  nixosTests,
+}:
 stdenv.mkDerivation rec {
   pname = "vsftpd";
   version = "3.0.5";
@@ -9,9 +17,9 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-JrYCrkVLC6bZnvRKCba54N+n9nIoEGc23x8njHC8kdM=";
   };
 
-  buildInputs = [ libcap openssl libseccomp pam ];
+  buildInputs = [libcap openssl libseccomp pam];
 
-  patches = [ ./CVE-2015-1419.patch ];
+  patches = [./CVE-2015-1419.patch];
 
   postPatch = ''
     sed -i "/VSF_BUILD_SSL/s/^#undef/#define/" builddefs.h
@@ -35,13 +43,13 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   passthru = {
-    tests = { inherit (nixosTests) vsftpd; };
+    tests = {inherit (nixosTests) vsftpd;};
   };
 
   meta = with lib; {
     description = "A very secure FTP daemon";
     license = licenses.gpl2;
-    maintainers = with maintainers; [ peterhoeg ];
+    maintainers = with maintainers; [peterhoeg];
     platforms = platforms.linux;
   };
 }

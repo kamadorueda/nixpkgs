@@ -1,4 +1,5 @@
-{ stdenv,
+{
+  stdenv,
   lib,
   fetchzip,
   autoPatchelfHook,
@@ -7,9 +8,8 @@
   makeDesktopItem,
   gtk3,
   openssl,
-  xdg-user-dirs
+  xdg-user-dirs,
 }:
-
 stdenv.mkDerivation rec {
   pname = "appflowy";
   version = "0.0.3";
@@ -20,14 +20,14 @@ stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [
-      autoPatchelfHook
-      makeWrapper
-      copyDesktopItems
+    autoPatchelfHook
+    makeWrapper
+    copyDesktopItems
   ];
 
   buildInputs = [
-      gtk3
-      openssl
+    gtk3
+    openssl
   ];
 
   dontBuild = true;
@@ -62,7 +62,7 @@ stdenv.mkDerivation rec {
       desktopName = "AppFlowy";
       comment = meta.description;
       exec = "appflowy";
-      categories = [ "Office" ];
+      categories = ["Office"];
     })
   ];
 
@@ -71,7 +71,7 @@ stdenv.mkDerivation rec {
     homepage = "https://www.appflowy.io/";
     license = licenses.agpl3Only;
     changelog = "https://github.com/AppFlowy-IO/appflowy/releases/tag/${version}";
-    maintainers = with maintainers; [ darkonion0 ];
-    platforms = [ "x86_64-linux" ];
+    maintainers = with maintainers; [darkonion0];
+    platforms = ["x86_64-linux"];
   };
 }

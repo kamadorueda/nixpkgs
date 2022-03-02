@@ -1,10 +1,10 @@
-{ lib
-, fetchFromGitLab
-, buildDunePackage
-, lwt
-, ptime
+{
+  lib,
+  fetchFromGitLab,
+  buildDunePackage,
+  lwt,
+  ptime,
 }:
-
 buildDunePackage rec {
   pname = "lwt-exit";
   version = "1.0";
@@ -30,6 +30,6 @@ buildDunePackage rec {
   meta = {
     description = "An opinionated clean-exit and signal-handling library for Lwt programs";
     license = lib.licenses.mit;
-    maintainers = [ lib.maintainers.ulrikstrid ];
+    maintainers = [lib.maintainers.ulrikstrid];
   };
 }

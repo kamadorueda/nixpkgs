@@ -1,13 +1,13 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, makeDesktopItem
-, copyDesktopItems
-, pkg-config
-, gtk3
-, alsa-lib
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  makeDesktopItem,
+  copyDesktopItems,
+  pkg-config,
+  gtk3,
+  alsa-lib,
 }:
-
 stdenv.mkDerivation rec {
   pname = "free42";
   version = "3.0.9";
@@ -74,7 +74,7 @@ stdenv.mkDerivation rec {
       exec = "free42bin";
       type = "Application";
       comment = meta.description;
-      categories = [ "Utility" "Calculator" ];
+      categories = ["Utility" "Calculator"];
     })
     (makeDesktopItem {
       name = "com.thomasokken.free42dec";
@@ -83,7 +83,7 @@ stdenv.mkDerivation rec {
       exec = "free42dec";
       type = "Application";
       comment = meta.description;
-      categories = [ "Utility" "Calculator" ];
+      categories = ["Utility" "Calculator"];
     })
   ];
 
@@ -91,7 +91,7 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/thomasokken/free42";
     description = "A software clone of HP-42S Calculator";
     license = licenses.gpl2Only;
-    maintainers = with maintainers; [ AndersonTorres plabadens ];
+    maintainers = with maintainers; [AndersonTorres plabadens];
     platforms = with platforms; unix;
   };
 }

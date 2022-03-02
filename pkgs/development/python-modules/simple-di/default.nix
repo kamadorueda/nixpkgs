@@ -1,12 +1,12 @@
-{ lib
-, buildPythonPackage
-, pythonOlder
-, fetchPypi
-, setuptools
-, typing-extensions
-, dataclasses
+{
+  lib,
+  buildPythonPackage,
+  pythonOlder,
+  fetchPypi,
+  setuptools,
+  typing-extensions,
+  dataclasses,
 }:
-
 buildPythonPackage rec {
   pname = "simple-di";
   version = "0.1.5";
@@ -20,12 +20,14 @@ buildPythonPackage rec {
     hash = "sha256-GSuZne5M1PsRpdhhFlyq0C2PBhfA+Ab8Wwn5BfGgPKA=";
   };
 
-  propagatedBuildInputs = [
-    setuptools
-    typing-extensions
-  ] ++ lib.optional (pythonOlder "3.7") [
-    dataclasses
-  ];
+  propagatedBuildInputs =
+    [
+      setuptools
+      typing-extensions
+    ]
+    ++ lib.optional (pythonOlder "3.7") [
+      dataclasses
+    ];
 
   pythonImportsCheck = [
     "simple_di"
@@ -38,6 +40,6 @@ buildPythonPackage rec {
     description = "Simple dependency injection library";
     homepage = "https://github.com/bentoml/simple_di";
     license = licenses.asl20;
-    maintainers = with maintainers; [ sauyon ];
+    maintainers = with maintainers; [sauyon];
   };
 }

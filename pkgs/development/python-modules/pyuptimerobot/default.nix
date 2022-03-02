@@ -1,13 +1,13 @@
-{ lib
-, aiohttp
-, aresponses
-, buildPythonPackage
-, fetchFromGitHub
-, pytestCheckHook
-, pytest-asyncio
-, pythonOlder
+{
+  lib,
+  aiohttp,
+  aresponses,
+  buildPythonPackage,
+  fetchFromGitHub,
+  pytestCheckHook,
+  pytest-asyncio,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "pyuptimerobot";
   version = "22.2.0";
@@ -46,6 +46,6 @@ buildPythonPackage rec {
     description = "Python API wrapper for Uptime Robot";
     homepage = "https://github.com/ludeeus/pyuptimerobot";
     license = licenses.mit;
-    maintainers = with maintainers; [ fab ];
+    maintainers = with maintainers; [fab];
   };
 }

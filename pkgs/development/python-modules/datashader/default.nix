@@ -1,27 +1,27 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, dask
-, bokeh
-, toolz
-, datashape
-, numba
-, numpy
-, pandas
-, pillow
-, xarray
-, colorcet
-, param
-, pyct
-, scipy
-, pytestCheckHook
-, nbsmoke
-, fastparquet
-, nbconvert
-, pytest-xdist
-, netcdf4
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  dask,
+  bokeh,
+  toolz,
+  datashape,
+  numba,
+  numpy,
+  pandas,
+  pillow,
+  xarray,
+  colorcet,
+  param,
+  pyct,
+  scipy,
+  pytestCheckHook,
+  nbsmoke,
+  fastparquet,
+  nbconvert,
+  pytest-xdist,
+  netcdf4,
 }:
-
 buildPythonPackage rec {
   pname = "datashader";
   version = "0.13.0";
@@ -32,21 +32,23 @@ buildPythonPackage rec {
     sha256 = "sha256-6JscHm1QjDmXOLLa83qhAvY/xwvlPM6duQ1lSxnCVV8=";
   };
 
-  propagatedBuildInputs = [
-    dask
-    bokeh
-    toolz
-    datashape
-    numba
-    numpy
-    pandas
-    pillow
-    xarray
-    colorcet
-    param
-    pyct
-    scipy
-  ] ++ dask.extras-require.complete;
+  propagatedBuildInputs =
+    [
+      dask
+      bokeh
+      toolz
+      datashape
+      numba
+      numpy
+      pandas
+      pillow
+      xarray
+      colorcet
+      param
+      pyct
+      scipy
+    ]
+    ++ dask.extras-require.complete;
 
   checkInputs = [
     pytestCheckHook
@@ -92,10 +94,10 @@ buildPythonPackage rec {
     "datashader"
   ];
 
-  meta = with lib;{
+  meta = with lib; {
     description = "Data visualization toolchain based on aggregating into a grid";
     homepage = "https://datashader.org";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ costrouc ];
+    maintainers = with maintainers; [costrouc];
   };
 }

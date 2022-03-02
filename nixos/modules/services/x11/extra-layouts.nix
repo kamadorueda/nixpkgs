@@ -1,8 +1,10 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   layouts = config.services.xserver.extraLayouts;
 
   layoutOpts = {
@@ -14,8 +16,7 @@ let
 
       languages = mkOption {
         type = types.listOf types.str;
-        description =
-        ''
+        description = ''
           A list of languages provided by the layout.
           (Use ISO 639-2 codes, for example: "eng" for english)
         '';
@@ -75,34 +76,30 @@ let
           It must contain a <literal>xkb_types "name" { ... }</literal> block.
         '';
       };
-
     };
   };
 
   xkb_patched = pkgs.xorg.xkeyboardconfig_custom {
     layouts = config.services.xserver.extraLayouts;
   };
-
-in
-
-{
-
+in {
   ###### interface
 
   options.services.xserver = {
     extraLayouts = mkOption {
       type = types.attrsOf (types.submodule layoutOpts);
       default = {};
-      example = literalExpression
-      ''
-        {
-          mine = {
-            description = "My custom xkb layout.";
-            languages = [ "eng" ];
-            symbolsFile = /path/to/my/layout;
-          };
-        }
-      '';
+      example =
+        literalExpression
+        ''
+          {
+            mine = {
+              description = "My custom xkb layout.";
+              languages = [ "eng" ];
+              symbolsFile = /path/to/my/layout;
+            };
+          }
+        '';
       description = ''
         Extra custom layouts that will be included in the xkb configuration.
         Information on how to create a new layout can be found here:
@@ -111,13 +108,11 @@ in
         <link xlink:href="https://wiki.archlinux.org/index.php/X_KeyBoard_extension#Basic_examples"></link>
       '';
     };
-
   };
 
   ###### implementation
 
-  config = mkIf (layouts != { }) {
-
+  config = mkIf (layouts != {}) {
     environment.sessionVariables = {
       # runtime override supported by multiple libraries e. g. libxkbcommon
       # https://xkbcommon.org/doc/current/group__include-path.html
@@ -126,10 +121,9 @@ in
 
     services.xserver = {
       xkbDir = "${xkb_patched}/etc/X11/xkb";
-      exportConfiguration = config.services.xserver.displayManager.startx.enable
+      exportConfiguration =
+        config.services.xserver.displayManager.startx.enable
         || config.services.xserver.displayManager.sx.enable;
     };
-
   };
-
 }

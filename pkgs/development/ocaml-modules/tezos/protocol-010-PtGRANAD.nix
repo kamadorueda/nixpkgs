@@ -1,10 +1,10 @@
-{ lib
-, buildDunePackage
-, tezos-stdlib
-, tezos-protocol-compiler
-, tezos-protocol-environment
+{
+  lib,
+  buildDunePackage,
+  tezos-stdlib,
+  tezos-protocol-compiler,
+  tezos-protocol-environment,
 }:
-
 buildDunePackage {
   pname = "tezos-protocol-010-PtGRANAD";
   inherit (tezos-stdlib) version useDune2;
@@ -22,7 +22,9 @@ buildDunePackage {
 
   doCheck = true;
 
-  meta = tezos-stdlib.meta // {
-    description = "Tezos/Protocol: economic-protocol definition";
-  };
+  meta =
+    tezos-stdlib.meta
+    // {
+      description = "Tezos/Protocol: economic-protocol definition";
+    };
 }

@@ -1,5 +1,9 @@
-{ lib, buildGoModule, fetchFromGitHub, installShellFiles }:
-
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+}:
 buildGoModule rec {
   pname = "witness";
   version = "0.1.6";
@@ -13,10 +17,10 @@ buildGoModule rec {
 
   vendorSha256 = "sha256-vXDsHHJknw9hsHx1mJA2c0CWwFbRXjCjitNWPh6V4yw=";
 
-  nativeBuildInputs = [ installShellFiles ];
+  nativeBuildInputs = [installShellFiles];
 
   # We only want the witness binary, not the helper utilities for generating docs.
-  subPackages = [ "cmd/witness" ];
+  subPackages = ["cmd/witness"];
 
   ldflags = [
     "-s"
@@ -52,6 +56,6 @@ buildGoModule rec {
     homepage = "https://github.com/testifysec/witness";
     changelog = "https://github.com/testifysec/witness/releases/tag/v${version}";
     license = licenses.asl20;
-    maintainers = with maintainers; [ fkautz jk ];
+    maintainers = with maintainers; [fkautz jk];
   };
 }

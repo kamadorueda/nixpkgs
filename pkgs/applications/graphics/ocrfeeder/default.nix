@@ -1,21 +1,22 @@
-{ lib, stdenv
-, fetchurl
-, pkg-config
-, gtk3
-, gtkspell3
-, isocodes
-, goocanvas2
-, intltool
-, itstool
-, libxml2
-, gnome
-, python3
-, gobject-introspection
-, wrapGAppsHook
-, tesseract4
-, extraOcrEngines ? [] # other supported engines are: ocrad gocr cuneiform
+{
+  lib,
+  stdenv,
+  fetchurl,
+  pkg-config,
+  gtk3,
+  gtkspell3,
+  isocodes,
+  goocanvas2,
+  intltool,
+  itstool,
+  libxml2,
+  gnome,
+  python3,
+  gobject-introspection,
+  wrapGAppsHook,
+  tesseract4,
+  extraOcrEngines ? [], # other supported engines are: ocrad gocr cuneiform
 }:
-
 stdenv.mkDerivation rec {
   pname = "ocrfeeder";
   version = "0.8.3";
@@ -39,14 +40,15 @@ stdenv.mkDerivation rec {
     goocanvas2
     gtkspell3
     isocodes
-    (python3.withPackages(ps: with ps; [
-      pyenchant
-      sane
-      pillow
-      reportlab
-      odfpy
-      pygobject3
-    ]))
+    (python3.withPackages (ps:
+      with ps; [
+        pyenchant
+        sane
+        pillow
+        reportlab
+        odfpy
+        pygobject3
+      ]))
   ];
 
   # https://gitlab.gnome.org/GNOME/ocrfeeder/-/issues/22
@@ -56,8 +58,9 @@ stdenv.mkDerivation rec {
   '';
 
   enginesPath = lib.makeBinPath ([
-    tesseract4
-  ] ++ extraOcrEngines);
+      tesseract4
+    ]
+    ++ extraOcrEngines);
 
   preFixup = ''
     gappsWrapperArgs+=(--prefix PATH : "${enginesPath}")
@@ -66,7 +69,7 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     homepage = "https://wiki.gnome.org/Apps/OCRFeeder";
     description = "Complete Optical Character Recognition and Document Analysis and Recognition program";
-    maintainers = with maintainers; [ doronbehar ];
+    maintainers = with maintainers; [doronbehar];
     license = licenses.gpl3Plus;
     platforms = platforms.linux;
   };

@@ -1,20 +1,20 @@
-{ lib
-, buildPythonPackage
-, pythonOlder
-, fetchFromGitHub
-, setuptools
-, geopy
-, docopt
-, pyyaml
-, certifi
-, amqtt
-, websockets
-, aiohttp
-, pytestCheckHook
-, asynctest
-, pytest-asyncio
+{
+  lib,
+  buildPythonPackage,
+  pythonOlder,
+  fetchFromGitHub,
+  setuptools,
+  geopy,
+  docopt,
+  pyyaml,
+  certifi,
+  amqtt,
+  websockets,
+  aiohttp,
+  pytestCheckHook,
+  asynctest,
+  pytest-asyncio,
 }:
-
 buildPythonPackage rec {
   pname = "volvooncall";
   version = "0.9.2";
@@ -46,12 +46,12 @@ buildPythonPackage rec {
     pytest-asyncio
   ];
 
-  pythonImportsCheck = [ "volvooncall" ];
+  pythonImportsCheck = ["volvooncall"];
 
   meta = with lib; {
     description = "Retrieve information from the Volvo On Call web service";
     homepage = "https://github.com/molobrakos/volvooncall";
     license = licenses.unlicense;
-    maintainers = with maintainers; [ dotlambda ];
+    maintainers = with maintainers; [dotlambda];
   };
 }

@@ -1,26 +1,22 @@
 # Configuration for the xfs_quota command
-
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
-
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.programs.xfs_quota;
 
-  limitOptions = opts: concatStringsSep " " [
-    (optionalString (opts.sizeSoftLimit != null) "bsoft=${opts.sizeSoftLimit}")
-    (optionalString (opts.sizeHardLimit != null) "bhard=${opts.sizeHardLimit}")
-  ];
-
-in
-
-{
-
+  limitOptions = opts:
+    concatStringsSep " " [
+      (optionalString (opts.sizeSoftLimit != null) "bsoft=${opts.sizeSoftLimit}")
+      (optionalString (opts.sizeHardLimit != null) "bhard=${opts.sizeHardLimit}")
+    ];
+in {
   ###### interface
 
   options = {
-
     programs.xfs_quota = {
       projects = mkOption {
         default = {};
@@ -69,21 +65,22 @@ in
         };
       };
     };
-
   };
-
 
   ###### implementation
 
   config = mkIf (cfg.projects != {}) {
-
-    environment.etc.projects.source = pkgs.writeText "etc-project"
+    environment.etc.projects.source =
+      pkgs.writeText "etc-project"
       (concatStringsSep "\n" (mapAttrsToList
-        (name: opts: "${toString opts.id}:${opts.path}") cfg.projects));
+        (name: opts: "${toString opts.id}:${opts.path}")
+        cfg.projects));
 
-    environment.etc.projid.source = pkgs.writeText "etc-projid"
+    environment.etc.projid.source =
+      pkgs.writeText "etc-projid"
       (concatStringsSep "\n" (mapAttrsToList
-        (name: opts: "${name}:${toString opts.id}") cfg.projects));
+        (name: opts: "${name}:${toString opts.id}")
+        cfg.projects));
 
     systemd.services = mapAttrs' (name: opts:
       nameValuePair "xfs_quota-${name}" {
@@ -93,18 +90,16 @@ in
           ${pkgs.xfsprogs.bin}/bin/xfs_quota -x -c 'limit -p ${limitOptions opts} ${name}' ${opts.fileSystem}
         '';
 
-        wantedBy = [ "multi-user.target" ];
-        after = [ ((replaceChars [ "/" ] [ "-" ] opts.fileSystem) + ".mount") ];
+        wantedBy = ["multi-user.target"];
+        after = [((replaceChars ["/"] ["-"] opts.fileSystem) + ".mount")];
 
-        restartTriggers = [ config.environment.etc.projects.source ];
+        restartTriggers = [config.environment.etc.projects.source];
 
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
         };
-      }
-    ) cfg.projects;
-
+      })
+    cfg.projects;
   };
-
 }

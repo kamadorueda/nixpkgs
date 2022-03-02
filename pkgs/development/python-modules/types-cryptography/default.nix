@@ -1,10 +1,10 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, types-enum34
-, types-ipaddress
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  types-enum34,
+  types-ipaddress,
 }:
-
 buildPythonPackage rec {
   pname = "types-cryptography";
   version = "3.3.15";
@@ -18,12 +18,12 @@ buildPythonPackage rec {
     "cryptography-stubs"
   ];
 
-  propagatedBuildInputs = [ types-enum34 types-ipaddress ];
+  propagatedBuildInputs = [types-enum34 types-ipaddress];
 
   meta = with lib; {
     description = "Typing stubs for cryptography";
     homepage = "https://github.com/python/typeshed";
     license = licenses.asl20;
-    maintainers = with maintainers; [ jpetrucciani ];
+    maintainers = with maintainers; [jpetrucciani];
   };
 }

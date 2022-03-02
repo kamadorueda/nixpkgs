@@ -1,8 +1,8 @@
-{ lib
-, fetchFromGitHub
-, python3
+{
+  lib,
+  fetchFromGitHub,
+  python3,
 }:
-
 python3.pkgs.buildPythonApplication rec {
   pname = "cfripper";
   version = "1.4.2";
@@ -50,7 +50,7 @@ python3.pkgs.buildPythonApplication rec {
   meta = with lib; {
     description = "Tool for analysing CloudFormation templates";
     homepage = "https://github.com/Skyscanner/cfripper";
-    license = with licenses; [ asl20 ];
-    maintainers = with maintainers; [ fab ];
+    license = with licenses; [asl20];
+    maintainers = with maintainers; [fab];
   };
 }

@@ -1,9 +1,19 @@
-{ lib, ocaml, fetchurl, buildDunePackage
-, pkg-config, which
-, bigarray-compat, eqaf, stdlib-shims
-, alcotest, astring, bos, findlib, fpath
+{
+  lib,
+  ocaml,
+  fetchurl,
+  buildDunePackage,
+  pkg-config,
+  which,
+  bigarray-compat,
+  eqaf,
+  stdlib-shims,
+  alcotest,
+  astring,
+  bos,
+  findlib,
+  fpath,
 }:
-
 buildDunePackage rec {
   pname = "digestif";
   version = "1.1.0";
@@ -15,14 +25,14 @@ buildDunePackage rec {
     sha256 = "01gwkbrznci4xdcbww4ysgsciz2qs0r8jsmhp0siwbcgcrf1jjv5";
   };
 
-  nativeBuildInputs = [ findlib which ];
-  buildInputs = [ ocaml ];
+  nativeBuildInputs = [findlib which];
+  buildInputs = [ocaml];
 
-  propagatedBuildInputs = [ bigarray-compat eqaf stdlib-shims ];
+  propagatedBuildInputs = [bigarray-compat eqaf stdlib-shims];
 
   strictDeps = !doCheck;
 
-  checkInputs = [ alcotest astring bos fpath ];
+  checkInputs = [alcotest astring bos fpath];
   doCheck = lib.versionAtLeast ocaml.version "4.05";
 
   postCheck = ''
@@ -33,6 +43,6 @@ buildDunePackage rec {
     description = "Simple hash algorithms in OCaml";
     homepage = "https://github.com/mirage/digestif";
     license = lib.licenses.mit;
-    maintainers = [ lib.maintainers.vbgl ];
+    maintainers = [lib.maintainers.vbgl];
   };
 }

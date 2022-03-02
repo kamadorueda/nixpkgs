@@ -1,8 +1,10 @@
-{ config, lib, pkgs, ...} :
-
-with lib;
-
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.orangefs.server;
 
   aliases = mapAttrsToList (alias: url: alias) cfg.servers;
@@ -13,42 +15,52 @@ let
   # One range of handles for each meta/data instance
   handleStep = maxHandle / (length aliases) / 2;
 
-  fileSystems = mapAttrsToList (name: fs: ''
-    <FileSystem>
-      Name ${name}
-      ID ${toString fs.id}
-      RootHandle ${toString fs.rootHandle}
+  fileSystems =
+    mapAttrsToList (name: fs: ''
+      <FileSystem>
+        Name ${name}
+        ID ${toString fs.id}
+        RootHandle ${toString fs.rootHandle}
 
-      ${fs.extraConfig}
+        ${fs.extraConfig}
 
-      <MetaHandleRanges>
-      ${concatStringsSep "\n" (
-          imap0 (i: alias:
-            let
-              begin = i * handleStep + 3;
-              end = begin + handleStep - 1;
-            in "Range ${alias} ${toString begin}-${toString end}") aliases
-       )}
-      </MetaHandleRanges>
+        <MetaHandleRanges>
+        ${
+        concatStringsSep "\n" (imap0 (i: alias: let
+          begin = i * handleStep + 3;
+          end = begin + handleStep - 1;
+        in "Range ${alias} ${toString begin}-${toString end}")
+        aliases)
+      }
+        </MetaHandleRanges>
 
-      <DataHandleRanges>
-      ${concatStringsSep "\n" (
-          imap0 (i: alias:
-            let
-              begin = i * handleStep + 3 + (length aliases) * handleStep;
-              end = begin + handleStep - 1;
-            in "Range ${alias} ${toString begin}-${toString end}") aliases
-       )}
-      </DataHandleRanges>
+        <DataHandleRanges>
+        ${
+        concatStringsSep "\n" (imap0 (i: alias: let
+          begin = i * handleStep + 3 + (length aliases) * handleStep;
+          end = begin + handleStep - 1;
+        in "Range ${alias} ${toString begin}-${toString end}")
+        aliases)
+      }
+        </DataHandleRanges>
 
-      <StorageHints>
-      TroveSyncMeta ${if fs.troveSyncMeta then "yes" else "no"}
-      TroveSyncData ${if fs.troveSyncData then "yes" else "no"}
-      ${fs.extraStorageHints}
-      </StorageHints>
+        <StorageHints>
+        TroveSyncMeta ${
+        if fs.troveSyncMeta
+        then "yes"
+        else "no"
+      }
+        TroveSyncData ${
+        if fs.troveSyncData
+        then "yes"
+        else "no"
+      }
+        ${fs.extraStorageHints}
+        </StorageHints>
 
-    </FileSystem>
-  '') cfg.fileSystems;
+      </FileSystem>
+    '')
+    cfg.fileSystems;
 
   configFile = ''
     <Defaults>
@@ -68,7 +80,6 @@ let
 
     ${concatStringsSep "\n" fileSystems}
   '';
-
 in {
   ###### interface
 
@@ -77,7 +88,7 @@ in {
       enable = mkEnableOption "OrangeFS server";
 
       logType = mkOption {
-        type = with types; enum [ "file" "syslog" ];
+        type = with types; enum ["file" "syslog"];
         default = "syslog";
         description = "Destination for log messages.";
       };
@@ -98,8 +109,8 @@ in {
 
       BMIModules = mkOption {
         type = with types; listOf str;
-        default = [ "bmi_tcp" ];
-        example = [ "bmi_tcp" "bmi_ib"];
+        default = ["bmi_tcp"];
+        example = ["bmi_tcp" "bmi_ib"];
         description = "List of BMI modules to load.";
       };
 
@@ -129,7 +140,7 @@ in {
         description = ''
           These options will create the <literal>&lt;FileSystem&gt;</literal> sections of config file.
         '';
-        default = { orangefs = {}; };
+        default = {orangefs = {};};
         example = literalExpression ''
           {
             fs1 = {
@@ -141,45 +152,46 @@ in {
             };
           }
         '';
-        type = with types; attrsOf (submodule ({ ... } : {
-          options = {
-            id = mkOption {
-              type = types.int;
-              default = 1;
-              description = "File system ID (must be unique within configuration).";
-            };
+        type = with types;
+          attrsOf (submodule ({...}: {
+            options = {
+              id = mkOption {
+                type = types.int;
+                default = 1;
+                description = "File system ID (must be unique within configuration).";
+              };
 
-            rootHandle = mkOption {
-              type = types.int;
-              default = 3;
-              description = "File system root ID.";
-            };
+              rootHandle = mkOption {
+                type = types.int;
+                default = 3;
+                description = "File system root ID.";
+              };
 
-            extraConfig = mkOption {
-              type = types.lines;
-              default = "";
-              description = "Extra config for <literal>&lt;FileSystem&gt;</literal> section.";
-            };
+              extraConfig = mkOption {
+                type = types.lines;
+                default = "";
+                description = "Extra config for <literal>&lt;FileSystem&gt;</literal> section.";
+              };
 
-            troveSyncMeta = mkOption {
-              type = types.bool;
-              default = true;
-              description = "Sync meta data.";
-            };
+              troveSyncMeta = mkOption {
+                type = types.bool;
+                default = true;
+                description = "Sync meta data.";
+              };
 
-            troveSyncData = mkOption {
-              type = types.bool;
-              default = false;
-              description = "Sync data.";
-            };
+              troveSyncData = mkOption {
+                type = types.bool;
+                default = false;
+                description = "Sync data.";
+              };
 
-            extraStorageHints = mkOption {
-              type = types.lines;
-              default = "";
-              description = "Extra config for <literal>&lt;StorageHints&gt;</literal> section.";
+              extraStorageHints = mkOption {
+                type = types.lines;
+                default = "";
+                description = "Extra config for <literal>&lt;StorageHints&gt;</literal> section.";
+              };
             };
-          };
-        }));
+          }));
       };
     };
   };
@@ -187,7 +199,7 @@ in {
   ###### implementation
 
   config = mkIf cfg.enable {
-    environment.systemPackages = [ pkgs.orangefs ];
+    environment.systemPackages = [pkgs.orangefs];
 
     # orangefs daemon will run as user
     users.users.orangefs = {
@@ -204,9 +216,9 @@ in {
     };
 
     systemd.services.orangefs-server = {
-      wantedBy = [ "multi-user.target" ];
-      requires = [ "network-online.target" ];
-      after = [ "network-online.target" ];
+      wantedBy = ["multi-user.target"];
+      requires = ["network-online.target"];
+      after = ["network-online.target"];
 
       serviceConfig = {
         # Run as "simple" in forground mode.
@@ -221,5 +233,4 @@ in {
       };
     };
   };
-
 }

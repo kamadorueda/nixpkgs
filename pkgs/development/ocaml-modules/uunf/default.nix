@@ -1,39 +1,47 @@
-{ lib, stdenv, fetchurl, ocaml, findlib, ocamlbuild, topkg, uchar, uutf, cmdliner }:
-let
+{
+  lib,
+  stdenv,
+  fetchurl,
+  ocaml,
+  findlib,
+  ocamlbuild,
+  topkg,
+  uchar,
+  uutf,
+  cmdliner,
+}: let
   pname = "uunf";
   webpage = "https://erratique.ch/software/${pname}";
   version = "14.0.0";
 in
+  if !lib.versionAtLeast ocaml.version "4.03"
+  then throw "${pname} is not available for OCaml ${ocaml.version}"
+  else
+    stdenv.mkDerivation {
+      name = "ocaml${ocaml.version}-${pname}-${version}";
+      inherit version;
 
-if !lib.versionAtLeast ocaml.version "4.03"
-then throw "${pname} is not available for OCaml ${ocaml.version}"
-else
+      src = fetchurl {
+        url = "${webpage}/releases/${pname}-${version}.tbz";
+        sha256 = "sha256:17wv0nm3vvwcbzb1b09akw8jblmigyhbfmh1sy9lkb5756ni94a2";
+      };
 
-stdenv.mkDerivation {
-  name = "ocaml${ocaml.version}-${pname}-${version}";
-  inherit version;
+      nativeBuildInputs = [ocaml findlib ocamlbuild topkg];
+      buildInputs = [topkg uutf cmdliner];
 
-  src = fetchurl {
-    url = "${webpage}/releases/${pname}-${version}.tbz";
-    sha256 = "sha256:17wv0nm3vvwcbzb1b09akw8jblmigyhbfmh1sy9lkb5756ni94a2";
-  };
+      propagatedBuildInputs = [uchar];
 
-  nativeBuildInputs = [ ocaml findlib ocamlbuild topkg ];
-  buildInputs = [ topkg uutf cmdliner ];
+      strictDeps = true;
 
-  propagatedBuildInputs = [ uchar ];
+      prePatch = lib.optionalString stdenv.isAarch64 "ulimit -s 16384";
 
-  strictDeps = true;
+      inherit (topkg) buildPhase installPhase;
 
-  prePatch = lib.optionalString stdenv.isAarch64 "ulimit -s 16384";
-
-  inherit (topkg) buildPhase installPhase;
-
-  meta = with lib; {
-    description = "An OCaml module for normalizing Unicode text";
-    homepage = webpage;
-    inherit (ocaml.meta) platforms;
-    license = licenses.bsd3;
-    maintainers = [ maintainers.vbgl ];
-  };
-}
+      meta = with lib; {
+        description = "An OCaml module for normalizing Unicode text";
+        homepage = webpage;
+        inherit (ocaml.meta) platforms;
+        license = licenses.bsd3;
+        maintainers = [maintainers.vbgl];
+      };
+    }

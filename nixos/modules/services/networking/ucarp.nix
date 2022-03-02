@@ -1,12 +1,13 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.networking.ucarp;
 
-  ucarpExec = concatStringsSep " " (
-    [
+  ucarpExec = concatStringsSep " " ([
       "${cfg.package}/bin/ucarp"
       "--interface=${cfg.interface}"
       "--srcip=${cfg.srcIp}"
@@ -24,8 +25,7 @@ let
     ++ (optional cfg.shutdown "--shutdown")
     ++ (optional cfg.ignoreIfState "--ignoreifstate")
     ++ (optional cfg.noMcast "--nomcast")
-    ++ (optional (cfg.extraParam != null) "--xparam=${cfg.extraParam}")
-  );
+    ++ (optional (cfg.extraParam != null) "--xparam=${cfg.extraParam}"));
 in {
   options.networking.ucarp = {
     enable = mkEnableOption "ucarp, userspace implementation of CARP";
@@ -160,8 +160,8 @@ in {
     systemd.services.ucarp = {
       description = "ucarp, userspace implementation of CARP";
 
-      wantedBy = [ "multi-user.target" ];
-      after = [ "network.target" ];
+      wantedBy = ["multi-user.target"];
+      after = ["network.target"];
 
       serviceConfig = {
         Type = "exec";
@@ -179,5 +179,5 @@ in {
     };
   };
 
-  meta.maintainers = with lib.maintainers; [ oxzi ];
+  meta.maintainers = with lib.maintainers; [oxzi];
 }

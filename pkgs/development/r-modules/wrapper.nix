@@ -1,11 +1,17 @@
-{ symlinkJoin, R, makeWrapper, recommendedPackages, packages }:
+{
+  symlinkJoin,
+  R,
+  makeWrapper,
+  recommendedPackages,
+  packages,
+}:
 symlinkJoin {
   name = R.name + "-wrapper";
   preferLocalBuild = true;
   allowSubstitutes = false;
 
   buildInputs = [R] ++ recommendedPackages ++ packages;
-  paths = [ R ];
+  paths = [R];
 
   nativeBuildInputs = [makeWrapper];
 
@@ -20,9 +26,11 @@ symlinkJoin {
   '';
 
   # Make the list of recommended R packages accessible to other packages such as rpy2
-  passthru = { inherit recommendedPackages; };
+  passthru = {inherit recommendedPackages;};
 
-    meta = R.meta // {
+  meta =
+    R.meta
+    // {
       # To prevent builds on hydra
       hydraPlatforms = [];
       # prefer wrapper over the package

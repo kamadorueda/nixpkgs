@@ -1,25 +1,25 @@
-{ lib
-, stdenv
-, bokeh
-, buildPythonPackage
-, cloudpickle
-, distributed
-, fetchFromGitHub
-, fetchpatch
-, fsspec
-, jinja2
-, numpy
-, packaging
-, pandas
-, partd
-, pytest-rerunfailures
-, pytest-xdist
-, pytestCheckHook
-, pythonOlder
-, pyyaml
-, toolz
+{
+  lib,
+  stdenv,
+  bokeh,
+  buildPythonPackage,
+  cloudpickle,
+  distributed,
+  fetchFromGitHub,
+  fetchpatch,
+  fsspec,
+  jinja2,
+  numpy,
+  packaging,
+  pandas,
+  partd,
+  pytest-rerunfailures,
+  pytest-xdist,
+  pytestCheckHook,
+  pythonOlder,
+  pyyaml,
+  toolz,
 }:
-
 buildPythonPackage rec {
   pname = "dask";
   version = "2022.02.0";
@@ -75,17 +75,19 @@ buildPythonPackage rec {
     "-m 'not network'"
   ];
 
-  disabledTests = lib.optionals stdenv.isDarwin [
-    # this test requires features of python3Packages.psutil that are
-    # blocked in sandboxed-builds
-    "test_auto_blocksize_csv"
-  ] ++ [
-    # A deprecation warning from newer sqlalchemy versions makes these tests
-    # to fail https://github.com/dask/dask/issues/7406
-    "test_sql"
-    # Test interrupt fails intermittently https://github.com/dask/dask/issues/2192
-    "test_interrupt"
-  ];
+  disabledTests =
+    lib.optionals stdenv.isDarwin [
+      # this test requires features of python3Packages.psutil that are
+      # blocked in sandboxed-builds
+      "test_auto_blocksize_csv"
+    ]
+    ++ [
+      # A deprecation warning from newer sqlalchemy versions makes these tests
+      # to fail https://github.com/dask/dask/issues/7406
+      "test_sql"
+      # Test interrupt fails intermittently https://github.com/dask/dask/issues/2192
+      "test_interrupt"
+    ];
 
   __darwinAllowLocalNetworking = true;
 
@@ -101,7 +103,7 @@ buildPythonPackage rec {
   ];
 
   passthru.extras-require = {
-    complete = [ distributed ];
+    complete = [distributed];
   };
 
   meta = with lib; {
@@ -109,6 +111,6 @@ buildPythonPackage rec {
     homepage = "https://dask.org/";
     changelog = "https://docs.dask.org/en/latest/changelog.html";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ fridh ];
+    maintainers = with maintainers; [fridh];
   };
 }

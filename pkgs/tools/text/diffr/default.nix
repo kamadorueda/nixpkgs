@@ -1,5 +1,10 @@
-{ lib, stdenv, fetchFromGitHub, rustPlatform, Security }:
-
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  rustPlatform,
+  Security,
+}:
 rustPlatform.buildRustPackage rec {
   pname = "diffr";
   version = "0.1.4";
@@ -13,7 +18,7 @@ rustPlatform.buildRustPackage rec {
 
   cargoSha256 = "05rfjangmyvmqm0bvl4bcvc7m4zhg66gknh85sxr3bzrlwzacwgw";
 
-  buildInputs = (lib.optional stdenv.isDarwin Security);
+  buildInputs = lib.optional stdenv.isDarwin Security;
 
   preCheck = ''
     export DIFFR_TESTS_BINARY_PATH=$releaseDir/diffr
@@ -22,7 +27,7 @@ rustPlatform.buildRustPackage rec {
   meta = with lib; {
     description = "Yet another diff highlighting tool";
     homepage = "https://github.com/mookid/diffr";
-    license = with licenses; [ mit ];
-    maintainers = with maintainers; [ davidtwco ];
+    license = with licenses; [mit];
+    maintainers = with maintainers; [davidtwco];
   };
 }

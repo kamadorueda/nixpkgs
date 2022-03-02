@@ -1,10 +1,9 @@
-{ lib
-, callPackage
-, boost-build
-, fetchurl
-}:
-
-let
+{
+  lib,
+  callPackage,
+  boost-build,
+  fetchurl,
+}: let
   # for boost 1.55 we need to use 1.56's b2
   # since 1.55's build system is not working
   # with our derivation
@@ -27,8 +26,7 @@ let
             then self
             else useBoost156; # see above
         };
-      }
-    );
+      });
 in {
   boost155 = makeBoost ./1.55.nix;
   boost159 = makeBoost ./1.59.nix;

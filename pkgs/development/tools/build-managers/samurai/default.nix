@@ -1,5 +1,9 @@
-{ lib, stdenv, fetchFromGitHub, fetchpatch }:
-
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  fetchpatch,
+}:
 stdenv.mkDerivation rec {
   pname = "samurai";
   version = "1.2";
@@ -11,7 +15,7 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-RPY3MFlnSDBZ5LOkdWnMiR/CZIBdqIFo9uLU+SAKPBI=";
   };
 
-  makeFlags = [ "DESTDIR=" "PREFIX=${placeholder "out"}" ];
+  makeFlags = ["DESTDIR=" "PREFIX=${placeholder "out"}"];
 
   patches = [
     (fetchpatch {
@@ -29,8 +33,7 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     description = "ninja-compatible build tool written in C";
     homepage = "https://github.com/michaelforney/samurai";
-    license = with licenses; [ mit asl20 ]; # see LICENSE
-    maintainers = with maintainers; [ dtzWill ];
+    license = with licenses; [mit asl20]; # see LICENSE
+    maintainers = with maintainers; [dtzWill];
   };
 }
-

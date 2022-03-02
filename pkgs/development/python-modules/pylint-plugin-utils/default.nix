@@ -1,13 +1,12 @@
-{ buildPythonPackage
-, fetchFromGitHub
-, isPy3k
-, lib
-
-# pythonPackages
-, pylint
-, toml
+{
+  buildPythonPackage,
+  fetchFromGitHub,
+  isPy3k,
+  lib,
+  # pythonPackages
+  pylint,
+  toml,
 }:
-
 buildPythonPackage rec {
   pname = "pylint-plugin-utils";
   version = "0.6";
@@ -21,7 +20,8 @@ buildPythonPackage rec {
   };
 
   propagatedBuildInputs = [
-    pylint toml
+    pylint
+    toml
   ];
 
   checkPhase = ''

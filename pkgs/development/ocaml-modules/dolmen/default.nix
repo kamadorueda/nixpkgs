@@ -1,8 +1,11 @@
-{ lib, fetchurl, buildDunePackage
-, menhir, menhirLib
-, fmt
+{
+  lib,
+  fetchurl,
+  buildDunePackage,
+  menhir,
+  menhirLib,
+  fmt,
 }:
-
 buildDunePackage rec {
   pname = "dolmen";
   version = "0.6";
@@ -18,8 +21,8 @@ buildDunePackage rec {
 
   strictDeps = true;
 
-  nativeBuildInputs = [ menhir ];
-  propagatedBuildInputs = [ menhirLib fmt ];
+  nativeBuildInputs = [menhir];
+  propagatedBuildInputs = [menhirLib fmt];
 
   # Testr are not compatible with menhir 20211128
   doCheck = false;
@@ -27,7 +30,7 @@ buildDunePackage rec {
   meta = {
     description = "An OCaml library providing clean and flexible parsers for input languages";
     license = lib.licenses.bsd2;
-    maintainers = [ lib.maintainers.vbgl ];
+    maintainers = [lib.maintainers.vbgl];
     homepage = "https://github.com/Gbury/dolmen";
   };
 }

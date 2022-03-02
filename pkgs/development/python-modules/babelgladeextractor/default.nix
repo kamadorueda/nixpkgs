@@ -1,14 +1,14 @@
-{ lib
-, isPy3k
-, buildPythonPackage
-, fetchPypi
-, Babel
+{
+  lib,
+  isPy3k,
+  buildPythonPackage,
+  fetchPypi,
+  Babel,
 }:
-
 buildPythonPackage rec {
   pname = "babelgladeextractor";
   version = "0.7.0";
-  disabled = (!isPy3k); # uses python3 specific file io in setup.py
+  disabled = !isPy3k; # uses python3 specific file io in setup.py
 
   src = fetchPypi {
     pname = "BabelGladeExtractor";
@@ -28,6 +28,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/gnome-keysign/babel-glade";
     description = "Babel Glade XML files translatable strings extractor";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ jtojnar ];
+    maintainers = with maintainers; [jtojnar];
   };
 }

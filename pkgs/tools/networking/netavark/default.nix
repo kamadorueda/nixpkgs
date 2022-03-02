@@ -1,10 +1,10 @@
-{ lib
-, rustPlatform
-, fetchFromGitHub
-, installShellFiles
-, mandown
+{
+  lib,
+  rustPlatform,
+  fetchFromGitHub,
+  installShellFiles,
+  mandown,
 }:
-
 rustPlatform.buildRustPackage rec {
   pname = "netavark";
   version = "1.0.1";
@@ -31,7 +31,7 @@ rustPlatform.buildRustPackage rec {
       VERGEN_RUSTC_HOST_TRIPLE=""
   '';
 
-  nativeBuildInputs = [ installShellFiles mandown ];
+  nativeBuildInputs = [installShellFiles mandown];
 
   postBuild = ''
     make -C docs
@@ -42,7 +42,7 @@ rustPlatform.buildRustPackage rec {
     description = "Rust based network stack for containers";
     homepage = "https://github.com/containers/netavark";
     license = licenses.asl20;
-    maintainers = with maintainers; [ ] ++ teams.podman.members;
+    maintainers = with maintainers; [] ++ teams.podman.members;
     platforms = platforms.linux;
   };
 }

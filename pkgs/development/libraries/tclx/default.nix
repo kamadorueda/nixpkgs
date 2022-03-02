@@ -1,5 +1,8 @@
-{ lib, fetchurl, tcl }:
-
+{
+  lib,
+  fetchurl,
+  tcl,
+}:
 tcl.mkTclDerivation rec {
   pname = "tclx";
   version = "8.4.1";
@@ -20,6 +23,6 @@ tcl.mkTclDerivation rec {
     homepage = "http://tclx.sourceforge.net/";
     description = "Tcl extensions";
     license = lib.licenses.tcltk;
-    maintainers = with lib.maintainers; [ kovirobi ];
+    maintainers = with lib.maintainers; [kovirobi];
   };
 }

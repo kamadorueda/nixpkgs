@@ -1,5 +1,8 @@
-{ lib, rustPlatform, fetchFromGitHub }:
-
+{
+  lib,
+  rustPlatform,
+  fetchFromGitHub,
+}:
 rustPlatform.buildRustPackage rec {
   pname = "grcov";
   version = "0.8.7";
@@ -26,13 +29,13 @@ rustPlatform.buildRustPackage rec {
       "test_integration_zip_zip"
     ];
     skipFlag = test: "--skip " + test;
-  in builtins.concatStringsSep " " (builtins.map skipFlag skipList);
+  in
+    builtins.concatStringsSep " " (builtins.map skipFlag skipList);
 
   meta = with lib; {
-    description =
-      "Rust tool to collect and aggregate code coverage data for multiple source files";
+    description = "Rust tool to collect and aggregate code coverage data for multiple source files";
     homepage = "https://github.com/mozilla/grcov";
     license = licenses.mpl20;
-    maintainers = with maintainers; [ DieracDelta ];
+    maintainers = with maintainers; [DieracDelta];
   };
 }

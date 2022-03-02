@@ -1,5 +1,10 @@
-{ lib, stdenv, fetchurl, libffi, coreutils }:
-
+{
+  lib,
+  stdenv,
+  fetchurl,
+  libffi,
+  coreutils,
+}:
 stdenv.mkDerivation rec {
   pname = "txr";
   version = "274";
@@ -9,7 +14,7 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-bWgz0kmPLN0V0rkFRiCqxkBjhN8FV9fL+Vu8GSw9Ja4=";
   };
 
-  buildInputs = [ libffi ];
+  buildInputs = [libffi];
 
   enableParallelBuilding = true;
 
@@ -43,7 +48,7 @@ stdenv.mkDerivation rec {
     description = "Programming language for convenient data munging";
     license = licenses.bsd2;
     homepage = "http://nongnu.org/txr";
-    maintainers = with lib.maintainers; [ dtzWill ];
+    maintainers = with lib.maintainers; [dtzWill];
     platforms = platforms.linux; # Darwin fails although it should work AFAIK
   };
 }

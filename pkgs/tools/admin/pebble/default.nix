@@ -1,9 +1,9 @@
-{ buildGoPackage
-, fetchFromGitHub
-, lib
-, nixosTests
+{
+  buildGoPackage,
+  fetchFromGitHub,
+  lib,
+  nixosTests,
 }:
-
 buildGoPackage rec {
   pname = "pebble";
   version = "2.3.0";
@@ -24,7 +24,7 @@ buildGoPackage rec {
   meta = {
     homepage = "https://github.com/letsencrypt/pebble";
     description = "A miniature version of Boulder, Pebble is a small RFC 8555 ACME test server not suited for a production CA";
-    license = [ lib.licenses.mpl20 ];
+    license = [lib.licenses.mpl20];
     maintainers = lib.teams.acme.members;
   };
 }

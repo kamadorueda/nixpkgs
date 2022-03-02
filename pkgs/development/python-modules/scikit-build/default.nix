@@ -1,28 +1,28 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, distro
-, packaging
-, setuptools
-, wheel
-# Test Inputs
-, cmake
-, codecov
-, coverage
-, cython
-, flake8
-, ninja
-, pathpy
-, pytest
-, pytest-cov
-, pytest-mock
-, pytest-runner
-, pytest-virtualenv
-, requests
-, six
-, virtualenv
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  distro,
+  packaging,
+  setuptools,
+  wheel,
+  # Test Inputs
+  cmake,
+  codecov,
+  coverage,
+  cython,
+  flake8,
+  ninja,
+  pathpy,
+  pytest,
+  pytest-cov,
+  pytest-mock,
+  pytest-runner,
+  pytest-virtualenv,
+  requests,
+  six,
+  virtualenv,
 }:
-
 buildPythonPackage rec {
   pname = "scikit-build";
   version = "0.12.0";
@@ -58,7 +58,7 @@ buildPythonPackage rec {
 
   dontUseCmakeConfigure = true;
 
-  disabledTests = lib.concatMapStringsSep " and " (s: "not " + s) ([
+  disabledTests = lib.concatMapStringsSep " and " (s: "not " + s) [
     "test_hello_develop" # tries setuptools develop install
     "test_source_distribution" # pip has no way to install missing dependencies
     "test_wheel" # pip has no way to install missing dependencies
@@ -66,7 +66,7 @@ buildPythonPackage rec {
     "test_install_command" # tries to alter out path
     "test_test_command" # tries to alter out path
     "test_setup" # tries to install using distutils
-  ]);
+  ];
 
   checkPhase = ''
     py.test -k '${disabledTests}'
@@ -75,7 +75,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Improved build system generator for CPython C/C++/Fortran/Cython extensions";
     homepage = "http://scikit-build.org/";
-    license = with licenses; [ mit bsd2 ]; # BSD due to reuses of PyNE code
-    maintainers = with maintainers; [ FlorianFranzen ];
+    license = with licenses; [mit bsd2]; # BSD due to reuses of PyNE code
+    maintainers = with maintainers; [FlorianFranzen];
   };
 }

@@ -1,12 +1,12 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, httpx
-, pydantic
-, pytestCheckHook
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  httpx,
+  pydantic,
+  pytestCheckHook,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "pycfmodel";
   version = "0.17.0";
@@ -47,6 +47,6 @@ buildPythonPackage rec {
     description = "Model for Cloud Formation scripts";
     homepage = "https://github.com/Skyscanner/pycfmodel";
     license = licenses.asl20;
-    maintainers = with maintainers; [ fab ];
+    maintainers = with maintainers; [fab];
   };
 }

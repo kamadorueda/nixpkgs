@@ -1,18 +1,18 @@
-{ lib
-, arrow
-, buildPythonPackage
-, fetchPypi
-, importlib-metadata
-, logfury
-, pytestCheckHook
-, pytest-lazy-fixture
-, pytest-mock
-, pythonOlder
-, requests
-, setuptools-scm
-, tqdm
+{
+  lib,
+  arrow,
+  buildPythonPackage,
+  fetchPypi,
+  importlib-metadata,
+  logfury,
+  pytestCheckHook,
+  pytest-lazy-fixture,
+  pytest-mock,
+  pythonOlder,
+  requests,
+  setuptools-scm,
+  tqdm,
 }:
-
 buildPythonPackage rec {
   pname = "b2sdk";
   version = "1.14.1";
@@ -29,14 +29,16 @@ buildPythonPackage rec {
     setuptools-scm
   ];
 
-  propagatedBuildInputs = [
-    arrow
-    logfury
-    requests
-    tqdm
-  ] ++ lib.optionals (pythonOlder "3.8") [
-    importlib-metadata
-  ];
+  propagatedBuildInputs =
+    [
+      arrow
+      logfury
+      requests
+      tqdm
+    ]
+    ++ lib.optionals (pythonOlder "3.8") [
+      importlib-metadata
+    ];
 
   checkInputs = [
     pytestCheckHook
@@ -66,6 +68,6 @@ buildPythonPackage rec {
     description = "Client library and utilities for access to B2 Cloud Storage (backblaze)";
     homepage = "https://github.com/Backblaze/b2-sdk-python";
     license = licenses.mit;
-    maintainers = with maintainers; [ ];
+    maintainers = with maintainers; [];
   };
 }

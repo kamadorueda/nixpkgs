@@ -1,14 +1,14 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, poetry-core
-, passlib
-, dnspython
-, loguru
-, toml
-, pytestCheckHook
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  poetry-core,
+  passlib,
+  dnspython,
+  loguru,
+  toml,
+  pytestCheckHook,
 }:
-
 buildPythonPackage rec {
   pname = "ciscoconfparse";
   version = "1.6.36";
@@ -48,13 +48,12 @@ buildPythonPackage rec {
     "test_reverse_dns_lookup"
   ];
 
-  pythonImportsCheck = [ "ciscoconfparse" ];
+  pythonImportsCheck = ["ciscoconfparse"];
 
   meta = with lib; {
-    description =
-      "Parse, Audit, Query, Build, and Modify Cisco IOS-style configurations";
+    description = "Parse, Audit, Query, Build, and Modify Cisco IOS-style configurations";
     homepage = "https://github.com/mpenning/ciscoconfparse";
     license = licenses.gpl3Only;
-    maintainers = [ maintainers.astro ];
+    maintainers = [maintainers.astro];
   };
 }

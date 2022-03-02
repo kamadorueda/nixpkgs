@@ -1,9 +1,10 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
-
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.rstudio-server;
 
   rserver-conf = builtins.toFile "rserver.conf" ''
@@ -15,10 +16,8 @@ let
   rsession-conf = builtins.toFile "rsession.conf" ''
     ${cfg.rsessionExtraConfig}
   '';
-
-in
-{
-  meta.maintainers = with maintainers; [ jbedo cfhammill ];
+in {
+  meta.maintainers = with maintainers; [jbedo cfhammill];
 
   options.services.rstudio-server = {
     enable = mkEnableOption "RStudio server";
@@ -64,17 +63,17 @@ in
         Extra contents for resssion.conf.
       '';
     };
-
   };
 
-  config = mkIf cfg.enable
+  config =
+    mkIf cfg.enable
     {
       systemd.services.rstudio-server = {
         description = "Rstudio server";
 
-        after = [ "network.target" ];
-        wantedBy = [ "multi-user.target" ];
-        restartTriggers = [ rserver-conf rsession-conf ];
+        after = ["network.target"];
+        wantedBy = ["multi-user.target"];
+        restartTriggers = [rserver-conf rsession-conf];
 
         serviceConfig = {
           Restart = "on-failure";
@@ -90,7 +89,7 @@ in
         "rstudio/rsession.conf".source = rsession-conf;
         "pam.d/rstudio".source = "/etc/pam.d/login";
       };
-      environment.systemPackages = [ cfg.package ];
+      environment.systemPackages = [cfg.package];
 
       users = {
         users.rstudio-server = {
@@ -102,6 +101,5 @@ in
           gid = config.ids.gids.rstudio-server;
         };
       };
-
     };
 }

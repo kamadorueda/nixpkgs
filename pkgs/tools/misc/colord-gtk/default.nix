@@ -1,29 +1,29 @@
-{ lib
-, stdenv
-, fetchurl
-, colord
-, gettext
-, meson
-, ninja
-, gobject-introspection
-, gtk-doc
-, docbook-xsl-ns
-, docbook-xsl-nons
-, docbook_xml_dtd_412
-, libxslt
-, glib
-, withGtk4 ? false
-, gtk3
-, gtk4
-, pkg-config
-, lcms2
+{
+  lib,
+  stdenv,
+  fetchurl,
+  colord,
+  gettext,
+  meson,
+  ninja,
+  gobject-introspection,
+  gtk-doc,
+  docbook-xsl-ns,
+  docbook-xsl-nons,
+  docbook_xml_dtd_412,
+  libxslt,
+  glib,
+  withGtk4 ? false,
+  gtk3,
+  gtk4,
+  pkg-config,
+  lcms2,
 }:
-
 stdenv.mkDerivation rec {
   pname = "colord-gtk";
   version = "0.3.0";
 
-  outputs = [ "out" "dev" "devdoc" ];
+  outputs = ["out" "dev" "devdoc"];
 
   src = fetchurl {
     url = "https://www.freedesktop.org/software/colord/releases/${pname}-${version}.tar.xz";
@@ -48,13 +48,19 @@ stdenv.mkDerivation rec {
     lcms2
   ];
 
-  propagatedBuildInputs = [
-    colord
-  ] ++ (if withGtk4 then [
-    gtk4
-  ] else [
-    gtk3
-  ]);
+  propagatedBuildInputs =
+    [
+      colord
+    ]
+    ++ (
+      if withGtk4
+      then [
+        gtk4
+      ]
+      else [
+        gtk3
+      ]
+    );
 
   mesonFlags = [
     "-Dgtk4=${lib.boolToString withGtk4}"

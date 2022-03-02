@@ -1,15 +1,15 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, google-api-core
-, libcst
-, mock
-, proto-plus
-, pytestCheckHook
-, pytest-asyncio
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  google-api-core,
+  libcst,
+  mock,
+  proto-plus,
+  pytestCheckHook,
+  pytest-asyncio,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "google-cloud-redis";
   version = "2.7.0";
@@ -44,6 +44,6 @@ buildPythonPackage rec {
     description = "Google Cloud Memorystore for Redis API client library";
     homepage = "https://github.com/googleapis/python-redis";
     license = licenses.asl20;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [SuperSandro2000];
   };
 }

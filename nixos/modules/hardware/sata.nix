@@ -1,5 +1,9 @@
-{ config, lib, pkgs, ... }:
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
   inherit (lib) mkEnableOption mkIf mkOption types;
 
   cfg = config.hardware.sata.timeout;
@@ -13,27 +17,22 @@ let
       ''ENV{SYSTEMD_WANTS}="${unitName d}"''
     ];
 
-  devicePath = device:
-    "/dev/disk/by-${device.idBy}/${device.name}";
+  devicePath = device: "/dev/disk/by-${device.idBy}/${device.name}";
 
-  unitName = device:
-    "sata-timeout-${lib.strings.sanitizeDerivationName device.name}";
+  unitName = device: "sata-timeout-${lib.strings.sanitizeDerivationName device.name}";
 
-  startScript =
-    pkgs.writeShellScript "sata-timeout.sh" ''
-      set -eEuo pipefail
+  startScript = pkgs.writeShellScript "sata-timeout.sh" ''
+    set -eEuo pipefail
 
-      device="$1"
+    device="$1"
 
-      ${pkgs.smartmontools}/bin/smartctl \
-        -l scterc,${toString cfg.deciSeconds},${toString cfg.deciSeconds} \
-        --quietmode errorsonly \
-        "$device"
-    '';
-
-in
-{
-  meta.maintainers = with lib.maintainers; [ peterhoeg ];
+    ${pkgs.smartmontools}/bin/smartctl \
+      -l scterc,${toString cfg.deciSeconds},${toString cfg.deciSeconds} \
+      --quietmode errorsonly \
+      "$device"
+  '';
+in {
+  meta.maintainers = with lib.maintainers; [peterhoeg];
 
   options.hardware.sata.timeout = {
     enable = mkEnableOption "SATA drive timeouts";
@@ -54,7 +53,8 @@ in
 
     drives = mkOption {
       description = "List of drives for which to configure the timeout.";
-      type = types.listOf
+      type =
+        types.listOf
         (types.submodule {
           options = {
             name = mkOption {
@@ -64,7 +64,7 @@ in
 
             idBy = mkOption {
               description = "The method to identify the drive.";
-              type = types.enum [ "path" "wwn" ];
+              type = types.enum ["path" "wwn"];
               default = "path";
             };
           };
@@ -79,7 +79,7 @@ in
       (e:
         lib.nameValuePair (unitName e) {
           description = "SATA timeout for ${e.name}";
-          wantedBy = [ "sata-timeout.target" ];
+          wantedBy = ["sata-timeout.target"];
           serviceConfig = {
             Type = "oneshot";
             ExecStart = "${startScript} '${devicePath e}'";
@@ -88,13 +88,12 @@ in
             ProtectHome = "tmpfs";
             ProtectSystem = "strict";
           };
-        }
-      )
+        })
       cfg.drives);
 
     systemd.targets.sata-timeout = {
       description = "SATA timeout";
-      wantedBy = [ "multi-user.target" ];
+      wantedBy = ["multi-user.target"];
     };
   };
 }

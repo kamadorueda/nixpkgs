@@ -1,11 +1,15 @@
-{ config, lib, pkgs, ... }:
-with lib;
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.hardware.printers;
-  ppdOptionsString = options: optionalString (options != {})
+  ppdOptionsString = options:
+    optionalString (options != {})
     (concatStringsSep " "
-      (mapAttrsToList (name: value: "-o '${name}'='${value}'") options)
-    );
+      (mapAttrsToList (name: value: "-o '${name}'='${value}'") options));
   ensurePrinter = p: ''
     ${pkgs.cups}/bin/lpadmin -p '${p.name}' -E \
       ${optionalString (p.location != null) "-L '${p.location}'"} \
@@ -20,10 +24,9 @@ let
 
   # "graph but not # or /" can't be implemented as regex alone due to missing lookahead support
   noInvalidChars = str: all (c: c != "#" && c != "/") (stringToCharacters str);
-  printerName = (types.addCheck (types.strMatching "[[:graph:]]+") noInvalidChars)
-    // { description = "printable string without spaces, # and /"; };
-
-
+  printerName =
+    (types.addCheck (types.strMatching "[[:graph:]]+") noInvalidChars)
+    // {description = "printable string without spaces, # and /";};
 in {
   options = {
     hardware.printers = {
@@ -111,19 +114,23 @@ in {
 
   config = mkIf (cfg.ensurePrinters != [] && config.services.printing.enable) {
     systemd.services.ensure-printers = let
-      cupsUnit = if config.services.printing.startWhenNeeded then "cups.socket" else "cups.service";
+      cupsUnit =
+        if config.services.printing.startWhenNeeded
+        then "cups.socket"
+        else "cups.service";
     in {
       description = "Ensure NixOS-configured CUPS printers";
-      wantedBy = [ "multi-user.target" ];
-      requires = [ cupsUnit ];
-      after = [ cupsUnit ];
+      wantedBy = ["multi-user.target"];
+      requires = [cupsUnit];
+      after = [cupsUnit];
 
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
       };
 
-      script = concatMapStringsSep "\n" ensurePrinter cfg.ensurePrinters
+      script =
+        concatMapStringsSep "\n" ensurePrinter cfg.ensurePrinters
         + optionalString (cfg.ensureDefaultPrinter != null) (ensureDefaultPrinter cfg.ensureDefaultPrinter);
     };
   };

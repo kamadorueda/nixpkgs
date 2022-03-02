@@ -1,5 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
-
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 buildGoModule rec {
   pname = "pcstat";
   version = "0.0.1";
@@ -17,6 +20,6 @@ buildGoModule rec {
     description = "Page Cache stat: get page cache stats for files on Linux";
     homepage = "https://github.com/tobert/pcstat";
     license = licenses.asl20;
-    maintainers = with maintainers; [ aminechikhaoui ];
+    maintainers = with maintainers; [aminechikhaoui];
   };
 }

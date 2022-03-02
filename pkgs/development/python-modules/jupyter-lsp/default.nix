@@ -1,10 +1,10 @@
-{ stdenv
-, lib
-, buildPythonPackage
-, fetchPypi
-, jupyter_server
+{
+  stdenv,
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  jupyter_server,
 }:
-
 buildPythonPackage rec {
   pname = "jupyter-lsp";
   version = "1.5.1";
@@ -19,14 +19,13 @@ buildPythonPackage rec {
   ];
   # tests require network
   doCheck = false;
-  pythonImportsCheck = [ "jupyter_lsp" ];
+  pythonImportsCheck = ["jupyter_lsp"];
 
   meta = with lib; {
     description = "Multi-Language Server WebSocket proxy for your Jupyter notebook or lab server";
     homepage = "https://pypi.org/project/jupyter-lsp";
     license = licenses.bsd3;
     platforms = platforms.all;
-    maintainers = with maintainers; [ doronbehar ];
+    maintainers = with maintainers; [doronbehar];
   };
 }
-

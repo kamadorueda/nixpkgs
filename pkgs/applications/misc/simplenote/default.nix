@@ -1,16 +1,15 @@
-{ atomEnv
-, autoPatchelfHook
-, dpkg
-, fetchurl
-, makeDesktopItem
-, makeWrapper
-, lib
-, stdenv
-, udev
-, wrapGAppsHook
-}:
-
-let
+{
+  atomEnv,
+  autoPatchelfHook,
+  dpkg,
+  fetchurl,
+  makeDesktopItem,
+  makeWrapper,
+  lib,
+  stdenv,
+  udev,
+  wrapGAppsHook,
+}: let
   inherit (stdenv.hostPlatform) system;
 
   throwSystem = throw "Unsupported system: ${system}";
@@ -19,9 +18,12 @@ let
 
   version = "2.9.0";
 
-  sha256 = {
-    x86_64-linux = "sha256-uwd9fYqZepJ/BBttprqkJhswqMepGsHDTd5Md9gjI68=";
-  }.${system} or throwSystem;
+  sha256 =
+    {
+      x86_64-linux = "sha256-uwd9fYqZepJ/BBttprqkJhswqMepGsHDTd5Md9gjI68=";
+    }
+    .${system}
+    or throwSystem;
 
   meta = with lib; {
     description = "The simplest way to keep notes";
@@ -46,7 +48,7 @@ let
     };
 
     desktopItem = makeDesktopItem {
-      categories = [ "Development" ];
+      categories = ["Development"];
       comment = "Simplenote for Linux";
       desktopName = "Simplenote";
       exec = "simplenote %U";
@@ -87,10 +89,9 @@ let
 
     postFixup = ''
       makeWrapper $out/opt/Simplenote/simplenote $out/bin/simplenote \
-        --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [ stdenv.cc.cc ] }" \
+        --prefix LD_LIBRARY_PATH : "${lib.makeLibraryPath [stdenv.cc.cc]}" \
         "''${gappsWrapperArgs[@]}"
     '';
   };
-
 in
-linux
+  linux

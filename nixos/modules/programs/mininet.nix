@@ -1,20 +1,27 @@
 # Global configuration for mininet
 # kernel must have NETNS/VETH/SCHED
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
+  cfg = config.programs.mininet;
 
-with lib;
+  generatedPath = with pkgs;
+    makeSearchPath "bin" [
+      iperf
+      ethtool
+      iproute2
+      socat
+    ];
 
-let
-  cfg  = config.programs.mininet;
+  pyEnv = pkgs.python.withPackages (ps: [ps.mininet-python]);
 
-  generatedPath = with pkgs; makeSearchPath "bin"  [
-    iperf ethtool iproute2 socat
-  ];
-
-  pyEnv = pkgs.python.withPackages(ps: [ ps.mininet-python ]);
-
-  mnexecWrapped = pkgs.runCommand "mnexec-wrapper"
-    { buildInputs = [ pkgs.makeWrapper pkgs.pythonPackages.wrapPython ]; }
+  mnexecWrapped =
+    pkgs.runCommand "mnexec-wrapper"
+    {buildInputs = [pkgs.makeWrapper pkgs.pythonPackages.wrapPython];}
     ''
       makeWrapper ${pkgs.mininet}/bin/mnexec \
         $out/bin/mnexec \
@@ -26,14 +33,12 @@ let
       # pkgs.telnet brings an undesired ifconfig into PATH see #43105
       ln -s ${pkgs.telnet}/bin/telnet $out/bin/telnet
     '';
-in
-{
+in {
   options.programs.mininet.enable = mkEnableOption "Mininet";
 
   config = mkIf cfg.enable {
-
     virtualisation.vswitch.enable = true;
 
-    environment.systemPackages = [ mnexecWrapped ];
+    environment.systemPackages = [mnexecWrapped];
   };
 }

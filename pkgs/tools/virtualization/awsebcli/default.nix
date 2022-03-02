@@ -1,24 +1,35 @@
-{ lib, python3, glibcLocales, docker-compose }:
-let
-  docker_compose = changeVersion (with localPython.pkgs; docker-compose.override {
-    inherit colorama pyyaml six dockerpty docker jsonschema requests websocket-client paramiko;
-  }).overridePythonAttrs "1.25.5" "1ijhg93zs3lswkljnm0rhww7gdy0g94psvsya2741prz2zcbcbks";
+{
+  lib,
+  python3,
+  glibcLocales,
+  docker-compose,
+}: let
+  docker_compose =
+    changeVersion
+    (with localPython.pkgs;
+      docker-compose.override {
+        inherit colorama pyyaml six dockerpty docker jsonschema requests websocket-client paramiko;
+      })
+    .overridePythonAttrs "1.25.5" "1ijhg93zs3lswkljnm0rhww7gdy0g94psvsya2741prz2zcbcbks";
 
-  changeVersion = overrideFunc: version: sha256: overrideFunc (oldAttrs: rec {
-    inherit version;
-    src = oldAttrs.src.override {
-      inherit version sha256;
-    };
-  });
+  changeVersion = overrideFunc: version: sha256:
+    overrideFunc (oldAttrs: rec {
+      inherit version;
+      src = oldAttrs.src.override {
+        inherit version sha256;
+      };
+    });
 
-  changeVersionHash = overrideFunc: version: hash: overrideFunc (oldAttrs: rec {
-    inherit version;
-    src = oldAttrs.src.override {
-      inherit version hash;
-    };
-  });
+  changeVersionHash = overrideFunc: version: hash:
+    overrideFunc (oldAttrs: rec {
+      inherit version;
+      src = oldAttrs.src.override {
+        inherit version hash;
+      };
+    });
 
-  localPython = python3.override
+  localPython =
+    python3.override
     {
       self = localPython;
       packageOverrides = self: super: {
@@ -45,54 +56,55 @@ let
       };
     };
 in
-with localPython.pkgs; buildPythonApplication rec {
-  pname = "awsebcli";
-  version = "3.20.3";
+  with localPython.pkgs;
+    buildPythonApplication rec {
+      pname = "awsebcli";
+      version = "3.20.3";
 
-  src = fetchPypi {
-    inherit pname version;
-    sha256 = "sha256-W3nUXPAXoicDQNXigktR1+b/9W6qvi90fujrXAekxTU=";
-  };
+      src = fetchPypi {
+        inherit pname version;
+        sha256 = "sha256-W3nUXPAXoicDQNXigktR1+b/9W6qvi90fujrXAekxTU=";
+      };
 
-  buildInputs = [
-    glibcLocales
-  ];
+      buildInputs = [
+        glibcLocales
+      ];
 
-  LC_ALL = "en_US.UTF-8";
+      LC_ALL = "en_US.UTF-8";
 
-  checkInputs = [
-    pytest
-    mock
-    nose
-    pathspec
-    colorama
-    requests
-    docutils
-  ];
+      checkInputs = [
+        pytest
+        mock
+        nose
+        pathspec
+        colorama
+        requests
+        docutils
+      ];
 
-  doCheck = true;
+      doCheck = true;
 
-  propagatedBuildInputs = [
-    blessed
-    botocore
-    cement
-    colorama
-    pathspec
-    pyyaml
-    future
-    requests
-    semantic-version
-    setuptools
-    tabulate
-    termcolor
-    websocket-client
-    docker_compose
-  ];
+      propagatedBuildInputs = [
+        blessed
+        botocore
+        cement
+        colorama
+        pathspec
+        pyyaml
+        future
+        requests
+        semantic-version
+        setuptools
+        tabulate
+        termcolor
+        websocket-client
+        docker_compose
+      ];
 
-  meta = with lib; {
-    homepage = "https://aws.amazon.com/elasticbeanstalk/";
-    description = "A command line interface for Elastic Beanstalk";
-    maintainers = with maintainers; [ eqyiel ];
-    license = licenses.asl20;
-  };
-}
+      meta = with lib; {
+        homepage = "https://aws.amazon.com/elasticbeanstalk/";
+        description = "A command line interface for Elastic Beanstalk";
+        maintainers = with maintainers; [eqyiel];
+        license = licenses.asl20;
+      };
+    }

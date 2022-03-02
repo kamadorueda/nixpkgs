@@ -1,11 +1,11 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, logical-unification
-, pytestCheckHook
-, pytest-html
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  logical-unification,
+  pytestCheckHook,
+  pytest-html,
 }:
-
 buildPythonPackage rec {
   pname = "cons";
   version = "0.4.5";
@@ -31,13 +31,13 @@ buildPythonPackage rec {
     "--self-contained-html"
   ];
 
-  pythonImportsCheck = [ "cons" ];
+  pythonImportsCheck = ["cons"];
 
   meta = with lib; {
     description = "An implementation of Lisp/Scheme-like cons in Python";
     homepage = "https://github.com/pythological/python-cons";
     changelog = "https://github.com/pythological/python-cons/releases";
     license = licenses.gpl3Only;
-    maintainers = with maintainers; [ Etjean ];
+    maintainers = with maintainers; [Etjean];
   };
 }

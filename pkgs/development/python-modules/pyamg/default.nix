@@ -1,13 +1,13 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, numpy
-, scipy
-, pytest
-, pybind11
-, setuptools-scm
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  numpy,
+  scipy,
+  pytest,
+  pybind11,
+  setuptools-scm,
 }:
-
 buildPythonPackage rec {
   pname = "pyamg";
   version = "4.2.2";
@@ -44,6 +44,6 @@ buildPythonPackage rec {
     description = "Algebraic Multigrid Solvers in Python";
     homepage = "https://github.com/pyamg/pyamg";
     license = licenses.mit;
-    maintainers = [ maintainers.costrouc ];
+    maintainers = [maintainers.costrouc];
   };
 }

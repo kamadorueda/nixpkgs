@@ -1,17 +1,17 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, google-api-core
-, google-cloud-testutils
-, libcst
-, proto-plus
-, pandas
-, pytestCheckHook
-, pytest-asyncio
-, mock
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  google-api-core,
+  google-cloud-testutils,
+  libcst,
+  proto-plus,
+  pandas,
+  pytestCheckHook,
+  pytest-asyncio,
+  mock,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "google-cloud-monitoring";
   version = "2.9.0";
@@ -52,6 +52,6 @@ buildPythonPackage rec {
     description = "Stackdriver Monitoring API client library";
     homepage = "https://github.com/googleapis/python-monitoring";
     license = licenses.asl20;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [SuperSandro2000];
   };
 }

@@ -1,17 +1,17 @@
-{ lib
-, stdenv
-, fetchzip
-, autoPatchelfHook
-, makeWrapper
-, makeDesktopItem
-, copyDesktopItems
-, wrapGAppsHook
-, gobject-introspection
-, gdk-pixbuf
-, jre
-, androidenv
+{
+  lib,
+  stdenv,
+  fetchzip,
+  autoPatchelfHook,
+  makeWrapper,
+  makeDesktopItem,
+  copyDesktopItems,
+  wrapGAppsHook,
+  gobject-introspection,
+  gdk-pixbuf,
+  jre,
+  androidenv,
 }:
-
 stdenv.mkDerivation rec {
   pname = "agi";
   version = "2.2.0-dev-20220120";
@@ -49,19 +49,21 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-  desktopItems = [(makeDesktopItem {
-    name = "agi";
-    desktopName = "Android GPU Inspector";
-    exec = "$out/bin/agi";
-    icon = "agi";
-    categories = [ "Development" "Debugger" "Graphics" "3DGraphics" ];
-  })];
+  desktopItems = [
+    (makeDesktopItem {
+      name = "agi";
+      desktopName = "Android GPU Inspector";
+      exec = "$out/bin/agi";
+      icon = "agi";
+      categories = ["Development" "Debugger" "Graphics" "3DGraphics"];
+    })
+  ];
 
   meta = with lib; {
     homepage = "https://github.com/google/agi/";
     description = "Android GPU Inspector";
     license = licenses.asl20;
-    platforms = [ "x86_64-linux" ];
-    maintainers = [ maintainers.ivar ];
+    platforms = ["x86_64-linux"];
+    maintainers = [maintainers.ivar];
   };
 }

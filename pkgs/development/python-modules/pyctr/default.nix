@@ -1,6 +1,10 @@
-{ lib, buildPythonPackage, fetchPypi, pythonOlder
-, pycryptodomex }:
-
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  pythonOlder,
+  pycryptodomex,
+}:
 buildPythonPackage rec {
   pname = "pyctr";
   version = "0.6.0";
@@ -11,14 +15,14 @@ buildPythonPackage rec {
     sha256 = "sha256-05lMcsIeJIHI3LwHQTjr4M+bn1FG+GQscuGq34XxjK8=";
   };
 
-  propagatedBuildInputs = [ pycryptodomex ];
+  propagatedBuildInputs = [pycryptodomex];
 
-  pythonImportsCheck = [ "pyctr" ];
+  pythonImportsCheck = ["pyctr"];
 
   meta = with lib; {
     description = "Python library to interact with Nintendo 3DS files";
     license = licenses.mit;
-    maintainers = with maintainers; [ rileyinman ];
+    maintainers = with maintainers; [rileyinman];
     homepage = "https://github.com/ihaveamac/pyctr";
   };
 }

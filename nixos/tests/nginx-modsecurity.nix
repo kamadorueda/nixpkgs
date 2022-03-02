@@ -1,12 +1,21 @@
-import ./make-test-python.nix ({ pkgs, lib, ... }: {
+import ./make-test-python.nix ({
+  pkgs,
+  lib,
+  ...
+}: {
   name = "nginx-modsecurity";
 
-  machine = { config, lib, pkgs, ... }: {
+  machine = {
+    config,
+    lib,
+    pkgs,
+    ...
+  }: {
     services.nginx = {
       enable = true;
-      additionalModules = [ pkgs.nginxModules.modsecurity-nginx ];
-      virtualHosts.localhost =
-        let modsecurity_conf = pkgs.writeText "modsecurity.conf" ''
+      additionalModules = [pkgs.nginxModules.modsecurity-nginx];
+      virtualHosts.localhost = let
+        modsecurity_conf = pkgs.writeText "modsecurity.conf" ''
           SecRuleEngine On
           SecDefaultAction "phase:1,log,auditlog,deny,status:403"
           SecDefaultAction "phase:2,log,auditlog,deny,status:403"

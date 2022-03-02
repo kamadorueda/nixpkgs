@@ -1,71 +1,86 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, cmake
-, nasm
-, openjdk
-, enableJava ? false # whether to build the java wrapper
-, enableJpeg7 ? false # whether to build libjpeg with v7 compatibility
-, enableJpeg8 ? false # whether to build libjpeg with v8 compatibility
-, enableStatic ? stdenv.hostPlatform.isStatic
-, enableShared ? !stdenv.hostPlatform.isStatic
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  nasm,
+  openjdk,
+  enableJava ? false, # whether to build the java wrapper
+  enableJpeg7 ? false, # whether to build libjpeg with v7 compatibility
+  enableJpeg8 ? false, # whether to build libjpeg with v8 compatibility
+  enableStatic ? stdenv.hostPlatform.isStatic,
+  enableShared ? !stdenv.hostPlatform.isStatic,
 }:
+assert !(enableJpeg7 && enableJpeg8); # pick only one or none, not both
 
-assert !(enableJpeg7 && enableJpeg8);  # pick only one or none, not both
+  stdenv.mkDerivation rec {
+    pname = "libjpeg-turbo";
+    version = "2.1.2";
 
-stdenv.mkDerivation rec {
+    src = fetchFromGitHub {
+      owner = "libjpeg-turbo";
+      repo = "libjpeg-turbo";
+      rev = version;
+      sha256 = "sha256-mlHueKAU/uNUdV9s4jWKAE+XVJdpEFhw2hxGvqRwAGc=";
+    };
 
-  pname = "libjpeg-turbo";
-  version = "2.1.2";
+    # This is needed by freeimage
+    patches =
+      [./0001-Compile-transupp.c-as-part-of-the-library.patch]
+      ++ lib.optional (stdenv.hostPlatform.libc or null == "msvcrt")
+      ./mingw-boolean.patch;
 
-  src = fetchFromGitHub {
-    owner = "libjpeg-turbo";
-    repo = "libjpeg-turbo";
-    rev = version;
-    sha256 = "sha256-mlHueKAU/uNUdV9s4jWKAE+XVJdpEFhw2hxGvqRwAGc=";
-  };
+    outputs = ["bin" "dev" "dev_private" "out" "man" "doc"];
 
-  # This is needed by freeimage
-  patches = [ ./0001-Compile-transupp.c-as-part-of-the-library.patch ]
-    ++ lib.optional (stdenv.hostPlatform.libc or null == "msvcrt")
-    ./mingw-boolean.patch;
+    postFixup = ''
+      moveToOutput include/transupp.h $dev_private
+    '';
 
-  outputs = [ "bin" "dev" "dev_private" "out" "man" "doc" ];
+    nativeBuildInputs =
+      [
+        cmake
+        nasm
+      ]
+      ++ lib.optionals enableJava [
+        openjdk
+      ];
 
-  postFixup = ''
-    moveToOutput include/transupp.h $dev_private
-  '';
+    cmakeFlags =
+      [
+        "-DENABLE_STATIC=${
+          if enableStatic
+          then "1"
+          else "0"
+        }"
+        "-DENABLE_SHARED=${
+          if enableShared
+          then "1"
+          else "0"
+        }"
+      ]
+      ++ lib.optionals enableJava [
+        "-DWITH_JAVA=1"
+      ]
+      ++ lib.optionals enableJpeg7 [
+        "-DWITH_JPEG7=1"
+      ]
+      ++ lib.optionals enableJpeg8 [
+        "-DWITH_JPEG8=1"
+      ]
+      ++ lib.optionals stdenv.hostPlatform.isRiscV [
+        # https://github.com/libjpeg-turbo/libjpeg-turbo/issues/428
+        # https://github.com/libjpeg-turbo/libjpeg-turbo/commit/88bf1d16786c74f76f2e4f6ec2873d092f577c75
+        "-DFLOATTEST=fp-contract"
+      ];
 
-  nativeBuildInputs = [
-    cmake
-    nasm
-  ] ++ lib.optionals enableJava [
-    openjdk
-  ];
+    doInstallCheck = true;
+    installCheckTarget = "test";
 
-  cmakeFlags = [
-    "-DENABLE_STATIC=${if enableStatic then "1" else "0"}"
-    "-DENABLE_SHARED=${if enableShared then "1" else "0"}"
-  ] ++ lib.optionals enableJava [
-    "-DWITH_JAVA=1"
-  ] ++ lib.optionals enableJpeg7 [
-    "-DWITH_JPEG7=1"
-  ] ++ lib.optionals enableJpeg8 [
-    "-DWITH_JPEG8=1"
-  ] ++ lib.optionals stdenv.hostPlatform.isRiscV [
-    # https://github.com/libjpeg-turbo/libjpeg-turbo/issues/428
-    # https://github.com/libjpeg-turbo/libjpeg-turbo/commit/88bf1d16786c74f76f2e4f6ec2873d092f577c75
-    "-DFLOATTEST=fp-contract"
-  ];
-
-  doInstallCheck = true;
-  installCheckTarget = "test";
-
-  meta = with lib; {
-    homepage = "https://libjpeg-turbo.org/";
-    description = "A faster (using SIMD) libjpeg implementation";
-    license = licenses.ijg; # and some parts under other BSD-style licenses
-    maintainers = with maintainers; [ vcunat colemickens kamadorueda ];
-    platforms = platforms.all;
-  };
-}
+    meta = with lib; {
+      homepage = "https://libjpeg-turbo.org/";
+      description = "A faster (using SIMD) libjpeg implementation";
+      license = licenses.ijg; # and some parts under other BSD-style licenses
+      maintainers = with maintainers; [vcunat colemickens kamadorueda];
+      platforms = platforms.all;
+    };
+  }

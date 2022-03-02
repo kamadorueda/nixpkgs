@@ -1,11 +1,14 @@
-import ./make-test-python.nix ({ pkgs, lib, ... }:
+import ./make-test-python.nix ({
+    pkgs,
+    lib,
+    ...
+  }:
   # This is seperate from pgadmin4 since we don't want both running at once
-
   {
     name = "pgadmin4-standalone";
-    meta.maintainers = with lib.maintainers; [ mkg20001 ];
+    meta.maintainers = with lib.maintainers; [mkg20001];
 
-    nodes.machine = { pkgs, ... }: {
+    nodes.machine = {pkgs, ...}: {
       environment.systemPackages = with pkgs; [
         curl
       ];

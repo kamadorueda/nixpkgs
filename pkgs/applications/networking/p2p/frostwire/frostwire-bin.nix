@@ -1,5 +1,10 @@
-{ lib, stdenv, fetchurl, jre, makeWrapper }:
-
+{
+  lib,
+  stdenv,
+  fetchurl,
+  jre,
+  makeWrapper,
+}:
 stdenv.mkDerivation rec {
   version = "6.9.7";
   pname = "frostwire";
@@ -9,7 +14,7 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-LsmDfNAj10x+txJ4PugyF3Irj/N1reb3ChTvFFIucdc=";
   };
 
-  nativeBuildInputs = [ makeWrapper ];
+  nativeBuildInputs = [makeWrapper];
 
   installPhase = ''
     runHook preInstall
@@ -36,7 +41,7 @@ stdenv.mkDerivation rec {
     homepage = "https://www.frostwire.com/";
     description = "BitTorrent Client and Cloud File Downloader";
     license = licenses.gpl3Plus;
-    maintainers = with maintainers; [ gavin ];
-    platforms = [ "x86_64-linux"];
+    maintainers = with maintainers; [gavin];
+    platforms = ["x86_64-linux"];
   };
 }

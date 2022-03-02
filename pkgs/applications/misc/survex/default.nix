@@ -1,22 +1,22 @@
-{ lib
-, stdenv
-, fetchurl
-, Carbon
-, Cocoa
-, ffmpeg
-, glib
-, libGLU
-, mesa
-, perl
-, pkg-config
-, proj
-, python3
-, wrapGAppsHook
-, wxGTK30-gtk3
-, wxmac
-, xlibsWrapper
+{
+  lib,
+  stdenv,
+  fetchurl,
+  Carbon,
+  Cocoa,
+  ffmpeg,
+  glib,
+  libGLU,
+  mesa,
+  perl,
+  pkg-config,
+  proj,
+  python3,
+  wrapGAppsHook,
+  wxGTK30-gtk3,
+  wxmac,
+  xlibsWrapper,
 }:
-
 stdenv.mkDerivation rec {
   pname = "survex";
   version = "1.4.1";
@@ -28,20 +28,23 @@ stdenv.mkDerivation rec {
     wrapGAppsHook
   ];
 
-  buildInputs = [
-    ffmpeg
-    glib
-    libGLU
-    mesa
-    proj
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    Carbon
-    Cocoa
-    wxmac
-  ] ++ lib.optionals stdenv.hostPlatform.isLinux [
-    wxGTK30-gtk3
-    xlibsWrapper
-  ];
+  buildInputs =
+    [
+      ffmpeg
+      glib
+      libGLU
+      mesa
+      proj
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      Carbon
+      Cocoa
+      wxmac
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      wxGTK30-gtk3
+      xlibsWrapper
+    ];
 
   src = fetchurl {
     url = "https://survex.com/software/${version}/${pname}-${version}.tar.gz";
@@ -53,7 +56,7 @@ stdenv.mkDerivation rec {
   '';
 
   enableParallelBuilding = true;
-  doCheck = (!stdenv.isDarwin); # times out
+  doCheck = !stdenv.isDarwin; # times out
   enableParallelChecking = false;
 
   meta = with lib; {
@@ -66,7 +69,7 @@ stdenv.mkDerivation rec {
     homepage = "https://survex.com/";
     changelog = "https://github.com/ojwb/survex/raw/v${version}/NEWS";
     license = licenses.gpl2Plus;
-    maintainers = [ maintainers.matthewcroughan ];
+    maintainers = [maintainers.matthewcroughan];
     platforms = platforms.all;
   };
 }

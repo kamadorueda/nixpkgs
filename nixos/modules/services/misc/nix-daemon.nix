@@ -1,9 +1,10 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
-
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.nix;
 
   nixPackage = cfg.package.out;
@@ -16,40 +17,45 @@ let
       description = "Nix build user ${toString nr}";
 
       /*
-        For consistency with the setgid(2), setuid(2), and setgroups(2)
-        calls in `libstore/build.cc', don't add any supplementary group
-        here except "nixbld".
-      */
+       For consistency with the setgid(2), setuid(2), and setgroups(2)
+       calls in `libstore/build.cc', don't add any supplementary group
+       here except "nixbld".
+       */
       uid = builtins.add config.ids.uids.nixbld nr;
       isSystemUser = true;
       group = "nixbld";
-      extraGroups = [ "nixbld" ];
+      extraGroups = ["nixbld"];
     };
   };
 
   nixbldUsers = listToAttrs (map makeNixBuildUser (range 1 cfg.nrBuildUsers));
 
-  nixConf =
-    assert isNixAtLeast "2.2";
-    let
+  nixConf = assert isNixAtLeast "2.2"; let
+    mkValueString = v:
+      if v == null
+      then ""
+      else if isInt v
+      then toString v
+      else if isBool v
+      then boolToString v
+      else if isFloat v
+      then floatToString v
+      else if isList v
+      then toString v
+      else if isDerivation v
+      then toString v
+      else if builtins.isPath v
+      then toString v
+      else if isString v
+      then v
+      else if isCoercibleToString v
+      then toString v
+      else abort "The nix conf value: ${toPretty {} v} can not be encoded";
 
-      mkValueString = v:
-        if v == null then ""
-        else if isInt v then toString v
-        else if isBool v then boolToString v
-        else if isFloat v then floatToString v
-        else if isList v then toString v
-        else if isDerivation v then toString v
-        else if builtins.isPath v then toString v
-        else if isString v then v
-        else if isCoercibleToString v then toString v
-        else abort "The nix conf value: ${toPretty {} v} can not be encoded";
+    mkKeyValue = k: v: "${escape ["="] k} = ${mkValueString v}";
 
-      mkKeyValue = k: v: "${escape [ "=" ] k} = ${mkValueString v}";
-
-      mkKeyValuePairs = attrs: concatStringsSep "\n" (mapAttrsToList mkKeyValue attrs);
-
-    in
+    mkKeyValuePairs = attrs: concatStringsSep "\n" (mapAttrsToList mkKeyValue attrs);
+  in
     pkgs.writeTextFile {
       name = "nix.conf";
       text = ''
@@ -60,7 +66,8 @@ let
         ${cfg.extraOptions}
       '';
       checkPhase =
-        if pkgs.stdenv.hostPlatform != pkgs.stdenv.buildPlatform then ''
+        if pkgs.stdenv.hostPlatform != pkgs.stdenv.buildPlatform
+        then ''
           echo "Ignoring validation for cross-compilation"
         ''
         else ''
@@ -72,7 +79,11 @@ let
             ${cfg.package}/bin/nix show-config ${optionalString (isNixAtLeast "2.3pre") "--no-net"} \
               ${optionalString (isNixAtLeast "2.4pre") "--option experimental-features nix-command"} \
             |& sed -e 's/^warning:/error:/' \
-            | (! grep '${if cfg.checkConfig then "^error:" else "^error: unknown setting"}')
+            | (! grep '${
+            if cfg.checkConfig
+            then "^error:"
+            else "^error: unknown setting"
+          }')
           set -o pipefail
         '';
     };
@@ -92,38 +103,36 @@ let
     systemFeatures = "system-features";
   };
 
-  semanticConfType = with types;
-    let
-      confAtom = nullOr
-        (oneOf [
-          bool
-          int
-          float
-          str
-          path
-          package
-        ]) // {
+  semanticConfType = with types; let
+    confAtom =
+      nullOr
+      (oneOf [
+        bool
+        int
+        float
+        str
+        path
+        package
+      ])
+      // {
         description = "Nix config atom (null, bool, int, float, str, path or package)";
       };
-    in
+  in
     attrsOf (either confAtom (listOf confAtom));
-
-in
-
-{
-  imports = [
-    (mkRenamedOptionModule [ "nix" "useChroot" ] [ "nix" "useSandbox" ])
-    (mkRenamedOptionModule [ "nix" "chrootDirs" ] [ "nix" "sandboxPaths" ])
-    (mkRenamedOptionModule [ "nix" "daemonIONiceLevel" ] [ "nix" "daemonIOSchedPriority" ])
-    (mkRemovedOptionModule [ "nix" "daemonNiceLevel" ] "Consider nix.daemonCPUSchedPolicy instead.")
-  ] ++ mapAttrsToList (oldConf: newConf: mkRenamedOptionModule [ "nix" oldConf ] [ "nix" "settings" newConf ]) legacyConfMappings;
+in {
+  imports =
+    [
+      (mkRenamedOptionModule ["nix" "useChroot"] ["nix" "useSandbox"])
+      (mkRenamedOptionModule ["nix" "chrootDirs"] ["nix" "sandboxPaths"])
+      (mkRenamedOptionModule ["nix" "daemonIONiceLevel"] ["nix" "daemonIOSchedPriority"])
+      (mkRemovedOptionModule ["nix" "daemonNiceLevel"] "Consider nix.daemonCPUSchedPolicy instead.")
+    ]
+    ++ mapAttrsToList (oldConf: newConf: mkRenamedOptionModule ["nix" oldConf] ["nix" "settings" newConf]) legacyConfMappings;
 
   ###### interface
 
   options = {
-
     nix = {
-
       enable = mkOption {
         type = types.bool;
         default = true;
@@ -152,7 +161,7 @@ in
       };
 
       daemonCPUSchedPolicy = mkOption {
-        type = types.enum [ "other" "batch" "idle" ];
+        type = types.enum ["other" "batch" "idle"];
         default = "other";
         example = "batch";
         description = ''
@@ -179,11 +188,11 @@ in
           <citerefentry><refentrytitle>systemd.resource-control
           </refentrytitle><manvolnum>5</manvolnum></citerefentry> and adjust
           <option>systemd.services.nix-daemon</option> directly.
-      '';
+        '';
       };
 
       daemonIOSchedClass = mkOption {
-        type = types.enum [ "best-effort" "idle" ];
+        type = types.enum ["best-effort" "idle"];
         default = "best-effort";
         example = "idle";
         description = ''
@@ -202,7 +211,7 @@ in
           systems that experience only intermittent phases of high I/O load,
           such as desktop or portable computers used interactively. Other
           systems should use the <literal>best-effort</literal> class.
-      '';
+        '';
       };
 
       daemonIOSchedPriority = mkOption {
@@ -241,8 +250,8 @@ in
             };
             systems = mkOption {
               type = types.listOf types.str;
-              default = [ ];
-              example = [ "x86_64-linux" "aarch64-linux" ];
+              default = [];
+              example = ["x86_64-linux" "aarch64-linux"];
               description = ''
                 The system types the build machine can execute derivations on.
                 Either this attribute or <varname>system</varname> must be
@@ -296,8 +305,8 @@ in
             };
             mandatoryFeatures = mkOption {
               type = types.listOf types.str;
-              default = [ ];
-              example = [ "big-parallel" ];
+              default = [];
+              example = ["big-parallel"];
               description = ''
                 A list of features mandatory for this builder. The builder will
                 be ignored for derivations that don't require all features in
@@ -307,8 +316,8 @@ in
             };
             supportedFeatures = mkOption {
               type = types.listOf types.str;
-              default = [ ];
-              example = [ "kvm" "big-parallel" ];
+              default = [];
+              example = ["kvm" "big-parallel"];
               description = ''
                 A list of features supported by this builder. The builder will
                 be ignored for derivations that require features not in this
@@ -326,7 +335,7 @@ in
             };
           };
         });
-        default = [ ];
+        default = [];
         description = ''
           This option lists the machines to be used if distributed builds are
           enabled (see <option>nix.distributedBuilds</option>).
@@ -340,7 +349,7 @@ in
       envVars = mkOption {
         type = types.attrs;
         internal = true;
-        default = { };
+        default = {};
         description = "Environment variables used by Nix.";
       };
 
@@ -389,26 +398,36 @@ in
       };
 
       registry = mkOption {
-        type = types.attrsOf (types.submodule (
-          let
-            referenceAttrs = with types; attrsOf (oneOf [
+        type = types.attrsOf (types.submodule (let
+          referenceAttrs = with types;
+            attrsOf (oneOf [
               str
               int
               bool
               package
             ]);
-          in
-          { config, name, ... }:
+        in
           {
+            config,
+            name,
+            ...
+          }: {
             options = {
               from = mkOption {
                 type = referenceAttrs;
-                example = { type = "indirect"; id = "nixpkgs"; };
+                example = {
+                  type = "indirect";
+                  id = "nixpkgs";
+                };
                 description = "The flake reference to be rewritten.";
               };
               to = mkOption {
                 type = referenceAttrs;
-                example = { type = "github"; owner = "my-org"; repo = "my-nixpkgs"; };
+                example = {
+                  type = "github";
+                  owner = "my-org";
+                  repo = "my-nixpkgs";
+                };
                 description = "The flake reference <option>from></option> is rewritten to.";
               };
               flake = mkOption {
@@ -430,18 +449,21 @@ in
               };
             };
             config = {
-              from = mkDefault { type = "indirect"; id = name; };
+              from = mkDefault {
+                type = "indirect";
+                id = name;
+              };
               to = mkIf (config.flake != null) (mkDefault
                 {
                   type = "path";
                   path = config.flake.outPath;
-                } // filterAttrs
+                }
+                // filterAttrs
                 (n: _: n == "lastModified" || n == "rev" || n == "revCount" || n == "narHash")
                 config.flake);
             };
-          }
-        ));
-        default = { };
+          }));
+        default = {};
         description = ''
           A system-wide flake registry.
         '';
@@ -463,7 +485,7 @@ in
 
           options = {
             max-jobs = mkOption {
-              type = types.either types.int (types.enum [ "auto" ]);
+              type = types.either types.int (types.enum ["auto"]);
               default = "auto";
               example = 64;
               description = ''
@@ -502,7 +524,7 @@ in
             };
 
             sandbox = mkOption {
-              type = types.either types.bool (types.enum [ "relaxed" ]);
+              type = types.either types.bool (types.enum ["relaxed"]);
               default = true;
               description = ''
                 If set, Nix will perform builds in a sandboxed environment that it
@@ -518,8 +540,8 @@ in
 
             extra-sandbox-paths = mkOption {
               type = types.listOf types.str;
-              default = [ ];
-              example = [ "/dev" "/proc" ];
+              default = [];
+              example = ["/dev" "/proc"];
               description = ''
                 Directories from the host filesystem to be included
                 in the sandbox.
@@ -538,8 +560,8 @@ in
 
             trusted-substituters = mkOption {
               type = types.listOf types.str;
-              default = [ ];
-              example = [ "https://hydra.nixos.org/" ];
+              default = [];
+              example = ["https://hydra.nixos.org/"];
               description = ''
                 List of binary cache URLs that non-root users can use (in
                 addition to those specified using
@@ -562,7 +584,7 @@ in
 
             trusted-public-keys = mkOption {
               type = types.listOf types.str;
-              example = [ "hydra.nixos.org-1:CNHJZBh9K4tP3EKF6FkkgeVYsS3ohTl+oS0Qa8bezVs=" ];
+              example = ["hydra.nixos.org-1:CNHJZBh9K4tP3EKF6FkkgeVYsS3ohTl+oS0Qa8bezVs="];
               description = ''
                 List of public keys used to sign binary caches. If
                 <option>nix.settings.trusted-public-keys</option> is enabled,
@@ -575,8 +597,8 @@ in
 
             trusted-users = mkOption {
               type = types.listOf types.str;
-              default = [ "root" ];
-              example = [ "root" "alice" "@wheel" ];
+              default = ["root"];
+              example = ["root" "alice" "@wheel"];
               description = ''
                 A list of names of users that have additional rights when
                 connecting to the Nix daemon, such as the ability to specify
@@ -590,7 +612,7 @@ in
 
             system-features = mkOption {
               type = types.listOf types.str;
-              example = [ "kvm" "big-parallel" "gccarch-skylake" ];
+              example = ["kvm" "big-parallel" "gccarch-skylake"];
               description = ''
                 The set of features supported by the machine. Derivations
                 can express dependencies on system features through the
@@ -604,8 +626,8 @@ in
 
             allowed-users = mkOption {
               type = types.listOf types.str;
-              default = [ "*" ];
-              example = [ "@wheel" "@builders" "alice" "bob" ];
+              default = ["*"];
+              example = ["@wheel" "@builders" "alice" "bob"];
               description = ''
                 A list of names of users (separated by whitespace) that are
                 allowed to connect to the Nix daemon. As with
@@ -618,7 +640,7 @@ in
             };
           };
         };
-        default = { };
+        default = {};
         example = literalExpression ''
           {
             use-sandbox = true;
@@ -650,7 +672,6 @@ in
     };
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
@@ -665,124 +686,141 @@ in
 
     environment.etc."nix/registry.json".text = builtins.toJSON {
       version = 2;
-      flakes = mapAttrsToList (n: v: { inherit (v) from to exact; }) cfg.registry;
+      flakes = mapAttrsToList (n: v: {inherit (v) from to exact;}) cfg.registry;
     };
 
     # List of machines for distributed Nix builds in the format
     # expected by build-remote.pl.
-    environment.etc."nix/machines" = mkIf (cfg.buildMachines != [ ]) {
+    environment.etc."nix/machines" = mkIf (cfg.buildMachines != []) {
       text =
         concatMapStrings
-          (machine:
-            (concatStringsSep " " ([
+        (machine:
+          (concatStringsSep " " ([
               "${optionalString (machine.sshUser != null) "${machine.sshUser}@"}${machine.hostName}"
-              (if machine.system != null then machine.system else if machine.systems != [ ] then concatStringsSep "," machine.systems else "-")
-              (if machine.sshKey != null then machine.sshKey else "-")
+              (
+                if machine.system != null
+                then machine.system
+                else if machine.systems != []
+                then concatStringsSep "," machine.systems
+                else "-"
+              )
+              (
+                if machine.sshKey != null
+                then machine.sshKey
+                else "-"
+              )
               (toString machine.maxJobs)
               (toString machine.speedFactor)
               (concatStringsSep "," (machine.supportedFeatures ++ machine.mandatoryFeatures))
               (concatStringsSep "," machine.mandatoryFeatures)
             ]
-            ++ optional (isNixAtLeast "2.4pre") (if machine.publicHostKey != null then machine.publicHostKey else "-")))
-            + "\n"
-          )
-          cfg.buildMachines;
+            ++ optional (isNixAtLeast "2.4pre") (
+              if machine.publicHostKey != null
+              then machine.publicHostKey
+              else "-"
+            )))
+          + "\n")
+        cfg.buildMachines;
     };
 
-    assertions =
-      let badMachine = m: m.system == null && m.systems == [ ];
-      in
-      [
-        {
-          assertion = !(any badMachine cfg.buildMachines);
-          message = ''
+    assertions = let
+      badMachine = m: m.system == null && m.systems == [];
+    in [
+      {
+        assertion = !(any badMachine cfg.buildMachines);
+        message =
+          ''
             At least one system type (via <varname>system</varname> or
               <varname>systems</varname>) must be set for every build machine.
               Invalid machine specifications:
-          '' + "      " +
-          (concatStringsSep "\n      "
+          ''
+          + "      "
+          + (concatStringsSep "\n      "
             (map (m: m.hostName)
-              (filter (badMachine) cfg.buildMachines)));
-        }
-      ];
+              (filter badMachine cfg.buildMachines)));
+      }
+    ];
 
-    systemd.packages = [ nixPackage ];
+    systemd.packages = [nixPackage];
 
-    systemd.sockets.nix-daemon.wantedBy = [ "sockets.target" ];
+    systemd.sockets.nix-daemon.wantedBy = ["sockets.target"];
 
-    systemd.services.nix-daemon =
-      {
-        path = [ nixPackage pkgs.util-linux config.programs.ssh.package ]
-          ++ optionals cfg.distributedBuilds [ pkgs.gzip ];
+    systemd.services.nix-daemon = {
+      path =
+        [nixPackage pkgs.util-linux config.programs.ssh.package]
+        ++ optionals cfg.distributedBuilds [pkgs.gzip];
 
-        environment = cfg.envVars
-          // { CURL_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"; }
-          // config.networking.proxy.envVars;
+      environment =
+        cfg.envVars
+        // {CURL_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt";}
+        // config.networking.proxy.envVars;
 
-        unitConfig.RequiresMountsFor = "/nix/store";
+      unitConfig.RequiresMountsFor = "/nix/store";
 
-        serviceConfig =
-          {
-            CPUSchedulingPolicy = cfg.daemonCPUSchedPolicy;
-            IOSchedulingClass = cfg.daemonIOSchedClass;
-            IOSchedulingPriority = cfg.daemonIOSchedPriority;
-            LimitNOFILE = 4096;
-          };
-
-        restartTriggers = [ nixConf ];
-
-        # `stopIfChanged = false` changes to switch behavior
-        # from   stop -> update units -> start
-        #   to   update units -> restart
-        #
-        # The `stopIfChanged` setting therefore controls a trade-off between a
-        # more predictable lifecycle, which runs the correct "version" of
-        # the `ExecStop` line, and on the other hand the availability of
-        # sockets during the switch, as the effectiveness of the stop operation
-        # depends on the socket being stopped as well.
-        #
-        # As `nix-daemon.service` does not make use of `ExecStop`, we prefer
-        # to keep the socket up and available. This is important for machines
-        # that run Nix-based services, such as automated build, test, and deploy
-        # services, that expect the daemon socket to be available at all times.
-        #
-        # Notably, the Nix client does not retry on failure to connect to the
-        # daemon socket, and the in-process RemoteStore instance will disable
-        # itself. This makes retries infeasible even for services that are
-        # aware of the issue. Failure to connect can affect not only new client
-        # processes, but also new RemoteStore instances in existing processes,
-        # as well as existing RemoteStore instances that have not saturated
-        # their connection pool.
-        #
-        # Also note that `stopIfChanged = true` does not kill existing
-        # connection handling daemons, as one might wish to happen before a
-        # breaking Nix upgrade (which is rare). The daemon forks that handle
-        # the individual connections split off into their own sessions, causing
-        # them not to be stopped by systemd.
-        # If a Nix upgrade does require all existing daemon processes to stop,
-        # nix-daemon must do so on its own accord, and only when the new version
-        # starts and detects that Nix's persistent state needs an upgrade.
-        stopIfChanged = false;
-
+      serviceConfig = {
+        CPUSchedulingPolicy = cfg.daemonCPUSchedPolicy;
+        IOSchedulingClass = cfg.daemonIOSchedClass;
+        IOSchedulingPriority = cfg.daemonIOSchedPriority;
+        LimitNOFILE = 4096;
       };
 
+      restartTriggers = [nixConf];
+
+      # `stopIfChanged = false` changes to switch behavior
+      # from   stop -> update units -> start
+      #   to   update units -> restart
+      #
+      # The `stopIfChanged` setting therefore controls a trade-off between a
+      # more predictable lifecycle, which runs the correct "version" of
+      # the `ExecStop` line, and on the other hand the availability of
+      # sockets during the switch, as the effectiveness of the stop operation
+      # depends on the socket being stopped as well.
+      #
+      # As `nix-daemon.service` does not make use of `ExecStop`, we prefer
+      # to keep the socket up and available. This is important for machines
+      # that run Nix-based services, such as automated build, test, and deploy
+      # services, that expect the daemon socket to be available at all times.
+      #
+      # Notably, the Nix client does not retry on failure to connect to the
+      # daemon socket, and the in-process RemoteStore instance will disable
+      # itself. This makes retries infeasible even for services that are
+      # aware of the issue. Failure to connect can affect not only new client
+      # processes, but also new RemoteStore instances in existing processes,
+      # as well as existing RemoteStore instances that have not saturated
+      # their connection pool.
+      #
+      # Also note that `stopIfChanged = true` does not kill existing
+      # connection handling daemons, as one might wish to happen before a
+      # breaking Nix upgrade (which is rare). The daemon forks that handle
+      # the individual connections split off into their own sessions, causing
+      # them not to be stopped by systemd.
+      # If a Nix upgrade does require all existing daemon processes to stop,
+      # nix-daemon must do so on its own accord, and only when the new version
+      # starts and detects that Nix's persistent state needs an upgrade.
+      stopIfChanged = false;
+    };
+
     # Set up the environment variables for running Nix.
-    environment.sessionVariables = cfg.envVars // { NIX_PATH = cfg.nixPath; };
+    environment.sessionVariables = cfg.envVars // {NIX_PATH = cfg.nixPath;};
 
-    environment.extraInit =
-      ''
-        if [ -e "$HOME/.nix-defexpr/channels" ]; then
-          export NIX_PATH="$HOME/.nix-defexpr/channels''${NIX_PATH:+:$NIX_PATH}"
-        fi
-      '';
+    environment.extraInit = ''
+      if [ -e "$HOME/.nix-defexpr/channels" ]; then
+        export NIX_PATH="$HOME/.nix-defexpr/channels''${NIX_PATH:+:$NIX_PATH}"
+      fi
+    '';
 
-    nix.nrBuildUsers = mkDefault (max 32 (if cfg.settings.max-jobs == "auto" then 0 else cfg.settings.max-jobs));
+    nix.nrBuildUsers = mkDefault (max 32 (
+      if cfg.settings.max-jobs == "auto"
+      then 0
+      else cfg.settings.max-jobs
+    ));
 
     users.users = nixbldUsers;
 
     services.xserver.displayManager.hiddenUsers = attrNames nixbldUsers;
 
-    system.activationScripts.nix = stringAfter [ "etc" "users" ]
+    system.activationScripts.nix =
+      stringAfter ["etc" "users"]
       ''
         install -m 0755 -d /nix/var/nix/{gcroots,profiles}/per-user
 
@@ -795,24 +833,20 @@ in
     # Legacy configuration conversion.
     nix.settings = mkMerge [
       {
-        trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
-        substituters = mkAfter [ "https://cache.nixos.org/" ];
+        trusted-public-keys = ["cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="];
+        substituters = mkAfter ["https://cache.nixos.org/"];
 
-        system-features = mkDefault (
-          [ "nixos-test" "benchmark" "big-parallel" "kvm" ] ++
-          optionals (pkgs.hostPlatform ? gcc.arch) (
+        system-features = mkDefault (["nixos-test" "benchmark" "big-parallel" "kvm"]
+          ++ optionals (pkgs.hostPlatform ? gcc.arch) (
             # a builder can run code for `gcc.arch` and inferior architectures
-            [ "gccarch-${pkgs.hostPlatform.gcc.arch}" ] ++
-            map (x: "gccarch-${x}") systems.architectures.inferiors.${pkgs.hostPlatform.gcc.arch}
-          )
-        );
+            ["gccarch-${pkgs.hostPlatform.gcc.arch}"]
+            ++ map (x: "gccarch-${x}") systems.architectures.inferiors.${pkgs.hostPlatform.gcc.arch}
+          ));
       }
 
-      (mkIf (!cfg.distributedBuilds) { builders = null; })
+      (mkIf (!cfg.distributedBuilds) {builders = null;})
 
-      (mkIf (isNixAtLeast "2.3pre") { sandbox-fallback = false; })
+      (mkIf (isNixAtLeast "2.3pre") {sandbox-fallback = false;})
     ];
-
   };
-
 }

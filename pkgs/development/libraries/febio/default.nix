@@ -1,7 +1,16 @@
-{ lib, stdenv, fetchFromGitHub, cmake, boost, eigen, libxml2, mpi, python3
-, mklSupport ? true, mkl
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  boost,
+  eigen,
+  libxml2,
+  mpi,
+  python3,
+  mklSupport ? true,
+  mkl,
 }:
-
 stdenv.mkDerivation rec {
   pname = "FEBio";
   version = "3.6";
@@ -14,12 +23,12 @@ stdenv.mkDerivation rec {
   };
 
   patches = [
-    ./fix-cmake.patch  # cannot find mkl libraries without this
+    ./fix-cmake.patch # cannot find mkl libraries without this
   ];
 
-  cmakeFlags = lib.optional mklSupport "-DUSE_MKL=On"
-    ++ lib.optional mklSupport "-DMKLROOT=${mkl}"
-  ;
+  cmakeFlags =
+    lib.optional mklSupport "-DUSE_MKL=On"
+    ++ lib.optional mklSupport "-DMKLROOT=${mkl}";
 
   installPhase = ''
     runHook preInstall
@@ -40,16 +49,16 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-  nativeBuildInputs = [ cmake ];
-  buildInputs = [ boost eigen libxml2 mpi python3 python3.pkgs.numpy ]
-   ++ lib.optional mklSupport mkl
-  ;
+  nativeBuildInputs = [cmake];
+  buildInputs =
+    [boost eigen libxml2 mpi python3 python3.pkgs.numpy]
+    ++ lib.optional mklSupport mkl;
 
   meta = {
     description = "FEBio Suite Solver";
-    license = with lib.licenses; [ mit ];
+    license = with lib.licenses; [mit];
     homepage = "https://febio.org/";
     platforms = lib.platforms.unix;
-    maintainers = with lib.maintainers; [ Scriptkiddi ];
+    maintainers = with lib.maintainers; [Scriptkiddi];
   };
 }

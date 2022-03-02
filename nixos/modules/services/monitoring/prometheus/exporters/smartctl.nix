@@ -1,8 +1,10 @@
-{ config, lib, pkgs, options }:
-
-with lib;
-
-let
+{
+  config,
+  lib,
+  pkgs,
+  options,
+}:
+with lib; let
   cfg = config.services.prometheus.exporters.smartctl;
   format = pkgs.formats.yaml {};
   configFile = format.generate "smartctl-exporter.yml" {
@@ -51,8 +53,8 @@ in {
       ];
       DevicePolicy = "closed";
       DeviceAllow = lib.mkOverride 100 (
-        if cfg.devices != [] then
-          cfg.devices
+        if cfg.devices != []
+        then cfg.devices
         else [
           "block-blkext rw"
           "block-sd rw"
@@ -65,7 +67,7 @@ in {
       PrivateDevices = lib.mkForce false;
       ProtectProc = "invisible";
       ProcSubset = "pid";
-      SupplementaryGroups = [ "disk" ];
+      SupplementaryGroups = ["disk"];
       SystemCallFilter = [
         "@system-service"
         "~@privileged @resources"

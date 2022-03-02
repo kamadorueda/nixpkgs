@@ -1,9 +1,10 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
-
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   udev = config.systemd.package;
 
   cfg = config.services.udev;
@@ -30,8 +31,10 @@ let
   '';
 
   # Perform substitutions in all udev rules files.
-  udevRules = pkgs.runCommand "udev-rules"
-    { preferLocalBuild = true;
+  udevRules =
+    pkgs.runCommand "udev-rules"
+    {
+      preferLocalBuild = true;
       allowSubstitutes = false;
       packages = unique (map toString cfg.packages);
     }
@@ -123,13 +126,17 @@ let
       # If auto-configuration is disabled, then remove
       # udev's 80-drivers.rules file, which contains rules for
       # automatically calling modprobe.
-      ${optionalString (!config.boot.hardwareScan) ''
-        ln -s /dev/null $out/80-drivers.rules
-      ''}
+      ${
+        optionalString (!config.boot.hardwareScan) ''
+          ln -s /dev/null $out/80-drivers.rules
+        ''
+      }
     ''; # */
 
-  hwdbBin = pkgs.runCommand "hwdb.bin"
-    { preferLocalBuild = true;
+  hwdbBin =
+    pkgs.runCommand "hwdb.bin"
+    {
+      preferLocalBuild = true;
       allowSubstitutes = false;
       packages = unique (map toString ([udev] ++ cfg.packages));
     }
@@ -155,18 +162,13 @@ let
   udevPath = pkgs.buildEnv {
     name = "udev-path";
     paths = cfg.path;
-    pathsToLink = [ "/bin" "/sbin" ];
+    pathsToLink = ["/bin" "/sbin"];
     ignoreCollisions = true;
   };
-
-in
-
-{
-
+in {
   ###### interface
 
   options = {
-
     boot.hardwareScan = mkOption {
       type = types.bool;
       default = true;
@@ -179,7 +181,6 @@ in
     };
 
     services.udev = {
-
       packages = mkOption {
         type = types.listOf types.path;
         default = [];
@@ -243,7 +244,6 @@ in
           read after all other files.
         '';
       };
-
     };
 
     hardware.firmware = mkOption {
@@ -258,12 +258,13 @@ in
         precedence.  Note that you must rebuild your system if you add
         files to any of these directories.
       '';
-      apply = list: pkgs.buildEnv {
-        name = "firmware";
-        paths = list;
-        pathsToLink = [ "/lib/firmware" ];
-        ignoreCollisions = true;
-      };
+      apply = list:
+        pkgs.buildEnv {
+          name = "firmware";
+          paths = list;
+          pathsToLink = ["/lib/firmware"];
+          ignoreCollisions = true;
+        };
     };
 
     networking.usePredictableInterfaceNames = mkOption {
@@ -282,34 +283,31 @@ in
         unpredictably.
       '';
     };
-
   };
-
 
   ###### implementation
 
   config = mkIf (!config.boot.isContainer) {
-
     services.udev.extraRules = nixosRules;
 
-    services.udev.packages = [ extraUdevRules extraHwdbFile ];
+    services.udev.packages = [extraUdevRules extraHwdbFile];
 
-    services.udev.path = [ pkgs.coreutils pkgs.gnused pkgs.gnugrep pkgs.util-linux udev ];
+    services.udev.path = [pkgs.coreutils pkgs.gnused pkgs.gnugrep pkgs.util-linux udev];
 
-    boot.kernelParams = mkIf (!config.networking.usePredictableInterfaceNames) [ "net.ifnames=0" ];
+    boot.kernelParams = mkIf (!config.networking.usePredictableInterfaceNames) ["net.ifnames=0"];
 
-    boot.initrd.extraUdevRulesCommands = optionalString (cfg.initrdRules != "")
+    boot.initrd.extraUdevRulesCommands =
+      optionalString (cfg.initrdRules != "")
       ''
         cat <<'EOF' > $out/99-local.rules
         ${cfg.initrdRules}
         EOF
       '';
 
-    environment.etc =
-      {
-        "udev/rules.d".source = udevRules;
-        "udev/hwdb.bin".source = hwdbBin;
-      };
+    environment.etc = {
+      "udev/rules.d".source = udevRules;
+      "udev/hwdb.bin".source = hwdbBin;
+    };
 
     system.requiredKernelConfig = with config.lib.kernelConfig; [
       (isEnabled "UNIX")
@@ -320,22 +318,20 @@ in
     # We don't place this into `extraModprobeConfig` so that stage-1 ramdisk doesn't bloat.
     environment.etc."modprobe.d/firmware.conf".text = "options firmware_class path=${config.hardware.firmware}/lib/firmware";
 
-    system.activationScripts.udevd =
-      ''
-        # The deprecated hotplug uevent helper is not used anymore
-        if [ -e /proc/sys/kernel/hotplug ]; then
-          echo "" > /proc/sys/kernel/hotplug
-        fi
+    system.activationScripts.udevd = ''
+      # The deprecated hotplug uevent helper is not used anymore
+      if [ -e /proc/sys/kernel/hotplug ]; then
+        echo "" > /proc/sys/kernel/hotplug
+      fi
 
-        # Allow the kernel to find our firmware.
-        if [ -e /sys/module/firmware_class/parameters/path ]; then
-          echo -n "${config.hardware.firmware}/lib/firmware" > /sys/module/firmware_class/parameters/path
-        fi
-      '';
+      # Allow the kernel to find our firmware.
+      if [ -e /sys/module/firmware_class/parameters/path ]; then
+        echo -n "${config.hardware.firmware}/lib/firmware" > /sys/module/firmware_class/parameters/path
+      fi
+    '';
 
-    systemd.services.systemd-udevd =
-      { restartTriggers = cfg.packages;
-      };
-
+    systemd.services.systemd-udevd = {
+      restartTriggers = cfg.packages;
+    };
   };
 }

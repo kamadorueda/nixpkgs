@@ -1,9 +1,9 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, python
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  python,
 }:
-
 buildPythonPackage rec {
   pname = "fleep";
   version = "1.0.1";
@@ -25,12 +25,12 @@ buildPythonPackage rec {
     ${python.interpreter} tests/speedtest.py
   '';
 
-  pythonImportsCheck = [ "fleep" ];
+  pythonImportsCheck = ["fleep"];
 
   meta = with lib; {
     description = "File format determination library";
     homepage = "https://github.com/floyernick/fleep-py";
     license = licenses.mit;
-    maintainers = with maintainers; [ wolfangaukang ];
+    maintainers = with maintainers; [wolfangaukang];
   };
 }

@@ -1,4 +1,4 @@
-import ./make-test-python.nix ({ pkgs, ... }: {
+import ./make-test-python.nix ({pkgs, ...}: {
   name = "starship";
   meta.maintainers = pkgs.starship.meta.maintainers;
 
@@ -13,22 +13,24 @@ import ./make-test-python.nix ({ pkgs, ... }: {
       };
     };
 
-    environment.systemPackages = map
-      (shell: pkgs.writeScriptBin "expect-${shell}" ''
-        #!${pkgs.expect}/bin/expect -f
+    environment.systemPackages =
+      map
+      (shell:
+        pkgs.writeScriptBin "expect-${shell}" ''
+          #!${pkgs.expect}/bin/expect -f
 
-        spawn env TERM=xterm ${shell} -i
+          spawn env TERM=xterm ${shell} -i
 
-        expect "<starship>" {
-          send "exit\n"
-        } timeout {
-          send_user "\n${shell} failed to display Starship\n"
-          exit 1
-        }
+          expect "<starship>" {
+            send "exit\n"
+          } timeout {
+            send_user "\n${shell} failed to display Starship\n"
+            exit 1
+          }
 
-        expect eof
-      '')
-      [ "bash" "fish" "zsh" ];
+          expect eof
+        '')
+      ["bash" "fish" "zsh"];
   };
 
   testScript = ''

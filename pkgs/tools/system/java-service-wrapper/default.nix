@@ -1,8 +1,12 @@
-{ lib, stdenv, fetchurl
-, jdk
-, ant, cunit, ncurses
+{
+  lib,
+  stdenv,
+  fetchurl,
+  jdk,
+  ant,
+  cunit,
+  ncurses,
 }:
-
 stdenv.mkDerivation rec {
   pname = "java-service-wrapper";
   version = "3.5.49";
@@ -12,8 +16,8 @@ stdenv.mkDerivation rec {
     hash = "sha256-gcScF5LIqWVBv8erI3hG5tt5BZPO2XlhFACz1Y60+v4=";
   };
 
-  buildInputs = [ jdk ];
-  nativeBuildInputs = [ ant cunit ncurses ];
+  buildInputs = [jdk];
+  nativeBuildInputs = [ant cunit ncurses];
 
   buildPhase = ''
     runHook preBuild
@@ -23,7 +27,11 @@ stdenv.mkDerivation rec {
     export JAVA_TOOL_OPTIONS=-Djava.home=$JAVA_HOME
     export CLASSPATH=${jdk}/lib/openjdk/lib/tools.jar
 
-    ${if stdenv.isi686 then "./build32.sh" else "./build64.sh"}
+    ${
+      if stdenv.isi686
+      then "./build32.sh"
+      else "./build64.sh"
+    }
 
     runHook postBuild
   '';
@@ -44,7 +52,7 @@ stdenv.mkDerivation rec {
     homepage = "https://wrapper.tanukisoftware.com/";
     changelog = "https://wrapper.tanukisoftware.com/doc/english/release-notes.html#${version}";
     license = licenses.gpl2Only;
-    platforms = [ "x86_64-linux" "i686-linux" ];
-    maintainers = [ maintainers.suhr ];
+    platforms = ["x86_64-linux" "i686-linux"];
+    maintainers = [maintainers.suhr];
   };
 }

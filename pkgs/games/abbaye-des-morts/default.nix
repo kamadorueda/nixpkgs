@@ -1,5 +1,11 @@
-{ lib, stdenv, fetchFromGitHub, SDL2, SDL2_image, SDL2_mixer }:
-
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  SDL2,
+  SDL2_image,
+  SDL2_mixer,
+}:
 stdenv.mkDerivation rec {
   pname = "abbaye-des-morts";
   version = "2.0.1";
@@ -11,11 +17,12 @@ stdenv.mkDerivation rec {
     sha256 = "1pwqf7r9bqb2p3xrw9i7y8pgr1401fy3mnnqpb1qkhmdl3gqi9hb";
   };
 
-  buildInputs = [ SDL2 SDL2_image SDL2_mixer ];
+  buildInputs = [SDL2 SDL2_image SDL2_mixer];
 
-  makeFlags = [ "PREFIX=$(out)" "DESTDIR=" ];
+  makeFlags = ["PREFIX=$(out)" "DESTDIR="];
 
-  preBuild = lib.optionalString stdenv.cc.isClang
+  preBuild =
+    lib.optionalString stdenv.cc.isClang
     ''
       substituteInPlace Makefile \
         --replace -fpredictive-commoning ""
@@ -30,6 +37,6 @@ stdenv.mkDerivation rec {
     homepage = "https://locomalito.com/abbaye_des_morts.php";
     description = "A retro arcade video game";
     license = licenses.gpl3;
-    maintainers = [ maintainers.marius851000 ];
+    maintainers = [maintainers.marius851000];
   };
 }

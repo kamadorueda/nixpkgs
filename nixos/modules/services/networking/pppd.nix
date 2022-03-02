@@ -1,13 +1,14 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
-  cfg = config.services.pppd;
-in
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
+  cfg = config.services.pppd;
+in {
   meta = {
-    maintainers = with maintainers; [ danderson ];
+    maintainers = with maintainers; [danderson];
   };
 
   options = {
@@ -24,38 +25,36 @@ in
       peers = mkOption {
         default = {};
         description = "pppd peers.";
-        type = types.attrsOf (types.submodule (
-          { name, ... }:
-          {
-            options = {
-              name = mkOption {
-                type = types.str;
-                default = name;
-                example = "dialup";
-                description = "Name of the PPP peer.";
-              };
-
-              enable = mkOption {
-                type = types.bool;
-                default = true;
-                example = false;
-                description = "Whether to enable this PPP peer.";
-              };
-
-              autostart = mkOption {
-                type = types.bool;
-                default = true;
-                example = false;
-                description = "Whether the PPP session is automatically started at boot time.";
-              };
-
-              config = mkOption {
-                type = types.lines;
-                default = "";
-                description = "pppd configuration for this peer, see the pppd(8) man page.";
-              };
+        type = types.attrsOf (types.submodule ({name, ...}: {
+          options = {
+            name = mkOption {
+              type = types.str;
+              default = name;
+              example = "dialup";
+              description = "Name of the PPP peer.";
             };
-          }));
+
+            enable = mkOption {
+              type = types.bool;
+              default = true;
+              example = false;
+              description = "Whether to enable this PPP peer.";
+            };
+
+            autostart = mkOption {
+              type = types.bool;
+              default = true;
+              example = false;
+              description = "Whether the PPP session is automatically started at boot time.";
+            };
+
+            config = mkOption {
+              type = types.lines;
+              default = "";
+              description = "pppd configuration for this peer, see the pppd(8) man page.";
+            };
+          };
+        }));
       };
     };
   };
@@ -71,10 +70,10 @@ in
     mkSystemd = peerCfg: {
       name = "pppd-${peerCfg.name}";
       value = {
-        restartTriggers = [ config.environment.etc."ppp/peers/${peerCfg.name}".source ];
-        before = [ "network.target" ];
-        wants = [ "network.target" ];
-        after = [ "network-pre.target" ];
+        restartTriggers = [config.environment.etc."ppp/peers/${peerCfg.name}".source];
+        before = ["network.target"];
+        wants = ["network.target"];
+        after = ["network-pre.target"];
         environment = {
           # pppd likes to write directly into /var/run. This is rude
           # on a modern system, so we use libredirect to transparently
@@ -89,8 +88,7 @@ in
             "CAP_NET_ADMIN"
             "CAP_NET_RAW"
           ];
-        in
-        {
+        in {
           ExecStart = "${getBin cfg.package}/sbin/pppd call ${peerCfg.name} nodetach nolog";
           Restart = "always";
           RestartSec = 5;
@@ -140,15 +138,15 @@ in
           RuntimeDirectory = "pppd";
           RuntimeDirectoryPreserve = true;
         };
-        wantedBy = mkIf peerCfg.autostart [ "multi-user.target" ];
+        wantedBy = mkIf peerCfg.autostart ["multi-user.target"];
       };
     };
 
     etcFiles = listToAttrs (map mkEtc enabledConfigs);
     systemdConfigs = listToAttrs (map mkSystemd enabledConfigs);
-
-  in mkIf cfg.enable {
-    environment.etc = etcFiles;
-    systemd.services = systemdConfigs;
-  };
+  in
+    mkIf cfg.enable {
+      environment.etc = etcFiles;
+      systemd.services = systemdConfigs;
+    };
 }

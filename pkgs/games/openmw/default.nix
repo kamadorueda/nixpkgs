@@ -1,24 +1,24 @@
-{ lib
-, mkDerivation
-, fetchFromGitHub
-, cmake
-, pkg-config
-, wrapQtAppsHook
-, openscenegraph
-, mygui
-, bullet
-, ffmpeg
-, boost
-, SDL2
-, unshield
-, openal
-, libXt
-, lz4
-, recastnavigation
-}:
-
-let
-  openscenegraph_openmw = (openscenegraph.override { colladaSupport = true; })
+{
+  lib,
+  mkDerivation,
+  fetchFromGitHub,
+  cmake,
+  pkg-config,
+  wrapQtAppsHook,
+  openscenegraph,
+  mygui,
+  bullet,
+  ffmpeg,
+  boost,
+  SDL2,
+  unshield,
+  openal,
+  libXt,
+  lz4,
+  recastnavigation,
+}: let
+  openscenegraph_openmw =
+    (openscenegraph.override {colladaSupport = true;})
     .overrideDerivation (self: {
       src = fetchFromGitHub {
         owner = "OpenMW";
@@ -37,51 +37,52 @@ let
       sha256 = "sha256-uQ4X8F8nmagbcFh0KexrmnhHIXFSB3A1CCnjPVeHL3Q=";
     };
     patches = [];
-    cmakeFlags = (old.cmakeFlags or []) ++ [
-      "-DUSE_DOUBLE_PRECISION=ON"
-      "-DBULLET2_MULTITHREADING=ON"
-    ];
+    cmakeFlags =
+      (old.cmakeFlags or [])
+      ++ [
+        "-DUSE_DOUBLE_PRECISION=ON"
+        "-DBULLET2_MULTITHREADING=ON"
+      ];
   });
-
 in
-mkDerivation rec {
-  pname = "openmw";
-  version = "0.47.0";
+  mkDerivation rec {
+    pname = "openmw";
+    version = "0.47.0";
 
-  src = fetchFromGitHub {
-    owner = "OpenMW";
-    repo = "openmw";
-    rev = "${pname}-${version}";
-    sha256 = "sha256-Xq9hDUTCQr79Zzjk0CsiXclVTHK6nrSowukIQqVdrKY=";
-  };
+    src = fetchFromGitHub {
+      owner = "OpenMW";
+      repo = "openmw";
+      rev = "${pname}-${version}";
+      sha256 = "sha256-Xq9hDUTCQr79Zzjk0CsiXclVTHK6nrSowukIQqVdrKY=";
+    };
 
-  nativeBuildInputs = [ cmake pkg-config wrapQtAppsHook ];
+    nativeBuildInputs = [cmake pkg-config wrapQtAppsHook];
 
-  buildInputs = [
-    SDL2
-    boost
-    bullet_openmw
-    ffmpeg
-    libXt
-    mygui
-    openal
-    openscenegraph_openmw
-    unshield
-    lz4
-    recastnavigation
-  ];
+    buildInputs = [
+      SDL2
+      boost
+      bullet_openmw
+      ffmpeg
+      libXt
+      mygui
+      openal
+      openscenegraph_openmw
+      unshield
+      lz4
+      recastnavigation
+    ];
 
-  cmakeFlags = [
-    # as of 0.46, openmw is broken with GLVND
-    "-DOpenGL_GL_PREFERENCE=LEGACY"
-    "-DOPENMW_USE_SYSTEM_RECASTNAVIGATION=1"
-  ];
+    cmakeFlags = [
+      # as of 0.46, openmw is broken with GLVND
+      "-DOpenGL_GL_PREFERENCE=LEGACY"
+      "-DOPENMW_USE_SYSTEM_RECASTNAVIGATION=1"
+    ];
 
-  meta = with lib; {
-    description = "An unofficial open source engine reimplementation of the game Morrowind";
-    homepage = "https://openmw.org";
-    license = licenses.gpl3Plus;
-    maintainers = with maintainers; [ abbradar marius851000 ];
-    platforms = platforms.linux;
-  };
-}
+    meta = with lib; {
+      description = "An unofficial open source engine reimplementation of the game Morrowind";
+      homepage = "https://openmw.org";
+      license = licenses.gpl3Plus;
+      maintainers = with maintainers; [abbradar marius851000];
+      platforms = platforms.linux;
+    };
+  }

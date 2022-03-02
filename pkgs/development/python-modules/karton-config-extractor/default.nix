@@ -1,11 +1,11 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, karton-core
-, malduck
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  karton-core,
+  malduck,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "karton-config-extractor";
   version = "2.0.2";
@@ -40,7 +40,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Static configuration extractor for the Karton framework";
     homepage = "https://github.com/CERT-Polska/karton-config-extractor";
-    license = with licenses; [ bsd3 ];
-    maintainers = with maintainers; [ fab ];
+    license = with licenses; [bsd3];
+    maintainers = with maintainers; [fab];
   };
 }

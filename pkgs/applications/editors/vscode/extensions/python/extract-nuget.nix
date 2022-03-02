@@ -1,10 +1,16 @@
-{ stdenv, unzip }:
-{ name, version, src, ... }:
-
+{
+  stdenv,
+  unzip,
+}: {
+  name,
+  version,
+  src,
+  ...
+}:
 stdenv.mkDerivation {
   inherit name version src;
 
-  nativeBuildInputs = [ unzip ];
+  nativeBuildInputs = [unzip];
   dontBuild = true;
   unpackPhase = "unzip $src";
   installPhase = ''

@@ -1,8 +1,8 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
 }:
-
 buildPythonPackage rec {
   pname = "types-enum34";
   version = "1.1.8";
@@ -20,6 +20,6 @@ buildPythonPackage rec {
     description = "Typing stubs for enum34";
     homepage = "https://github.com/python/typeshed";
     license = licenses.asl20;
-    maintainers = with maintainers; [ jpetrucciani ];
+    maintainers = with maintainers; [jpetrucciani];
   };
 }

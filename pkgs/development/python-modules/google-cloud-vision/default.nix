@@ -1,15 +1,15 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, google-api-core
-, libcst
-, mock
-, proto-plus
-, pytestCheckHook
-, pytest-asyncio
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  google-api-core,
+  libcst,
+  mock,
+  proto-plus,
+  pytestCheckHook,
+  pytest-asyncio,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "google-cloud-vision";
   version = "2.7.0";
@@ -48,6 +48,6 @@ buildPythonPackage rec {
     description = "Cloud Vision API API client library";
     homepage = "https://github.com/googleapis/python-vision";
     license = licenses.asl20;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [SuperSandro2000];
   };
 }

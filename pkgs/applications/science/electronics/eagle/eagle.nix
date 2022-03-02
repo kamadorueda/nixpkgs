@@ -1,16 +1,53 @@
-{ lib, stdenv, mkDerivation, fetchurl, makeDesktopItem
-, libXrender, libXrandr, libXcursor, libX11, libXext, libXi, libxcb
- , libGL, glib, nss, nspr, expat, alsa-lib
-, qtbase, qtdeclarative, qtsvg, qtlocation, qtwebchannel, qtwebengine
-}:
-
-let
-  libPath = lib.makeLibraryPath
-    [ libXrender libXrandr libXcursor libX11 libXext libXi libxcb
-      libGL glib nss nspr expat alsa-lib
-      qtbase qtdeclarative qtsvg qtlocation qtwebchannel qtwebengine
+{
+  lib,
+  stdenv,
+  mkDerivation,
+  fetchurl,
+  makeDesktopItem,
+  libXrender,
+  libXrandr,
+  libXcursor,
+  libX11,
+  libXext,
+  libXi,
+  libxcb,
+  libGL,
+  glib,
+  nss,
+  nspr,
+  expat,
+  alsa-lib,
+  qtbase,
+  qtdeclarative,
+  qtsvg,
+  qtlocation,
+  qtwebchannel,
+  qtwebengine,
+}: let
+  libPath =
+    lib.makeLibraryPath
+    [
+      libXrender
+      libXrandr
+      libXcursor
+      libX11
+      libXext
+      libXi
+      libxcb
+      libGL
+      glib
+      nss
+      nspr
+      expat
+      alsa-lib
+      qtbase
+      qtdeclarative
+      qtsvg
+      qtlocation
+      qtwebchannel
+      qtwebengine
     ];
-  in
+in
   mkDerivation rec {
     pname = "eagle";
     version = "9.6.2";
@@ -27,14 +64,30 @@ let
       comment = "Schematic capture and PCB layout";
       desktopName = "Eagle";
       genericName = "Schematic editor";
-      categories = [ "Development" ];
+      categories = ["Development"];
     };
 
-    buildInputs =
-      [ libXrender libXrandr libXcursor libX11 libXext libXi libxcb
-        libGL glib nss nspr expat alsa-lib
-        qtbase qtdeclarative qtsvg qtlocation qtwebchannel qtwebengine
-      ];
+    buildInputs = [
+      libXrender
+      libXrandr
+      libXcursor
+      libX11
+      libXext
+      libXi
+      libxcb
+      libGL
+      glib
+      nss
+      nspr
+      expat
+      alsa-lib
+      qtbase
+      qtdeclarative
+      qtsvg
+      qtlocation
+      qtwebchannel
+      qtwebengine
+    ];
 
     installPhase = ''
       # Extract eagle tarball
@@ -74,7 +127,7 @@ let
       description = "Schematic editor and PCB layout tool from Autodesk (formerly CadSoft)";
       homepage = "https://www.autodesk.com/products/eagle/overview";
       license = licenses.unfree;
-      platforms = [ "x86_64-linux" ];
-      maintainers = [ ];
+      platforms = ["x86_64-linux"];
+      maintainers = [];
     };
   }

@@ -1,9 +1,10 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
-
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.bitlbee;
   bitlbeeUid = config.ids.uids.bitlbee;
 
@@ -12,40 +13,34 @@ let
     enablePam = cfg.authBackend == "pam";
   };
 
-  bitlbeeConfig = pkgs.writeText "bitlbee.conf"
+  bitlbeeConfig =
+    pkgs.writeText "bitlbee.conf"
     ''
-    [settings]
-    RunMode = Daemon
-    ConfigDir = ${cfg.configDir}
-    DaemonInterface = ${cfg.interface}
-    DaemonPort = ${toString cfg.portNumber}
-    AuthMode = ${cfg.authMode}
-    AuthBackend = ${cfg.authBackend}
-    Plugindir = ${pkgs.bitlbee-plugins cfg.plugins}/lib/bitlbee
-    ${lib.optionalString (cfg.hostName != "") "HostName = ${cfg.hostName}"}
-    ${lib.optionalString (cfg.protocols != "") "Protocols = ${cfg.protocols}"}
-    ${cfg.extraSettings}
+      [settings]
+      RunMode = Daemon
+      ConfigDir = ${cfg.configDir}
+      DaemonInterface = ${cfg.interface}
+      DaemonPort = ${toString cfg.portNumber}
+      AuthMode = ${cfg.authMode}
+      AuthBackend = ${cfg.authBackend}
+      Plugindir = ${pkgs.bitlbee-plugins cfg.plugins}/lib/bitlbee
+      ${lib.optionalString (cfg.hostName != "") "HostName = ${cfg.hostName}"}
+      ${lib.optionalString (cfg.protocols != "") "Protocols = ${cfg.protocols}"}
+      ${cfg.extraSettings}
 
-    [defaults]
-    ${cfg.extraDefaults}
+      [defaults]
+      ${cfg.extraDefaults}
     '';
 
   purple_plugin_path =
     lib.concatMapStringsSep ":"
-      (plugin: "${plugin}/lib/pidgin/:${plugin}/lib/purple-2/")
-      cfg.libpurple_plugins
-    ;
-
-in
-
-{
-
+    (plugin: "${plugin}/lib/pidgin/:${plugin}/lib/purple-2/")
+    cfg.libpurple_plugins;
+in {
   ###### interface
 
   options = {
-
     services.bitlbee = {
-
       enable = mkOption {
         type = types.bool;
         default = false;
@@ -76,7 +71,7 @@ in
 
       authBackend = mkOption {
         default = "storage";
-        type = types.enum [ "storage" "pam" ];
+        type = types.enum ["storage" "pam"];
         description = ''
           How users are authenticated
             storage -- save passwords internally
@@ -86,7 +81,7 @@ in
 
       authMode = mkOption {
         default = "Open";
-        type = types.enum [ "Open" "Closed" "Registered" ];
+        type = types.enum ["Open" "Closed" "Registered"];
         description = ''
           The following authentication modes are available:
             Open -- Accept connections from anyone, use NickServ for user authentication.
@@ -156,20 +151,18 @@ in
           Will be inserted in the Default section of the config file.
         '';
       };
-
     };
-
   };
 
   ###### implementation
 
-  config =  mkMerge [
+  config = mkMerge [
     (mkIf config.services.bitlbee.enable {
       systemd.services.bitlbee = {
         environment.PURPLE_PLUGIN_PATH = purple_plugin_path;
         description = "BitlBee IRC to other chat networks gateway";
-        after = [ "network.target" ];
-        wantedBy = [ "multi-user.target" ];
+        after = ["network.target"];
+        wantedBy = ["multi-user.target"];
 
         serviceConfig = {
           DynamicUser = true;
@@ -178,12 +171,10 @@ in
         };
       };
 
-      environment.systemPackages = [ bitlbeePkg ];
-
+      environment.systemPackages = [bitlbeePkg];
     })
     (mkIf (config.services.bitlbee.authBackend == "pam") {
       security.pam.services.bitlbee = {};
     })
   ];
-
 }

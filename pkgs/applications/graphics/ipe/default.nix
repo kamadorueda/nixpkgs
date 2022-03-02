@@ -1,22 +1,22 @@
-{ lib
-, mkDerivation
-, makeDesktopItem
-, fetchurl
-, pkg-config
-, copyDesktopItems
-, cairo
-, freetype
-, ghostscript
-, gsl
-, libjpeg
-, libpng
-, libspiro
-, lua5
-, qtbase
-, texlive
-, zlib
+{
+  lib,
+  mkDerivation,
+  makeDesktopItem,
+  fetchurl,
+  pkg-config,
+  copyDesktopItems,
+  cairo,
+  freetype,
+  ghostscript,
+  gsl,
+  libjpeg,
+  libpng,
+  libspiro,
+  lua5,
+  qtbase,
+  texlive,
+  zlib,
 }:
-
 mkDerivation rec {
   pname = "ipe";
   version = "7.2.23";
@@ -28,7 +28,7 @@ mkDerivation rec {
 
   sourceRoot = "${pname}-${version}/src";
 
-  nativeBuildInputs = [ pkg-config copyDesktopItems ];
+  nativeBuildInputs = [pkg-config copyDesktopItems];
 
   buildInputs = [
     cairo
@@ -48,7 +48,7 @@ mkDerivation rec {
   URWFONTDIR = "${texlive}/texmf-dist/fonts/type1/urw/";
   LUA_PACKAGE = "lua";
 
-  qtWrapperArgs = [ "--prefix PATH : ${lib.makeBinPath [ texlive ]}" ];
+  qtWrapperArgs = ["--prefix PATH : ${lib.makeBinPath [texlive]}"];
 
   enableParallelBuilding = true;
 
@@ -60,8 +60,8 @@ mkDerivation rec {
       comment = "A drawing editor for creating figures in PDF format";
       exec = "ipe";
       icon = "ipe";
-      mimeTypes = [ "text/xml" "application/pdf" ];
-      categories = [ "Graphics" "Qt" ];
+      mimeTypes = ["text/xml" "application/pdf"];
+      categories = ["Graphics" "Qt"];
       startupNotify = true;
       startupWMClass = "ipe";
     })
@@ -81,7 +81,7 @@ mkDerivation rec {
       It supports making small figures for inclusion into LaTeX-documents
       as well as presentations in PDF.
     '';
-    maintainers = with maintainers; [ ttuegel ];
+    maintainers = with maintainers; [ttuegel];
     platforms = platforms.linux;
   };
 }

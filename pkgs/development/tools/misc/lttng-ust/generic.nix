@@ -1,7 +1,15 @@
-{ version, sha256 }:
-
-{ lib, stdenv, fetchurl, pkg-config, liburcu, numactl, python3 }:
-
+{
+  version,
+  sha256,
+}: {
+  lib,
+  stdenv,
+  fetchurl,
+  pkg-config,
+  liburcu,
+  numactl,
+  python3,
+}:
 # NOTE:
 #   ./configure ...
 #   [...]
@@ -12,7 +20,6 @@
 #   [...]
 #
 # Debian builds with std.h (systemtap).
-
 stdenv.mkDerivation rec {
   pname = "lttng-ust";
   inherit version;
@@ -22,23 +29,22 @@ stdenv.mkDerivation rec {
     inherit sha256;
   };
 
-  nativeBuildInputs = [ pkg-config ];
-  buildInputs = [ numactl python3 ];
+  nativeBuildInputs = [pkg-config];
+  buildInputs = [numactl python3];
 
   preConfigure = ''
     patchShebangs .
   '';
 
-  propagatedBuildInputs = [ liburcu ];
+  propagatedBuildInputs = [liburcu];
 
   enableParallelBuilding = true;
 
   meta = with lib; {
     description = "LTTng Userspace Tracer libraries";
     homepage = "https://lttng.org/";
-    license = with licenses; [ lgpl21Only gpl2Only mit ];
+    license = with licenses; [lgpl21Only gpl2Only mit];
     platforms = platforms.linux;
-    maintainers = [ maintainers.bjornfor ];
+    maintainers = [maintainers.bjornfor];
   };
-
 }

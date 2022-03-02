@@ -1,5 +1,9 @@
-{ lib, buildGoModule, fetchurl, nixosTests }:
-
+{
+  lib,
+  buildGoModule,
+  fetchurl,
+  nixosTests,
+}:
 buildGoModule rec {
   pname = "ipfs";
   version = "0.12.0"; # When updating, also check if the repo version changed and adjust repoVersion below
@@ -23,7 +27,7 @@ buildGoModule rec {
 
   sourceRoot = ".";
 
-  subPackages = [ "cmd/ipfs" ];
+  subPackages = ["cmd/ipfs"];
 
   passthru.tests.ipfs = nixosTests.ipfs;
 
@@ -45,6 +49,6 @@ buildGoModule rec {
     homepage = "https://ipfs.io/";
     license = licenses.mit;
     platforms = platforms.unix;
-    maintainers = with maintainers; [ fpletz ];
+    maintainers = with maintainers; [fpletz];
   };
 }

@@ -1,61 +1,61 @@
-import ./make-test-python.nix ({ pkgs, ... }: let
-  snakeOil = pkgs.runCommand "snakeoil-certs" {
-    outputs = [ "out" "cacert" "cert" "key" "crl" ];
-    buildInputs = [ pkgs.gnutls.bin ];
-    caTemplate = pkgs.writeText "snakeoil-ca.template" ''
-      cn = server
-      expiration_days = -1
-      cert_signing_key
-      ca
-    '';
-    certTemplate = pkgs.writeText "snakeoil-cert.template" ''
-      cn = server
-      expiration_days = -1
-      tls_www_server
-      encryption_key
-      signing_key
-    '';
-    crlTemplate = pkgs.writeText "snakeoil-crl.template" ''
-      expiration_days = -1
-    '';
-    userCertTemplate = pkgs.writeText "snakeoil-user-cert.template" ''
-      organization = snakeoil
-      cn = server
-      expiration_days = -1
-      tls_www_client
-      encryption_key
-      signing_key
-    '';
-  } ''
-    certtool -p --bits 4096 --outfile ca.key
-    certtool -s --template "$caTemplate" --load-privkey ca.key \
-                --outfile "$cacert"
-    certtool -p --bits 4096 --outfile "$key"
-    certtool -c --template "$certTemplate" \
-                --load-ca-privkey ca.key \
-                --load-ca-certificate "$cacert" \
-                --load-privkey "$key" \
-                --outfile "$cert"
-    certtool --generate-crl --template "$crlTemplate" \
-                            --load-ca-privkey ca.key \
-                            --load-ca-certificate "$cacert" \
-                            --outfile "$crl"
+import ./make-test-python.nix ({pkgs, ...}: let
+  snakeOil =
+    pkgs.runCommand "snakeoil-certs" {
+      outputs = ["out" "cacert" "cert" "key" "crl"];
+      buildInputs = [pkgs.gnutls.bin];
+      caTemplate = pkgs.writeText "snakeoil-ca.template" ''
+        cn = server
+        expiration_days = -1
+        cert_signing_key
+        ca
+      '';
+      certTemplate = pkgs.writeText "snakeoil-cert.template" ''
+        cn = server
+        expiration_days = -1
+        tls_www_server
+        encryption_key
+        signing_key
+      '';
+      crlTemplate = pkgs.writeText "snakeoil-crl.template" ''
+        expiration_days = -1
+      '';
+      userCertTemplate = pkgs.writeText "snakeoil-user-cert.template" ''
+        organization = snakeoil
+        cn = server
+        expiration_days = -1
+        tls_www_client
+        encryption_key
+        signing_key
+      '';
+    } ''
+      certtool -p --bits 4096 --outfile ca.key
+      certtool -s --template "$caTemplate" --load-privkey ca.key \
+                  --outfile "$cacert"
+      certtool -p --bits 4096 --outfile "$key"
+      certtool -c --template "$certTemplate" \
+                  --load-ca-privkey ca.key \
+                  --load-ca-certificate "$cacert" \
+                  --load-privkey "$key" \
+                  --outfile "$cert"
+      certtool --generate-crl --template "$crlTemplate" \
+                              --load-ca-privkey ca.key \
+                              --load-ca-certificate "$cacert" \
+                              --outfile "$crl"
 
-    mkdir "$out"
+      mkdir "$out"
 
-    # Stripping key information before the actual PEM-encoded values is solely
-    # to make test output a bit less verbose when copying the client key to the
-    # actual client.
-    certtool -p --bits 4096 | sed -n \
-      -e '/^----* *BEGIN/,/^----* *END/p' > "$out/alice.key"
+      # Stripping key information before the actual PEM-encoded values is solely
+      # to make test output a bit less verbose when copying the client key to the
+      # actual client.
+      certtool -p --bits 4096 | sed -n \
+        -e '/^----* *BEGIN/,/^----* *END/p' > "$out/alice.key"
 
-    certtool -c --template "$userCertTemplate" \
-                --load-privkey "$out/alice.key" \
-                --load-ca-privkey ca.key \
-                --load-ca-certificate "$cacert" \
-                --outfile "$out/alice.cert"
-  '';
-
+      certtool -c --template "$userCertTemplate" \
+                  --load-privkey "$out/alice.key" \
+                  --load-ca-privkey ca.key \
+                  --load-ca-certificate "$cacert" \
+                  --outfile "$out/alice.cert"
+    '';
 in {
   name = "taskserver";
 
@@ -65,14 +65,18 @@ in {
       services.taskserver.listenHost = "::";
       services.taskserver.fqdn = "server";
       services.taskserver.organisations = {
-        testOrganisation.users = [ "alice" "foo" ];
-        anotherOrganisation.users = [ "bob" ];
+        testOrganisation.users = ["alice" "foo"];
+        anotherOrganisation.users = ["bob"];
       };
     };
 
     # New generation of the server with manual config
-    newServer = { lib, nodes, ... }: {
-      imports = [ server ];
+    newServer = {
+      lib,
+      nodes,
+      ...
+    }: {
+      imports = [server];
       services.taskserver.pki.manual = {
         ca.cert = snakeOil.cacert;
         server.cert = snakeOil.cert;
@@ -83,13 +87,17 @@ in {
       # generation.
       networking = lib.mapAttrs (lib.const lib.mkForce) {
         interfaces.eth1.ipv4 = nodes.server.config.networking.interfaces.eth1.ipv4;
-        inherit (nodes.server.config.networking)
-          hostName primaryIPAddress extraHosts;
+        inherit
+          (nodes.server.config.networking)
+          hostName
+          primaryIPAddress
+          extraHosts
+          ;
       };
     };
 
-    client1 = { pkgs, ... }: {
-      environment.systemPackages = [ pkgs.taskwarrior pkgs.gnutls ];
+    client1 = {pkgs, ...}: {
+      environment.systemPackages = [pkgs.taskwarrior pkgs.gnutls];
       users.users.alice.isNormalUser = true;
       users.users.bob.isNormalUser = true;
       users.users.foo.isNormalUser = true;
@@ -99,7 +107,7 @@ in {
     client2 = client1;
   };
 
-  testScript = { nodes, ... }: let
+  testScript = {nodes, ...}: let
     cfg = nodes.server.config.services.taskserver;
     portStr = toString cfg.listenPort;
     newServerSystem = nodes.newServer.config.system.build.toplevel;

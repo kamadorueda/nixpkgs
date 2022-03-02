@@ -1,16 +1,19 @@
-{ config, lib, pkgs, ... }:
-
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 # TODO: This is not secure, have a look at the file docs/security.txt inside
 # the project sources.
-with lib;
-
-let
+with lib; let
   cfg = config.power.ups;
-in
-
-let
-  upsOptions = {name, config, ...}:
-  {
+in let
+  upsOptions = {
+    name,
+    config,
+    ...
+  }: {
     options = {
       # This can be infered from the UPS model by looking at
       # /nix/store/nut/share/driver.list
@@ -76,29 +79,24 @@ let
           Lines which would be added inside ups.conf for handling this UPS.
         '';
       };
-
     };
 
     config = {
       directives = mkOrder 10 ([
-        "driver = ${config.driver}"
-        "port = ${config.port}"
-        ''desc = "${config.description}"''
-        "sdorder = ${toString config.shutdownOrder}"
-      ] ++ (optional (config.maxStartDelay != null)
-            "maxstartdelay = ${toString config.maxStartDelay}")
-      );
+          "driver = ${config.driver}"
+          "port = ${config.port}"
+          ''desc = "${config.description}"''
+          "sdorder = ${toString config.shutdownOrder}"
+        ]
+        ++ (optional (config.maxStartDelay != null)
+          "maxstartdelay = ${toString config.maxStartDelay}"));
 
       summary =
         concatStringsSep "\n      "
-          (["[${name}]"] ++ config.directives);
+        (["[${name}]"] ++ config.directives);
     };
   };
-
-in
-
-
-{
+in {
   options = {
     # powerManagement.powerDownCommands
 
@@ -148,7 +146,6 @@ in
         '';
       };
 
-
       maxStartDelay = mkOption {
         default = 45;
         type = types.int;
@@ -171,18 +168,16 @@ in
         '';
         type = with types; attrsOf (submodule upsOptions);
       };
-
     };
   };
 
   config = mkIf cfg.enable {
-
-    environment.systemPackages = [ pkgs.nut ];
+    environment.systemPackages = [pkgs.nut];
 
     systemd.services.upsmon = {
       description = "Uninterruptible Power Supplies (Monitor)";
-      after = [ "network.target" ];
-      wantedBy = [ "multi-user.target" ];
+      after = ["network.target"];
+      wantedBy = ["multi-user.target"];
       serviceConfig.Type = "forking";
       script = "${pkgs.nut}/sbin/upsmon";
       environment.NUT_CONFPATH = "/etc/nut/";
@@ -191,8 +186,8 @@ in
 
     systemd.services.upsd = {
       description = "Uninterruptible Power Supplies (Daemon)";
-      after = [ "network.target" "upsmon.service" ];
-      wantedBy = [ "multi-user.target" ];
+      after = ["network.target" "upsmon.service"];
+      wantedBy = ["multi-user.target"];
       serviceConfig.Type = "forking";
       # TODO: replace 'root' by another username.
       script = "${pkgs.nut}/sbin/upsd -u root";
@@ -202,8 +197,8 @@ in
 
     systemd.services.upsdrv = {
       description = "Uninterruptible Power Supplies (Register all UPS)";
-      after = [ "upsd.service" ];
-      wantedBy = [ "multi-user.target" ];
+      after = ["upsd.service"];
+      wantedBy = ["multi-user.target"];
       # TODO: replace 'root' by another username.
       script = "${pkgs.nut}/bin/upsdrvctl -u root start";
       serviceConfig = {
@@ -215,11 +210,13 @@ in
     };
 
     environment.etc = {
-      "nut/nut.conf".source = pkgs.writeText "nut.conf"
+      "nut/nut.conf".source =
+        pkgs.writeText "nut.conf"
         ''
           MODE = ${cfg.mode}
         '';
-      "nut/ups.conf".source = pkgs.writeText "ups.conf"
+      "nut/ups.conf".source =
+        pkgs.writeText "ups.conf"
         ''
           maxstartdelay = ${toString cfg.maxStartDelay}
 
@@ -231,33 +228,32 @@ in
       # These file are containing private informations and thus should not
       # be stored inside the Nix store.
       /*
-      "nut/upsd.conf".source = "";
-      "nut/upsd.users".source = "";
-      "nut/upsmon.conf".source = "";
-      */
+       "nut/upsd.conf".source = "";
+       "nut/upsd.users".source = "";
+       "nut/upsmon.conf".source = "";
+       */
     };
 
     power.ups.schedulerRules = mkDefault "${pkgs.nut}/etc/upssched.conf.sample";
 
-    system.activationScripts.upsSetup = stringAfter [ "users" "groups" ]
+    system.activationScripts.upsSetup =
+      stringAfter ["users" "groups"]
       ''
         # Used to store pid files of drivers.
         mkdir -p /var/state/ups
       '';
 
-
-/*
-    users.users.nut =
-      { uid = 84;
-        home = "/var/lib/nut";
-        createHome = true;
-        group = "nut";
-        description = "UPnP A/V Media Server user";
-      };
-
-    users.groups."nut" =
-      { gid = 84; };
-*/
-
+    /*
+     users.users.nut =
+       { uid = 84;
+         home = "/var/lib/nut";
+         createHome = true;
+         group = "nut";
+         description = "UPnP A/V Media Server user";
+       };
+     
+     users.groups."nut" =
+       { gid = 84; };
+     */
   };
 }

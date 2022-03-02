@@ -1,17 +1,15 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, pythonOlder
-
-# propagates
-, packaging
-
-# tests
-, pyqt5
-, pyside
-, pytestCheckHook
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  pythonOlder,
+  # propagates
+  packaging,
+  # tests
+  pyqt5,
+  pyside,
+  pytestCheckHook,
 }:
-
 buildPythonPackage rec {
   pname = "QtPy";
   version = "2.0.0";

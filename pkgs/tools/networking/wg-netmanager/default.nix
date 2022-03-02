@@ -1,5 +1,12 @@
-{ lib, stdenv, fetchFromGitHub, rustPlatform, darwin, wireguard-go, Security }:
-
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  rustPlatform,
+  darwin,
+  wireguard-go,
+  Security,
+}:
 rustPlatform.buildRustPackage rec {
   pname = "wg-netmanager";
   version = "0.5.1";
@@ -28,8 +35,8 @@ rustPlatform.buildRustPackage rec {
       To achieve this, wireguard network manager needs to be running on each node.
     '';
     homepage = "https://github.com/gin66/wg_netmanager";
-    license = with licenses; [ mit asl20 bsd3 mpl20 ];
-    maintainers = with maintainers; [ gin66 ];
+    license = with licenses; [mit asl20 bsd3 mpl20];
+    maintainers = with maintainers; [gin66];
     platforms = platforms.linux;
   };
 }

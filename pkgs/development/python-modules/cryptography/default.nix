@@ -1,24 +1,25 @@
-{ lib, stdenv
-, buildPythonPackage
-, fetchPypi
-, rustPlatform
-, setuptools-rust
-, openssl
-, cryptography_vectors
-, darwin
-, packaging
-, six
-, isPyPy
-, cffi
-, pytest
-, pytest-subtests
-, pretend
-, libiconv
-, iso8601
-, pytz
-, hypothesis
+{
+  lib,
+  stdenv,
+  buildPythonPackage,
+  fetchPypi,
+  rustPlatform,
+  setuptools-rust,
+  openssl,
+  cryptography_vectors,
+  darwin,
+  packaging,
+  six,
+  isPyPy,
+  cffi,
+  pytest,
+  pytest-subtests,
+  pretend,
+  libiconv,
+  iso8601,
+  pytz,
+  hypothesis,
 }:
-
 buildPythonPackage rec {
   pname = "cryptography";
   version = "36.0.0"; # Also update the hash in vectors.nix
@@ -37,23 +38,29 @@ buildPythonPackage rec {
 
   cargoRoot = "src/rust";
 
-  outputs = [ "out" "dev" ];
+  outputs = ["out" "dev"];
 
-  nativeBuildInputs = lib.optionals (!isPyPy) [
-    cffi
-  ] ++ [
-    rustPlatform.cargoSetupHook
-    setuptools-rust
-  ] ++ (with rustPlatform; [ rust.cargo rust.rustc ]);
+  nativeBuildInputs =
+    lib.optionals (!isPyPy) [
+      cffi
+    ]
+    ++ [
+      rustPlatform.cargoSetupHook
+      setuptools-rust
+    ]
+    ++ (with rustPlatform; [rust.cargo rust.rustc]);
 
-  buildInputs = [ openssl ]
-             ++ lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security libiconv ];
-  propagatedBuildInputs = [
-    packaging
-    six
-  ] ++ lib.optionals (!isPyPy) [
-    cffi
-  ];
+  buildInputs =
+    [openssl]
+    ++ lib.optionals stdenv.isDarwin [darwin.apple_sdk.frameworks.Security libiconv];
+  propagatedBuildInputs =
+    [
+      packaging
+      six
+    ]
+    ++ lib.optionals (!isPyPy) [
+      cffi
+    ];
 
   checkInputs = [
     cryptography_vectors
@@ -66,14 +73,13 @@ buildPythonPackage rec {
   ];
 
   pytestFlags = lib.concatStringsSep " " ([
-    "--disable-pytest-warnings"
-  ] ++
-    lib.optionals (stdenv.isDarwin && stdenv.isAarch64) [
+      "--disable-pytest-warnings"
+    ]
+    ++ lib.optionals (stdenv.isDarwin && stdenv.isAarch64) [
       # aarch64-darwin forbids W+X memory, but this tests depends on it:
       # * https://cffi.readthedocs.io/en/latest/using.html#callbacks
       "--ignore=tests/hazmat/backends/test_openssl_memleak.py"
-    ]
-  );
+    ]);
 
   checkPhase = ''
     py.test ${pytestFlags} tests
@@ -89,9 +95,10 @@ buildPythonPackage rec {
       supports Python 2.7, Python 3.5+, and PyPy 5.4+.
     '';
     homepage = "https://github.com/pyca/cryptography";
-    changelog = "https://cryptography.io/en/latest/changelog/#v"
-      + replaceStrings [ "." ] [ "-" ] version;
-    license = with licenses; [ asl20 bsd3 psfl ];
-    maintainers = with maintainers; [ primeos ];
+    changelog =
+      "https://cryptography.io/en/latest/changelog/#v"
+      + replaceStrings ["."] ["-"] version;
+    license = with licenses; [asl20 bsd3 psfl];
+    maintainers = with maintainers; [primeos];
   };
 }

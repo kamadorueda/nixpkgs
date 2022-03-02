@@ -1,12 +1,14 @@
-{ config, lib, pkgs, ... }:
-
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
   inherit (lib) mkEnableOption mkIf mkOption optionalString types;
 
   cfg = config.services.bird2;
-  caps = [ "CAP_NET_ADMIN" "CAP_NET_BIND_SERVICE" "CAP_NET_RAW" ];
-in
-{
+  caps = ["CAP_NET_ADMIN" "CAP_NET_BIND_SERVICE" "CAP_NET_RAW"];
+in {
   ###### interface
   options = {
     services.bird2 = {
@@ -45,15 +47,14 @@ in
     };
   };
 
-
   imports = [
-    (lib.mkRemovedOptionModule [ "services" "bird" ] "Use services.bird2 instead")
-    (lib.mkRemovedOptionModule [ "services" "bird6" ] "Use services.bird2 instead")
+    (lib.mkRemovedOptionModule ["services" "bird"] "Use services.bird2 instead")
+    (lib.mkRemovedOptionModule ["services" "bird6"] "Use services.bird2 instead")
   ];
 
   ###### implementation
   config = mkIf cfg.enable {
-    environment.systemPackages = [ pkgs.bird ];
+    environment.systemPackages = [pkgs.bird];
 
     environment.etc."bird/bird2.conf".source = pkgs.writeTextFile {
       name = "bird2";
@@ -67,9 +68,9 @@ in
 
     systemd.services.bird2 = {
       description = "BIRD Internet Routing Daemon";
-      wantedBy = [ "multi-user.target" ];
+      wantedBy = ["multi-user.target"];
       reloadIfChanged = true;
-      restartTriggers = [ config.environment.etc."bird/bird2.conf".source ];
+      restartTriggers = [config.environment.etc."bird/bird2.conf".source];
       serviceConfig = {
         Type = "forking";
         Restart = "on-failure";
@@ -97,7 +98,7 @@ in
         group = "bird2";
         isSystemUser = true;
       };
-      groups.bird2 = { };
+      groups.bird2 = {};
     };
   };
 }

@@ -1,12 +1,12 @@
-{ lib
-, stdenv
-, fetchFromGitea
-, rustPlatform
-, libiconv
-, Security
-, installShellFiles
+{
+  lib,
+  stdenv,
+  fetchFromGitea,
+  rustPlatform,
+  libiconv,
+  Security,
+  installShellFiles,
 }:
-
 rustPlatform.buildRustPackage rec {
   pname = "git-gone";
   version = "0.3.8";
@@ -21,9 +21,9 @@ rustPlatform.buildRustPackage rec {
 
   cargoSha256 = "sha256-gBQ4V8Bwx6Di8aVnOYwx0UZZIIOFxZAXT7Tl1Yli0Fk=";
 
-  nativeBuildInputs = [ installShellFiles ];
+  nativeBuildInputs = [installShellFiles];
 
-  buildInputs = lib.optionals stdenv.isDarwin [ libiconv Security ];
+  buildInputs = lib.optionals stdenv.isDarwin [libiconv Security];
 
   postInstall = ''
     installManPage git-gone.1
@@ -34,6 +34,6 @@ rustPlatform.buildRustPackage rec {
     homepage = "https://codeberg.org/flausch/git-gone";
     changelog = "https://codeberg.org/flausch/git-gone/raw/tag/v${version}/CHANGELOG.md";
     license = licenses.asl20;
-    maintainers = [ maintainers.marsam ];
+    maintainers = [maintainers.marsam];
   };
 }

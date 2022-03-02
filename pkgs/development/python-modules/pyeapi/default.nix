@@ -1,12 +1,12 @@
-{ lib
-, buildPythonPackage
-, pythonAtLeast
-, fetchFromGitHub
-, netaddr
-, pytestCheckHook
-, mock
+{
+  lib,
+  buildPythonPackage,
+  pythonAtLeast,
+  fetchFromGitHub,
+  netaddr,
+  pytestCheckHook,
+  mock,
 }:
-
 buildPythonPackage rec {
   pname = "pyeapi";
   version = "0.8.4";
@@ -22,21 +22,21 @@ buildPythonPackage rec {
     sha256 = "13chya6wix5jb82k67gr44bjx35gcdwz80nsvpv0gvzs6shn4d7b";
   };
 
-  propagatedBuildInputs = [ netaddr ];
+  propagatedBuildInputs = [netaddr];
 
   checkInputs = [
     mock
     pytestCheckHook
   ];
 
-  pytestFlagsArray = [ "test/unit" ];
+  pytestFlagsArray = ["test/unit"];
 
-  pythonImportsCheck = [ "pyeapi" ];
+  pythonImportsCheck = ["pyeapi"];
 
   meta = with lib; {
     description = "Client for Arista eAPI";
     homepage = "https://github.com/arista-eosplus/pyeapi";
     license = licenses.bsd3;
-    maintainers = [ maintainers.astro ];
+    maintainers = [maintainers.astro];
   };
 }

@@ -1,12 +1,16 @@
-{ lib, ruby, bundlerApp, fetchpatch }:
-
+{
+  lib,
+  ruby,
+  bundlerApp,
+  fetchpatch,
+}:
 bundlerApp {
   pname = "3llo";
 
   gemfile = ./Gemfile;
   lockfile = ./Gemfile.lock;
 
-  gemset = lib.recursiveUpdate (import ./gemset.nix) ({
+  gemset = lib.recursiveUpdate (import ./gemset.nix) {
     "3llo" = {
       dontBuild = false;
       patches = [
@@ -16,16 +20,16 @@ bundlerApp {
         })
       ];
     };
-  });
+  };
 
   inherit ruby;
 
-  exes = [ "3llo" ];
+  exes = ["3llo"];
 
   meta = with lib; {
     description = "Trello interactive CLI on terminal";
     license = licenses.mit;
     homepage = "https://github.com/qcam/3llo";
-    maintainers = with maintainers; [ ];
+    maintainers = with maintainers; [];
   };
 }

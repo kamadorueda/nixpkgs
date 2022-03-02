@@ -1,8 +1,11 @@
-{ config, options, lib, pkgs, ... }:
-
-with lib;
-
-let
+{
+  config,
+  options,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.nixpkgs;
   opt = options.nixpkgs;
 
@@ -14,31 +17,32 @@ let
     then f x
     else f;
 
-  mergeConfig = lhs_: rhs_:
-    let
-      lhs = optCall lhs_ { inherit pkgs; };
-      rhs = optCall rhs_ { inherit pkgs; };
-    in
-    recursiveUpdate lhs rhs //
-    optionalAttrs (lhs ? packageOverrides) {
+  mergeConfig = lhs_: rhs_: let
+    lhs = optCall lhs_ {inherit pkgs;};
+    rhs = optCall rhs_ {inherit pkgs;};
+  in
+    recursiveUpdate lhs rhs
+    // optionalAttrs (lhs ? packageOverrides) {
       packageOverrides = pkgs:
-        optCall lhs.packageOverrides pkgs //
-        optCall (attrByPath ["packageOverrides"] ({}) rhs) pkgs;
-    } //
-    optionalAttrs (lhs ? perlPackageOverrides) {
+        optCall lhs.packageOverrides pkgs
+        // optCall (attrByPath ["packageOverrides"] {} rhs) pkgs;
+    }
+    // optionalAttrs (lhs ? perlPackageOverrides) {
       perlPackageOverrides = pkgs:
-        optCall lhs.perlPackageOverrides pkgs //
-        optCall (attrByPath ["perlPackageOverrides"] ({}) rhs) pkgs;
+        optCall lhs.perlPackageOverrides pkgs
+        // optCall (attrByPath ["perlPackageOverrides"] {} rhs) pkgs;
     };
 
   configType = mkOptionType {
     name = "nixpkgs-config";
     description = "nixpkgs config";
-    check = x:
-      let traceXIfNot = c:
-            if c x then true
-            else lib.traceSeqN 1 x false;
-      in traceXIfNot isConfig;
+    check = x: let
+      traceXIfNot = c:
+        if c x
+        then true
+        else lib.traceSeqN 1 x false;
+    in
+      traceXIfNot isConfig;
     merge = args: foldr (def: mergeConfig def.value) {};
   };
 
@@ -59,18 +63,17 @@ let
     inherit (cfg) config overlays localSystem crossSystem;
   };
 
-  finalPkgs = if opt.pkgs.isDefined then cfg.pkgs.appendOverlays cfg.overlays else defaultPkgs;
-
-in
-
-{
+  finalPkgs =
+    if opt.pkgs.isDefined
+    then cfg.pkgs.appendOverlays cfg.overlays
+    else defaultPkgs;
+in {
   imports = [
     ./assertions.nix
     ./meta.nix
   ];
 
   options.nixpkgs = {
-
     pkgs = mkOption {
       defaultText = literalExpression ''
         import "''${nixos}/.." {
@@ -114,7 +117,8 @@ in
 
     config = mkOption {
       default = {};
-      example = literalExpression
+      example =
+        literalExpression
         ''
           { allowBroken = true; allowUnfree = true; }
         '';
@@ -130,7 +134,8 @@ in
 
     overlays = mkOption {
       default = [];
-      example = literalExpression
+      example =
+        literalExpression
         ''
           [
             (self: super: {
@@ -158,12 +163,16 @@ in
 
     localSystem = mkOption {
       type = types.attrs; # TODO utilize lib.systems.parsedPlatform
-      default = { inherit (cfg) system; };
-      example = { system = "aarch64-linux"; config = "aarch64-unknown-linux-gnu"; };
+      default = {inherit (cfg) system;};
+      example = {
+        system = "aarch64-linux";
+        config = "aarch64-unknown-linux-gnu";
+      };
       # Make sure that the final value has all fields for sake of other modules
       # referring to this. TODO make `lib.systems` itself use the module system.
       apply = lib.systems.elaborate;
-      defaultText = literalExpression
+      defaultText =
+        literalExpression
         ''(import "''${nixos}/../lib").lib.systems.examples.aarch64-multiplatform'';
       description = ''
         Specifies the platform on which NixOS should be built. When
@@ -182,7 +191,10 @@ in
     crossSystem = mkOption {
       type = types.nullOr types.attrs; # TODO utilize lib.systems.parsedPlatform
       default = null;
-      example = { system = "aarch64-linux"; config = "aarch64-unknown-linux-gnu"; };
+      example = {
+        system = "aarch64-linux";
+        config = "aarch64-unknown-linux-gnu";
+      };
       description = ''
         Specifies the platform for which NixOS should be
         built. Specify this only if it is different from
@@ -235,22 +247,20 @@ in
     };
 
     assertions = [
-      (
-        let
-          nixosExpectedSystem =
-            if config.nixpkgs.crossSystem != null
-            then config.nixpkgs.crossSystem.system or (lib.systems.parse.doubleFromSystem (lib.systems.parse.mkSystemFromString config.nixpkgs.crossSystem.config))
-            else config.nixpkgs.localSystem.system or (lib.systems.parse.doubleFromSystem (lib.systems.parse.mkSystemFromString config.nixpkgs.localSystem.config));
-          nixosOption =
-            if config.nixpkgs.crossSystem != null
-            then "nixpkgs.crossSystem"
-            else "nixpkgs.localSystem";
-          pkgsSystem = finalPkgs.stdenv.targetPlatform.system;
-        in {
-          assertion = nixosExpectedSystem == pkgsSystem;
-          message = "The NixOS nixpkgs.pkgs option was set to a Nixpkgs invocation that compiles to target system ${pkgsSystem} but NixOS was configured for system ${nixosExpectedSystem} via NixOS option ${nixosOption}. The NixOS system settings must match the Nixpkgs target system.";
-        }
-      )
+      (let
+        nixosExpectedSystem =
+          if config.nixpkgs.crossSystem != null
+          then config.nixpkgs.crossSystem.system or (lib.systems.parse.doubleFromSystem (lib.systems.parse.mkSystemFromString config.nixpkgs.crossSystem.config))
+          else config.nixpkgs.localSystem.system or (lib.systems.parse.doubleFromSystem (lib.systems.parse.mkSystemFromString config.nixpkgs.localSystem.config));
+        nixosOption =
+          if config.nixpkgs.crossSystem != null
+          then "nixpkgs.crossSystem"
+          else "nixpkgs.localSystem";
+        pkgsSystem = finalPkgs.stdenv.targetPlatform.system;
+      in {
+        assertion = nixosExpectedSystem == pkgsSystem;
+        message = "The NixOS nixpkgs.pkgs option was set to a Nixpkgs invocation that compiles to target system ${pkgsSystem} but NixOS was configured for system ${nixosExpectedSystem} via NixOS option ${nixosOption}. The NixOS system settings must match the Nixpkgs target system.";
+      })
     ];
   };
 

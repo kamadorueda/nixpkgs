@@ -3,34 +3,33 @@
 # closure, and $out/registration contains a file suitable for use with
 # "nix-store --load-db" and "nix-store --register-validity
 # --hash-given".
-
-{ stdenv, buildPackages }:
-
-{ rootPaths }:
-
+{
+  stdenv,
+  buildPackages,
+}: {rootPaths}:
 assert builtins.langVersion >= 5;
+  stdenv.mkDerivation {
+    name = "closure-info";
 
-stdenv.mkDerivation {
-  name = "closure-info";
+    __structuredAttrs = true;
 
-  __structuredAttrs = true;
+    exportReferencesGraph.closure = rootPaths;
 
-  exportReferencesGraph.closure = rootPaths;
+    preferLocalBuild = true;
 
-  preferLocalBuild = true;
+    PATH = "${buildPackages.coreutils}/bin:${buildPackages.jq}/bin";
 
-  PATH = "${buildPackages.coreutils}/bin:${buildPackages.jq}/bin";
+    builder =
+      builtins.toFile "builder"
+      ''
+        . .attrs.sh
 
-  builder = builtins.toFile "builder"
-    ''
-      . .attrs.sh
+        out=''${outputs[out]}
 
-      out=''${outputs[out]}
+        mkdir $out
 
-      mkdir $out
-
-      jq -r ".closure | map(.narSize) | add" < .attrs.json > $out/total-nar-size
-      jq -r '.closure | map([.path, .narHash, .narSize, "", (.references | length)] + .references) | add | map("\(.)\n") | add' < .attrs.json | head -n -1 > $out/registration
-      jq -r .closure[].path < .attrs.json > $out/store-paths
-    '';
-}
+        jq -r ".closure | map(.narSize) | add" < .attrs.json > $out/total-nar-size
+        jq -r '.closure | map([.path, .narHash, .narSize, "", (.references | length)] + .references) | add | map("\(.)\n") | add' < .attrs.json | head -n -1 > $out/registration
+        jq -r .closure[].path < .attrs.json > $out/store-paths
+      '';
+  }

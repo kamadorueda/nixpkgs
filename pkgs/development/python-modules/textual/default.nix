@@ -1,13 +1,13 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, fetchpatch
-, poetry-core
-, rich
-, typing-extensions
-, pytestCheckHook
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  fetchpatch,
+  poetry-core,
+  rich,
+  typing-extensions,
+  pytestCheckHook,
 }:
-
 buildPythonPackage rec {
   pname = "textual";
   version = "0.1.15";
@@ -29,7 +29,7 @@ buildPythonPackage rec {
     })
   ];
 
-  nativeBuildInputs = [ poetry-core ];
+  nativeBuildInputs = [poetry-core];
 
   propagatedBuildInputs = [
     rich
@@ -40,12 +40,12 @@ buildPythonPackage rec {
     pytestCheckHook
   ];
 
-  pythonImportsCheck = [ "textual" ];
+  pythonImportsCheck = ["textual"];
 
   meta = with lib; {
     description = "TUI framework for Python inspired by modern web development";
     homepage = "https://github.com/Textualize/textual";
     license = licenses.mit;
-    maintainers = with maintainers; [ jyooru ];
+    maintainers = with maintainers; [jyooru];
   };
 }

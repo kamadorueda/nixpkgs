@@ -1,15 +1,15 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, pytestCheckHook
-, google-cloud-core
-, google-api-core
-, grpc-google-iam-v1
-, proto-plus
-, mock
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  pytestCheckHook,
+  google-cloud-core,
+  google-api-core,
+  grpc-google-iam-v1,
+  proto-plus,
+  mock,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "google-cloud-resource-manager";
   version = "1.4.0";
@@ -48,6 +48,6 @@ buildPythonPackage rec {
     description = "Google Cloud Resource Manager API client library";
     homepage = "https://github.com/googleapis/python-resource-manager";
     license = licenses.asl20;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [SuperSandro2000];
   };
 }

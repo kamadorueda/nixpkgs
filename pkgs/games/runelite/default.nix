@@ -1,5 +1,14 @@
-{ pkgs, lib, stdenv, makeDesktopItem, fetchurl, unzip, makeWrapper, xorg, jre, }:
-
+{
+  pkgs,
+  lib,
+  stdenv,
+  makeDesktopItem,
+  fetchurl,
+  unzip,
+  makeWrapper,
+  xorg,
+  jre,
+}:
 stdenv.mkDerivation rec {
   pname = "runelite";
   version = "2.1.5";
@@ -33,10 +42,10 @@ stdenv.mkDerivation rec {
     comment = "Open source Old School RuneScape client";
     desktopName = "RuneLite";
     genericName = "Oldschool Runescape";
-    categories = [ "Game" ];
+    categories = ["Game"];
   };
 
-  nativeBuildInputs = [ makeWrapper unzip ];
+  nativeBuildInputs = [makeWrapper unzip];
   installPhase = ''
     mkdir -p $out/share/runelite
     mkdir -p $out/share/applications
@@ -59,7 +68,7 @@ stdenv.mkDerivation rec {
     description = "Open source Old School RuneScape client";
     homepage = "https://runelite.net/";
     license = licenses.bsd2;
-    maintainers = with maintainers; [ kmeakin ];
-    platforms = [ "x86_64-linux" ];
+    maintainers = with maintainers; [kmeakin];
+    platforms = ["x86_64-linux"];
   };
 }

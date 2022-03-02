@@ -1,20 +1,17 @@
-{ lib
-, buildPythonPackage
-, fetchpatch
-, fetchPypi
-, pythonAtLeast
-, pythonOlder
-
-# native
-, flit-core
-
-# propagates
-, typing-extensions
-
-# tests
-, python
+{
+  lib,
+  buildPythonPackage,
+  fetchpatch,
+  fetchPypi,
+  pythonAtLeast,
+  pythonOlder,
+  # native
+  flit-core,
+  # propagates
+  typing-extensions,
+  # tests
+  python,
 }:
-
 buildPythonPackage rec {
   pname = "aioitertools";
   version = "0.10.0";
@@ -47,6 +44,6 @@ buildPythonPackage rec {
     description = "Implementation of itertools, builtins, and more for AsyncIO and mixed-type iterables";
     license = licenses.mit;
     homepage = "https://pypi.org/project/aioitertools/";
-    maintainers = with maintainers; [ teh ];
+    maintainers = with maintainers; [teh];
   };
 }

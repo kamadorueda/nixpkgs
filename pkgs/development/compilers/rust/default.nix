@@ -1,30 +1,33 @@
-{ rustcVersion
-, rustcSha256
-, enableRustcDev ? true
-, bootstrapVersion
-, bootstrapHashes
-, selectRustPackage
-, rustcPatches ? []
-, llvmBootstrapForDarwin
-, llvmShared
-, llvmSharedForBuild
-, llvmSharedForHost
-, llvmSharedForTarget
-, llvmPackagesForBuild # Exposed through rustc for LTO in Firefox
-}:
-{ stdenv, lib
-, buildPackages
-, newScope, callPackage
-, CoreFoundation, Security, SystemConfiguration
-, pkgsBuildTarget, pkgsBuildBuild
-, makeRustPlatform
-}:
-
-let
-  # Use `import` to make sure no packages sneak in here.
-  lib' = import ../../../build-support/rust/lib { inherit lib; };
-in
 {
+  rustcVersion,
+  rustcSha256,
+  enableRustcDev ? true,
+  bootstrapVersion,
+  bootstrapHashes,
+  selectRustPackage,
+  rustcPatches ? [],
+  llvmBootstrapForDarwin,
+  llvmShared,
+  llvmSharedForBuild,
+  llvmSharedForHost,
+  llvmSharedForTarget,
+  llvmPackagesForBuild, # Exposed through rustc for LTO in Firefox
+}: {
+  stdenv,
+  lib,
+  buildPackages,
+  newScope,
+  callPackage,
+  CoreFoundation,
+  Security,
+  SystemConfiguration,
+  pkgsBuildTarget,
+  pkgsBuildBuild,
+  makeRustPlatform,
+}: let
+  # Use `import` to make sure no packages sneak in here.
+  lib' = import ../../../build-support/rust/lib {inherit lib;};
+in {
   lib = lib';
 
   # Backwards compat before `lib` was factored out.
@@ -53,7 +56,7 @@ in
       # nothing in the final package set should refer to this.
       bootstrapRustPackages = self.buildRustPackages.overrideScope' (_: _:
         lib.optionalAttrs (stdenv.buildPlatform == stdenv.hostPlatform)
-          (selectRustPackage buildPackages).packages.prebuilt);
+        (selectRustPackage buildPackages).packages.prebuilt);
       bootRustPlatform = makeRustPlatform bootstrapRustPackages;
     in {
       # Packages suitable for build-time, e.g. `build.rs`-type stuff.
@@ -61,29 +64,30 @@ in
       # Analogous to stdenv
       rustPlatform = makeRustPlatform self.buildRustPackages;
       rustc = self.callPackage ./rustc.nix ({
-        version = rustcVersion;
-        sha256 = rustcSha256;
-        inherit enableRustcDev;
-        inherit llvmShared llvmSharedForBuild llvmSharedForHost llvmSharedForTarget llvmPackagesForBuild;
+          version = rustcVersion;
+          sha256 = rustcSha256;
+          inherit enableRustcDev;
+          inherit llvmShared llvmSharedForBuild llvmSharedForHost llvmSharedForTarget llvmPackagesForBuild;
 
-        patches = rustcPatches;
+          patches = rustcPatches;
 
-        # Use boot package set to break cycle
-        rustPlatform = bootRustPlatform;
-      } // lib.optionalAttrs (stdenv.cc.isClang && stdenv.hostPlatform == stdenv.buildPlatform) {
-        stdenv = llvmBootstrapForDarwin.stdenv;
-        pkgsBuildBuild = pkgsBuildBuild // { targetPackages.stdenv = llvmBootstrapForDarwin.stdenv; };
-        pkgsBuildHost = pkgsBuildBuild // { targetPackages.stdenv = llvmBootstrapForDarwin.stdenv; };
-        pkgsBuildTarget = pkgsBuildTarget // { targetPackages.stdenv = llvmBootstrapForDarwin.stdenv; };
-      });
-      rustfmt = self.callPackage ./rustfmt.nix { inherit Security; };
+          # Use boot package set to break cycle
+          rustPlatform = bootRustPlatform;
+        }
+        // lib.optionalAttrs (stdenv.cc.isClang && stdenv.hostPlatform == stdenv.buildPlatform) {
+          stdenv = llvmBootstrapForDarwin.stdenv;
+          pkgsBuildBuild = pkgsBuildBuild // {targetPackages.stdenv = llvmBootstrapForDarwin.stdenv;};
+          pkgsBuildHost = pkgsBuildBuild // {targetPackages.stdenv = llvmBootstrapForDarwin.stdenv;};
+          pkgsBuildTarget = pkgsBuildTarget // {targetPackages.stdenv = llvmBootstrapForDarwin.stdenv;};
+        });
+      rustfmt = self.callPackage ./rustfmt.nix {inherit Security;};
       cargo = self.callPackage ./cargo.nix {
         # Use boot package set to break cycle
         rustPlatform = bootRustPlatform;
         inherit CoreFoundation Security;
       };
-      clippy = self.callPackage ./clippy.nix { inherit Security; };
-      rls = self.callPackage ./rls { inherit CoreFoundation Security SystemConfiguration; };
+      clippy = self.callPackage ./clippy.nix {inherit Security;};
+      rls = self.callPackage ./rls {inherit CoreFoundation Security SystemConfiguration;};
     });
   };
 }

@@ -1,16 +1,16 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, google-api-core
-, google-cloud-core
-, grpc-google-iam-v1
-, libcst
-, mock
-, proto-plus
-, pytestCheckHook
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  google-api-core,
+  google-cloud-core,
+  grpc-google-iam-v1,
+  libcst,
+  mock,
+  proto-plus,
+  pytestCheckHook,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "google-cloud-bigtable";
   version = "2.6.0";
@@ -55,6 +55,6 @@ buildPythonPackage rec {
     description = "Google Cloud Bigtable API client library";
     homepage = "https://github.com/googleapis/python-bigtable";
     license = licenses.asl20;
-    maintainers = with maintainers; [ costrouc ];
+    maintainers = with maintainers; [costrouc];
   };
 }

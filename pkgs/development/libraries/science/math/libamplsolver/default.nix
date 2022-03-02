@@ -1,5 +1,9 @@
-{ lib, stdenv, fetchurl, fetchpatch }:
-
+{
+  lib,
+  stdenv,
+  fetchurl,
+  fetchpatch,
+}:
 stdenv.mkDerivation rec {
   pname = "libamplsolver";
   version = "20211109";
@@ -30,8 +34,8 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     description = "A library of routines that help solvers work with AMPL";
     homepage = "https://ampl.com/netlib/ampl/";
-    license = [ licenses.mit ];
+    license = [licenses.mit];
     platforms = platforms.linux;
-    maintainers = with maintainers; [ aanderse ];
+    maintainers = with maintainers; [aanderse];
   };
 }

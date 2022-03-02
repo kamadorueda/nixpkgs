@@ -1,5 +1,14 @@
-{ lib, stdenv, fetchurl, fetchpatch, flex, bison, readline, libssh, nixosTests }:
-
+{
+  lib,
+  stdenv,
+  fetchurl,
+  fetchpatch,
+  flex,
+  bison,
+  readline,
+  libssh,
+  nixosTests,
+}:
 stdenv.mkDerivation rec {
   pname = "bird";
   version = "2.0.9";
@@ -9,8 +18,8 @@ stdenv.mkDerivation rec {
     url = "ftp://bird.network.cz/pub/bird/${pname}-${version}.tar.gz";
   };
 
-  nativeBuildInputs = [ flex bison ];
-  buildInputs = [ readline libssh ];
+  nativeBuildInputs = [flex bison];
+  buildInputs = [readline libssh];
 
   patches = [
     ./dont-create-sysconfdir-2.patch
@@ -20,7 +29,7 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  CPP="${stdenv.cc.targetPrefix}cpp -E";
+  CPP = "${stdenv.cc.targetPrefix}cpp -E";
 
   configureFlags = [
     "--localstatedir=/var"
@@ -33,7 +42,7 @@ stdenv.mkDerivation rec {
     description = "BIRD Internet Routing Daemon";
     homepage = "http://bird.network.cz";
     license = licenses.gpl2Plus;
-    maintainers = with maintainers; [ fpletz globin ];
+    maintainers = with maintainers; [fpletz globin];
     platforms = platforms.linux;
   };
 }

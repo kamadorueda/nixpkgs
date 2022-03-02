@@ -1,13 +1,15 @@
-{ version
-, urls
-, sha256
-, configureFlags ? []
-, patches ? []
+{
+  version,
+  urls,
+  sha256,
+  configureFlags ? [],
+  patches ? [],
+}: {
+  lib,
+  stdenv,
+  fetchurl,
+  gmp,
 }:
-
-{ lib, stdenv, fetchurl, gmp
-}:
-
 stdenv.mkDerivation {
   name = "isl-${version}";
 
@@ -17,7 +19,7 @@ stdenv.mkDerivation {
 
   inherit patches;
 
-  buildInputs = [ gmp ];
+  buildInputs = [gmp];
 
   inherit configureFlags;
 

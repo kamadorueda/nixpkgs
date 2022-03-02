@@ -1,55 +1,67 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.syncoid;
 
   # Extract local dasaset names (so no datasets containing "@")
-  localDatasetName = d: optionals (d != null) (
-    let m = builtins.match "([^/@]+[^@]*)" d; in
-    optionals (m != null) m
-  );
+  localDatasetName = d:
+    optionals (d != null) (let
+      m = builtins.match "([^/@]+[^@]*)" d;
+    in
+      optionals (m != null) m);
 
   # Escape as required by: https://www.freedesktop.org/software/systemd/man/systemd.unit.html
   escapeUnitName = name:
-    lib.concatMapStrings (s: if lib.isList s then "-" else s)
-      (builtins.split "[^a-zA-Z0-9_.\\-]+" name);
+    lib.concatMapStrings (s:
+      if lib.isList s
+      then "-"
+      else s)
+    (builtins.split "[^a-zA-Z0-9_.\\-]+" name);
 
   # Function to build "zfs allow" commands for the filesystems we've
   # delegated permissions to. It also checks if the target dataset
   # exists before delegating permissions, if it doesn't exist we
   # delegate it to the parent dataset. This should solve the case of
   # provisoning new datasets.
-  buildAllowCommand = permissions: dataset: (
-    "-+${pkgs.writeShellScript "zfs-allow-${dataset}" ''
+  buildAllowCommand = permissions: dataset: "-+${
+    pkgs.writeShellScript "zfs-allow-${dataset}" ''
       # Here we explicitly use the booted system to guarantee the stable API needed by ZFS
 
       # Run a ZFS list on the dataset to check if it exists
-      if ${lib.escapeShellArgs [
-        "/run/booted-system/sw/bin/zfs"
-        "list"
-        dataset
-      ]} 2> /dev/null; then
-        ${lib.escapeShellArgs [
+      if ${
+        lib.escapeShellArgs [
+          "/run/booted-system/sw/bin/zfs"
+          "list"
+          dataset
+        ]
+      } 2> /dev/null; then
+        ${
+        lib.escapeShellArgs [
           "/run/booted-system/sw/bin/zfs"
           "allow"
           cfg.user
           (concatStringsSep "," permissions)
           dataset
-        ]}
+        ]
+      }
       else
-        ${lib.escapeShellArgs [
+        ${
+        lib.escapeShellArgs [
           "/run/booted-system/sw/bin/zfs"
           "allow"
           cfg.user
           (concatStringsSep "," permissions)
           # Remove the last part of the path
           (builtins.dirOf dataset)
-        ]}
+        ]
+      }
       fi
-    ''}"
-  );
+    ''
+  }";
 
   # Function to build "zfs unallow" commands for the filesystems we've
   # delegated permissions to. Here we unallow both the target but also
@@ -57,29 +69,31 @@ let
   # knowing if the allow command did execute on the parent dataset or
   # not in the pre-hook. We can't run the same if in the post hook
   # since the dataset should have been created at this point.
-  buildUnallowCommand = permissions: dataset: (
-    "-+${pkgs.writeShellScript "zfs-unallow-${dataset}" ''
+  buildUnallowCommand = permissions: dataset: "-+${
+    pkgs.writeShellScript "zfs-unallow-${dataset}" ''
       # Here we explicitly use the booted system to guarantee the stable API needed by ZFS
-      ${lib.escapeShellArgs [
-        "/run/booted-system/sw/bin/zfs"
-        "unallow"
-        cfg.user
-        (concatStringsSep "," permissions)
-        dataset
-      ]}
-      ${lib.escapeShellArgs [
-        "/run/booted-system/sw/bin/zfs"
-        "unallow"
-        cfg.user
-        (concatStringsSep "," permissions)
-        # Remove the last part of the path
-        (builtins.dirOf dataset)
-      ]}
-    ''}"
-  );
-in
-{
-
+      ${
+        lib.escapeShellArgs [
+          "/run/booted-system/sw/bin/zfs"
+          "unallow"
+          cfg.user
+          (concatStringsSep "," permissions)
+          dataset
+        ]
+      }
+      ${
+        lib.escapeShellArgs [
+          "/run/booted-system/sw/bin/zfs"
+          "unallow"
+          cfg.user
+          (concatStringsSep "," permissions)
+          # Remove the last part of the path
+          (builtins.dirOf dataset)
+        ]
+      }
+    ''
+  }";
+in {
   # Interface
 
   options.services.syncoid = {
@@ -133,7 +147,7 @@ in
     localSourceAllow = mkOption {
       type = types.listOf types.str;
       # Permissions snapshot and destroy are in case --no-sync-snap is not used
-      default = [ "bookmark" "hold" "send" "snapshot" "destroy" ];
+      default = ["bookmark" "hold" "send" "snapshot" "destroy"];
       description = ''
         Permissions granted for the <option>services.syncoid.user</option> user
         for local source datasets. See
@@ -144,8 +158,8 @@ in
 
     localTargetAllow = mkOption {
       type = types.listOf types.str;
-      default = [ "change-key" "compression" "create" "mount" "mountpoint" "receive" "rollback" ];
-      example = [ "create" "mount" "receive" "rollback" ];
+      default = ["change-key" "compression" "create" "mount" "mountpoint" "receive" "rollback"];
+      example = ["create" "mount" "receive" "rollback"];
       description = ''
         Permissions granted for the <option>services.syncoid.user</option> user
         for local target datasets. See
@@ -159,8 +173,8 @@ in
 
     commonArgs = mkOption {
       type = types.listOf types.str;
-      default = [ ];
-      example = [ "--no-sync-snap" ];
+      default = [];
+      example = ["--no-sync-snap"];
       description = ''
         Arguments to add to every syncoid command, unless disabled for that
         command. See
@@ -171,14 +185,14 @@ in
 
     service = mkOption {
       type = types.attrs;
-      default = { };
+      default = {};
       description = ''
         Systemd configuration common to all syncoid services.
       '';
     };
 
     commands = mkOption {
-      type = types.attrsOf (types.submodule ({ name, ... }: {
+      type = types.attrsOf (types.submodule ({name, ...}: {
         options = {
           source = mkOption {
             type = types.str;
@@ -265,7 +279,7 @@ in
 
           service = mkOption {
             type = types.attrs;
-            default = { };
+            default = {};
             description = ''
               Systemd configuration specific to this syncoid service.
             '';
@@ -273,8 +287,8 @@ in
 
           extraArgs = mkOption {
             type = types.listOf types.str;
-            default = [ ];
-            example = [ "--sshport 2222" ];
+            default = [];
+            example = ["--sshport 2222"];
             description = "Extra syncoid arguments for this command.";
           };
         };
@@ -285,7 +299,7 @@ in
           localTargetAllow = mkDefault cfg.localTargetAllow;
         };
       }));
-      default = { };
+      default = {};
       example = literalExpression ''
         {
           "pool/test".target = "root@target:pool/test";
@@ -310,43 +324,44 @@ in
         };
       };
       groups = mkIf (cfg.group == "syncoid") {
-        syncoid = { };
+        syncoid = {};
       };
     };
 
-    systemd.services = mapAttrs'
+    systemd.services =
+      mapAttrs'
       (name: c:
         nameValuePair "syncoid-${escapeUnitName name}" (mkMerge [
           {
             description = "Syncoid ZFS synchronization from ${c.source} to ${c.target}";
-            after = [ "zfs.target" ];
+            after = ["zfs.target"];
             startAt = cfg.interval;
             # syncoid may need zpool to get feature@extensible_dataset
-            path = [ "/run/booted-system/sw/bin/" ];
+            path = ["/run/booted-system/sw/bin/"];
             serviceConfig = {
               ExecStartPre =
-                (map (buildAllowCommand c.localSourceAllow) (localDatasetName c.source)) ++
-                (map (buildAllowCommand c.localTargetAllow) (localDatasetName c.target));
+                (map (buildAllowCommand c.localSourceAllow) (localDatasetName c.source))
+                ++ (map (buildAllowCommand c.localTargetAllow) (localDatasetName c.target));
               ExecStopPost =
-                (map (buildUnallowCommand c.localSourceAllow) (localDatasetName c.source)) ++
-                (map (buildUnallowCommand c.localTargetAllow) (localDatasetName c.target));
-              ExecStart = lib.escapeShellArgs ([ "${pkgs.sanoid}/bin/syncoid" ]
+                (map (buildUnallowCommand c.localSourceAllow) (localDatasetName c.source))
+                ++ (map (buildUnallowCommand c.localTargetAllow) (localDatasetName c.target));
+              ExecStart = lib.escapeShellArgs (["${pkgs.sanoid}/bin/syncoid"]
                 ++ optionals c.useCommonArgs cfg.commonArgs
                 ++ optional c.recursive "-r"
-                ++ optionals (c.sshKey != null) [ "--sshkey" c.sshKey ]
+                ++ optionals (c.sshKey != null) ["--sshkey" c.sshKey]
                 ++ c.extraArgs
                 ++ [
-                "--sendoptions"
-                c.sendOptions
-                "--recvoptions"
-                c.recvOptions
-                "--no-privilege-elevation"
-                c.source
-                c.target
-              ]);
+                  "--sendoptions"
+                  c.sendOptions
+                  "--recvoptions"
+                  c.recvOptions
+                  "--no-privilege-elevation"
+                  c.source
+                  c.target
+                ]);
               User = cfg.user;
               Group = cfg.group;
-              StateDirectory = [ "syncoid" ];
+              StateDirectory = ["syncoid"];
               StateDirectoryMode = "700";
               # Prevent SSH control sockets of different syncoid services from interfering
               PrivateTmp = true;
@@ -359,7 +374,7 @@ in
               # systemd-analyze security | grep syncoid-'*'
               AmbientCapabilities = "";
               CapabilityBoundingSet = "";
-              DeviceAllow = [ "/dev/zfs" ];
+              DeviceAllow = ["/dev/zfs"];
               LockPersonality = true;
               MemoryDenyWriteExecute = true;
               NoNewPrivileges = true;
@@ -376,19 +391,19 @@ in
               ProtectKernelTunables = true;
               ProtectSystem = "strict";
               RemoveIPC = true;
-              RestrictAddressFamilies = [ "AF_UNIX" "AF_INET" "AF_INET6" ];
+              RestrictAddressFamilies = ["AF_UNIX" "AF_INET" "AF_INET6"];
               RestrictNamespaces = true;
               RestrictRealtime = true;
               RestrictSUIDSGID = true;
               RootDirectory = "/run/syncoid/${escapeUnitName name}";
               RootDirectoryStartOnly = true;
-              BindPaths = [ "/dev/zfs" ];
-              BindReadOnlyPaths = [ builtins.storeDir "/etc" "/run" "/bin/sh" ];
+              BindPaths = ["/dev/zfs"];
+              BindReadOnlyPaths = [builtins.storeDir "/etc" "/run" "/bin/sh"];
               # Avoid useless mounting of RootDirectory= in the own RootDirectory= of ExecStart='s mount namespace.
-              InaccessiblePaths = [ "-+/run/syncoid/${escapeUnitName name}" ];
+              InaccessiblePaths = ["-+/run/syncoid/${escapeUnitName name}"];
               MountAPIVFS = true;
               # Create RootDirectory= in the host's mount namespace.
-              RuntimeDirectory = [ "syncoid/${escapeUnitName name}" ];
+              RuntimeDirectory = ["syncoid/${escapeUnitName name}"];
               RuntimeDirectoryMode = "700";
               SystemCallFilter = [
                 "@system-service"
@@ -417,5 +432,5 @@ in
       cfg.commands;
   };
 
-  meta.maintainers = with maintainers; [ julm lopsided98 ];
+  meta.maintainers = with maintainers; [julm lopsided98];
 }

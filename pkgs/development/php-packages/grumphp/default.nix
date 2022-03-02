@@ -1,4 +1,10 @@
-{ mkDerivation, fetchurl, makeWrapper, lib, php }:
+{
+  mkDerivation,
+  fetchurl,
+  makeWrapper,
+  lib,
+  php,
+}:
 mkDerivation rec {
   pname = "grumphp";
   version = "1.8.1";
@@ -10,7 +16,7 @@ mkDerivation rec {
 
   dontUnpack = true;
 
-  nativeBuildInputs = [ makeWrapper ];
+  nativeBuildInputs = [makeWrapper];
 
   installPhase = ''
     runHook preInstall

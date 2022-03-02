@@ -1,17 +1,17 @@
-{ buildPythonPackage
-, fetchPypi
-, lib
-, isPy3k
-, six
-, attrs
-, pytest
-, testtools
+{
+  buildPythonPackage,
+  fetchPypi,
+  lib,
+  isPy3k,
+  six,
+  attrs,
+  pytest,
+  testtools,
 }:
-
 buildPythonPackage rec {
   version = "1.1.0";
   pname = "effect";
-  disabled = (!isPy3k);
+  disabled = !isPy3k;
 
   src = fetchPypi {
     inherit pname version;

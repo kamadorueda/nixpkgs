@@ -1,11 +1,16 @@
-{ stdenvNoCC, breezy }:
-{ url, rev, sha256 }:
-
+{
+  stdenvNoCC,
+  breezy,
+}: {
+  url,
+  rev,
+  sha256,
+}:
 stdenvNoCC.mkDerivation {
   name = "bzr-export";
 
   builder = ./builder.sh;
-  nativeBuildInputs = [ breezy ];
+  nativeBuildInputs = [breezy];
 
   outputHashAlgo = "sha256";
   outputHashMode = "recursive";

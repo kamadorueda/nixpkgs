@@ -1,5 +1,8 @@
-{ python3Packages, lib, fetchFromGitHub }:
-
+{
+  python3Packages,
+  lib,
+  fetchFromGitHub,
+}:
 python3Packages.buildPythonApplication rec {
   pname = "nerd-font-patcher";
   version = "2.1.0";
@@ -16,7 +19,7 @@ python3Packages.buildPythonApplication rec {
     sha256 = "sha256-ePBlEVjzAJ7g6iAGIqPfgZ8bwtNILmyEVm0zD+xNN6k=";
   };
 
-  propagatedBuildInputs = with python3Packages; [ fontforge ];
+  propagatedBuildInputs = with python3Packages; [fontforge];
 
   format = "other";
 
@@ -37,6 +40,6 @@ python3Packages.buildPythonApplication rec {
     description = "Font patcher to generate Nerd font";
     homepage = "https://nerdfonts.com/";
     license = licenses.mit;
-    maintainers = with maintainers; [ ck3d ];
+    maintainers = with maintainers; [ck3d];
   };
 }

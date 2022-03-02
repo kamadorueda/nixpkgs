@@ -1,25 +1,26 @@
 # Not everyone has a suitable remote builder set up, so the cross-compilation
 # tests that _include_ running the result are separate. That way, most people
 # can run the majority of the test suite without the extra setup.
-
-
-import ./make-test-python.nix ({ pkgs, ... }:
-let
-
+import ./make-test-python.nix ({pkgs, ...}: let
   remoteSystem =
     if pkgs.system == "aarch64-linux"
     then "x86_64-linux"
     else "aarch64-linux";
 
-  remoteCrossPkgs = import ../.. /*nixpkgs*/ {
-    # NOTE: This is the machine that runs the build -  local from the
-    #       'perspective' of the build script.
-    localSystem = remoteSystem;
+  remoteCrossPkgs =
+    import ../..
+    /*
+     nixpkgs
+     */
+    {
+      # NOTE: This is the machine that runs the build -  local from the
+      #       'perspective' of the build script.
+      localSystem = remoteSystem;
 
-    # NOTE: Since this file can't control where the test will be _run_ we don't
-    #       cross-compile _to_ a different system but _from_ a different system
-    crossSystem = pkgs.system;
-  };
+      # NOTE: Since this file can't control where the test will be _run_ we don't
+      #       cross-compile _to_ a different system but _from_ a different system
+      crossSystem = pkgs.system;
+    };
 
   hello1 = remoteCrossPkgs.dockerTools.buildImage {
     name = "hello1";
@@ -32,15 +33,14 @@ let
     tag = "latest";
     contents = remoteCrossPkgs.hello;
   };
-
 in {
   name = "docker-tools";
   meta = with pkgs.lib.maintainers; {
-    maintainers = [ roberth ];
+    maintainers = [roberth];
   };
 
   nodes = {
-    docker = { ... }: {
+    docker = {...}: {
       virtualisation = {
         diskSize = 2048;
         docker.enable = true;

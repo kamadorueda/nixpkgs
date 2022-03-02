@@ -1,21 +1,20 @@
-{ lib, stdenv, grub2_xen }:
-
-with lib;
-let
+{
+  lib,
+  stdenv,
+  grub2_xen,
+}:
+with lib; let
   efiSystemsBuild = {
     i686-linux.target = "i386";
     x86_64-linux.target = "x86_64";
     aarch64-linux.target = "aarch64";
   };
-
-in (
-
-stdenv.mkDerivation rec {
+in (stdenv.mkDerivation rec {
   name = "pvgrub-image";
 
   configs = ./configs;
 
-  buildInputs = [ grub2_xen ];
+  buildInputs = [grub2_xen];
 
   buildCommand = ''
     cp "${configs}"/* .
@@ -32,10 +31,9 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     description = "PvGrub image for use for booting PV Xen guests";
 
-    longDescription =
-      '' This package provides a PvGrub image for booting Para-Virtualized (PV)
-         Xen guests
-      '';
+    longDescription = ''      This package provides a PvGrub image for booting Para-Virtualized (PV)
+              Xen guests
+    '';
 
     platforms = platforms.gnu ++ platforms.linux;
   };

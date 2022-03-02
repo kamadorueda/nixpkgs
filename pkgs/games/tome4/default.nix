@@ -1,6 +1,19 @@
-{ lib, stdenv, fetchurl, makeDesktopItem, makeWrapper, premake4, unzip
-, openal, libpng, libvorbis, libGLU, SDL2, SDL2_image, SDL2_ttf }:
-
+{
+  lib,
+  stdenv,
+  fetchurl,
+  makeDesktopItem,
+  makeWrapper,
+  premake4,
+  unzip,
+  openal,
+  libpng,
+  libvorbis,
+  libGLU,
+  SDL2,
+  SDL2_image,
+  SDL2_ttf,
+}:
 stdenv.mkDerivation rec {
   pname = "tome4";
   version = "1.7.4";
@@ -17,7 +30,7 @@ stdenv.mkDerivation rec {
     icon = pname;
     comment = "An open-source, single-player, role-playing roguelike game set in the world of Eyal.";
     type = "Application";
-    categories = [ "Game" "RolePlaying" ];
+    categories = ["Game" "RolePlaying"];
     genericName = pname;
   };
 
@@ -26,12 +39,18 @@ stdenv.mkDerivation rec {
     sed -i 's|#include <GL/glext.h>||' src/tgl.h
   '';
 
-  nativeBuildInputs = [ makeWrapper unzip premake4 ];
+  nativeBuildInputs = [makeWrapper unzip premake4];
 
   # tome4 vendors quite a few libraries so someone might want to look
   # into avoiding that...
   buildInputs = [
-    libGLU openal libpng libvorbis SDL2 SDL2_ttf SDL2_image
+    libGLU
+    openal
+    libpng
+    libvorbis
+    SDL2
+    SDL2_ttf
+    SDL2_image
   ];
 
   # disable parallel building as it caused sporadic build failures
@@ -39,7 +58,7 @@ stdenv.mkDerivation rec {
 
   NIX_CFLAGS_COMPILE = "-I${SDL2.dev}/include/SDL2 -I${SDL2_image}/include/SDL2 -I${SDL2_ttf}/include/SDL2";
 
-  makeFlags = [ "config=release" ];
+  makeFlags = ["config=release"];
 
   # The wrapper needs to cd into the correct directory as tome4's detection of
   # the game asset root directory is faulty.
@@ -70,7 +89,7 @@ stdenv.mkDerivation rec {
     description = "Tales of Maj'eyal (rogue-like game)";
     homepage = "https://te4.org/";
     license = licenses.gpl3;
-    maintainers = with maintainers; [ chattered peterhoeg ];
-    platforms = with platforms; [ "i686-linux" "x86_64-linux" ];
+    maintainers = with maintainers; [chattered peterhoeg];
+    platforms = with platforms; ["i686-linux" "x86_64-linux"];
   };
 }

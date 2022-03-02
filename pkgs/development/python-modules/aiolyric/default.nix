@@ -1,11 +1,11 @@
-{ lib
-, aiohttp
-, buildPythonPackage
-, fetchFromGitHub
-, pythonOlder
-, pytestCheckHook
+{
+  lib,
+  aiohttp,
+  buildPythonPackage,
+  fetchFromGitHub,
+  pythonOlder,
+  pytestCheckHook,
 }:
-
 buildPythonPackage rec {
   pname = "aiolyric";
   version = "1.0.10";
@@ -40,7 +40,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python module for the Honeywell Lyric Platform";
     homepage = "https://github.com/timmo001/aiolyric";
-    license = with licenses; [ mit ];
-    maintainers = with maintainers; [ fab ];
+    license = with licenses; [mit];
+    maintainers = with maintainers; [fab];
   };
 }

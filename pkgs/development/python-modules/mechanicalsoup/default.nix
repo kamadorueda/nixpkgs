@@ -1,16 +1,16 @@
-{ lib
-, beautifulsoup4
-, buildPythonPackage
-, pythonAtLeast
-, fetchFromGitHub
-, lxml
-, pytest-httpbin
-, pytest-mock
-, pytestCheckHook
-, requests
-, requests-mock
+{
+  lib,
+  beautifulsoup4,
+  buildPythonPackage,
+  pythonAtLeast,
+  fetchFromGitHub,
+  lxml,
+  pytest-httpbin,
+  pytest-mock,
+  pytestCheckHook,
+  requests,
+  requests-mock,
 }:
-
 buildPythonPackage rec {
   pname = "mechanicalsoup";
   version = "1.1.0";
@@ -45,12 +45,12 @@ buildPythonPackage rec {
       --replace " --cov --cov-config .coveragerc --flake8" ""
   '';
 
-  pythonImportsCheck = [ "mechanicalsoup" ];
+  pythonImportsCheck = ["mechanicalsoup"];
 
   meta = with lib; {
     description = "Python library for automating interaction with websites";
     homepage = "https://github.com/hickford/MechanicalSoup";
     license = licenses.mit;
-    maintainers = with maintainers; [ jgillich fab ];
+    maintainers = with maintainers; [jgillich fab];
   };
 }

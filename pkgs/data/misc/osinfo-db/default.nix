@@ -1,11 +1,11 @@
-{ lib
-, stdenv
-, fetchurl
-, osinfo-db-tools
-, gettext
-, libxml2
+{
+  lib,
+  stdenv,
+  fetchurl,
+  osinfo-db-tools,
+  gettext,
+  libxml2,
 }:
-
 stdenv.mkDerivation rec {
   pname = "osinfo-db";
   version = "20220214";
@@ -31,6 +31,6 @@ stdenv.mkDerivation rec {
     changelog = "https://gitlab.com/libosinfo/osinfo-db/-/commits/v${version}";
     license = licenses.gpl2Plus;
     platforms = platforms.linux;
-    maintainers = [ maintainers.bjornfor ];
+    maintainers = [maintainers.bjornfor];
   };
 }

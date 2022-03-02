@@ -1,9 +1,9 @@
-{ lib
-, fetchFromGitHub
-, python3
-, wrapQtAppsHook
+{
+  lib,
+  fetchFromGitHub,
+  python3,
+  wrapQtAppsHook,
 }:
-
 python3.pkgs.buildPythonApplication rec {
   pname = "maestral-qt";
   version = "1.5.3";
@@ -18,36 +18,44 @@ python3.pkgs.buildPythonApplication rec {
 
   format = "pyproject";
 
-  propagatedBuildInputs = with python3.pkgs; [
-    click
-    markdown2
-    maestral
-    packaging
-    pyqt5
-  ] ++ lib.optionals (pythonOlder "3.9") [
-    importlib-resources
-  ];
+  propagatedBuildInputs = with python3.pkgs;
+    [
+      click
+      markdown2
+      maestral
+      packaging
+      pyqt5
+    ]
+    ++ lib.optionals (pythonOlder "3.9") [
+      importlib-resources
+    ];
 
-  nativeBuildInputs = [ wrapQtAppsHook ];
+  nativeBuildInputs = [wrapQtAppsHook];
 
   makeWrapperArgs = [
     # Firstly, add all necessary QT variables
     "\${qtWrapperArgs[@]}"
 
     # Add the installed directories to the python path so the daemon can find them
-    "--prefix" "PYTHONPATH" ":" "${lib.concatStringsSep ":" (map (p: p + "/lib/${python3.libPrefix}/site-packages") (python3.pkgs.requiredPythonModules python3.pkgs.maestral.propagatedBuildInputs))}"
-    "--prefix" "PYTHONPATH" ":" "${python3.pkgs.maestral}/lib/${python3.libPrefix}/site-packages"
+    "--prefix"
+    "PYTHONPATH"
+    ":"
+    "${lib.concatStringsSep ":" (map (p: p + "/lib/${python3.libPrefix}/site-packages") (python3.pkgs.requiredPythonModules python3.pkgs.maestral.propagatedBuildInputs))}"
+    "--prefix"
+    "PYTHONPATH"
+    ":"
+    "${python3.pkgs.maestral}/lib/${python3.libPrefix}/site-packages"
   ];
 
   # no tests
   doCheck = false;
 
-  pythonImportsCheck = [ "maestral_qt" ];
+  pythonImportsCheck = ["maestral_qt"];
 
   meta = with lib; {
     description = "GUI front-end for maestral (an open-source Dropbox client) for Linux";
     license = licenses.mit;
-    maintainers = with maintainers; [ peterhoeg ];
+    maintainers = with maintainers; [peterhoeg];
     platforms = platforms.linux;
     homepage = "https://maestral.app";
   };

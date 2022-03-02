@@ -1,12 +1,12 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, python-Levenshtein
-, pytesseract
-, opencv4
-, fuzzywuzzy
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  python-Levenshtein,
+  pytesseract,
+  opencv4,
+  fuzzywuzzy,
 }:
-
 buildPythonPackage rec {
   pname = "videocr";
   version = "0.1.6";
@@ -35,12 +35,12 @@ buildPythonPackage rec {
   # Project has no tests
   doCheck = false;
 
-  pythonImportsCheck = [ "videocr" ];
+  pythonImportsCheck = ["videocr"];
 
   meta = with lib; {
     description = "Extract hardcoded subtitles from videos using machine learning";
     homepage = "https://github.com/apm1467/videocr";
     license = licenses.mit;
-    maintainers = with maintainers; [ ozkutuk ];
+    maintainers = with maintainers; [ozkutuk];
   };
 }

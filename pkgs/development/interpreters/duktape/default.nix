@@ -1,5 +1,9 @@
-{ lib, stdenv, fetchurl, validatePkgConfig }:
-
+{
+  lib,
+  stdenv,
+  fetchurl,
+  validatePkgConfig,
+}:
 stdenv.mkDerivation rec {
   pname = "duktape";
   version = "2.7.0";
@@ -8,7 +12,7 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-kPjS+otVZ8aJmDDd7ywD88J5YLEayiIvoXqnrGE8KJA=";
   };
 
-  nativeBuildInputs = [ validatePkgConfig ];
+  nativeBuildInputs = [validatePkgConfig];
 
   postPatch = ''
     substituteInPlace Makefile.sharedlibrary \
@@ -37,7 +41,7 @@ stdenv.mkDerivation rec {
     homepage = "https://duktape.org/";
     downloadPage = "https://duktape.org/download.html";
     license = licenses.mit;
-    maintainers = [ maintainers.fgaz ];
+    maintainers = [maintainers.fgaz];
     platforms = platforms.all;
   };
 }

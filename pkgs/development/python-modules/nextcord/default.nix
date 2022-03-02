@@ -1,19 +1,19 @@
-{ lib
-, stdenv
-, buildPythonPackage
-, pythonOlder
-, fetchFromGitHub
-, substituteAll
-, ffmpeg
-, libopus
-, aiohttp
-, aiodns
-, brotli
-, cchardet
-, orjson
-, pynacl
+{
+  lib,
+  stdenv,
+  buildPythonPackage,
+  pythonOlder,
+  fetchFromGitHub,
+  substituteAll,
+  ffmpeg,
+  libopus,
+  aiohttp,
+  aiodns,
+  brotli,
+  cchardet,
+  orjson,
+  pynacl,
 }:
-
 buildPythonPackage rec {
   pname = "nextcord";
   version = "2.0.0a8";
@@ -59,6 +59,6 @@ buildPythonPackage rec {
     description = "Python wrapper for the Discord API forked from discord.py";
     homepage = "https://github.com/nextcord/nextcord";
     license = licenses.mit;
-    maintainers = with maintainers; [ dotlambda ];
+    maintainers = with maintainers; [dotlambda];
   };
 }

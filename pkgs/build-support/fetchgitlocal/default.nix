@@ -1,11 +1,13 @@
-{ runCommand, git }: src:
-
-let
+{
+  runCommand,
+  git,
+}: src: let
   srcStr = toString src;
 
   # Adds the current directory (respecting ignored files) to the git store, and returns the hash
-  gitHashFile = runCommand "put-in-git" {
-      nativeBuildInputs = [ git ];
+  gitHashFile =
+    runCommand "put-in-git" {
+      nativeBuildInputs = [git];
       dummy = builtins.currentTime; # impure, do every time
       preferLocalBuild = true;
     } ''
@@ -26,8 +28,9 @@ let
 
   gitHash = builtins.readFile gitHashFile; # cache against git hash
 
-  nixPath = runCommand "put-in-nix" {
-      nativeBuildInputs = [ git ];
+  nixPath =
+    runCommand "put-in-nix" {
+      nativeBuildInputs = [git];
       preferLocalBuild = true;
     } ''
       mkdir $out
@@ -36,5 +39,5 @@ let
       git -C ${srcStr} archive --format=tar ${gitHash} \
         | tar xf - -C $out
     '';
-
-in nixPath
+in
+  nixPath

@@ -1,14 +1,15 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.gitolite;
   # Use writeTextDir to not leak Nix store hash into file name
   pubkeyFile = (pkgs.writeTextDir "gitolite-admin.pub" cfg.adminPubkey) + "/gitolite-admin.pub";
   hooks = lib.concatMapStrings (hook: "${hook} ") cfg.commonHooks;
-in
-{
+in {
   options = {
     services.gitolite = {
       enable = mkOption {
@@ -112,10 +113,9 @@ in
     };
   };
 
-  config = mkIf cfg.enable (
-  let
+  config = mkIf cfg.enable (let
     manageGitoliteRc = cfg.extraGitoliteRc != "";
-    rcDir = pkgs.runCommand "gitolite-rc" { preferLocalBuild = true; } rcDirScript;
+    rcDir = pkgs.runCommand "gitolite-rc" {preferLocalBuild = true;} rcDirScript;
     rcDirScript =
       ''
         mkdir "$out"
@@ -128,16 +128,18 @@ in
 
         END
         cat "$out/gitolite.rc.default" >>"$out/gitolite.rc"
-      '' +
-      optionalString (cfg.extraGitoliteRc != "") ''
-        echo -n ${escapeShellArg ''
+      ''
+      + optionalString (cfg.extraGitoliteRc != "") ''
+        echo -n ${
+          escapeShellArg ''
 
-          # Added by NixOS:
-          ${removeSuffix "\n" cfg.extraGitoliteRc}
+            # Added by NixOS:
+            ${removeSuffix "\n" cfg.extraGitoliteRc}
 
-          # per perl rules, this should be the last line in such a file:
-          1;
-        ''} >>"$out/gitolite.rc"
+            # per perl rules, this should be the last line in such a file:
+            1;
+          ''
+        } >>"$out/gitolite.rc"
       '';
   in {
     services.gitolite.extraGitoliteRc = optionalString cfg.enableGitAnnex ''
@@ -146,17 +148,17 @@ in
     '';
 
     users.users.${cfg.user} = {
-      description     = "Gitolite user";
-      home            = cfg.dataDir;
-      uid             = config.ids.uids.gitolite;
-      group           = cfg.group;
+      description = "Gitolite user";
+      home = cfg.dataDir;
+      uid = config.ids.uids.gitolite;
+      group = cfg.group;
       useDefaultShell = true;
     };
     users.groups.${cfg.group}.gid = config.ids.gids.gitolite;
 
     systemd.services.gitolite-init = {
       description = "Gitolite initialization";
-      wantedBy    = [ "multi-user.target" ];
+      wantedBy = ["multi-user.target"];
       unitConfig.RequiresMountsFor = cfg.dataDir;
 
       environment = {
@@ -178,11 +180,11 @@ in
         }
       ];
 
-      path = [ pkgs.gitolite pkgs.git pkgs.perl pkgs.bash pkgs.diffutils config.programs.ssh.package ];
-      script =
-      let
+      path = [pkgs.gitolite pkgs.git pkgs.perl pkgs.bash pkgs.diffutils config.programs.ssh.package];
+      script = let
         rcSetupScriptIfCustomFile =
-          if manageGitoliteRc then ''
+          if manageGitoliteRc
+          then ''
             cat <<END
             <3>ERROR: NixOS can't apply declarative configuration
             <3>to your .gitolite.rc file, because it seems to be
@@ -195,13 +197,16 @@ in
             # show up in `systemctl status gitolite-init`.
             journalctl --flush
             exit 1
-          '' else ''
+          ''
+          else ''
             :
           '';
         rcSetupScriptIfDefaultFileOrStoreSymlink =
-          if manageGitoliteRc then ''
+          if manageGitoliteRc
+          then ''
             ln -sf "${rcDir}/gitolite.rc" "$GITOLITE_RC"
-          '' else ''
+          ''
+          else ''
             [[ -L "$GITOLITE_RC" ]] && rm -f "$GITOLITE_RC"
           '';
       in
@@ -210,11 +215,13 @@ in
              ( [[ -f "$GITOLITE_RC" ]] && diff -q "$GITOLITE_RC" "$GITOLITE_RC_DEFAULT" >/dev/null ) ||
              ( [[ -L "$GITOLITE_RC" ]] && [[ "$(readlink "$GITOLITE_RC")" =~ ^/nix/store/ ]] )
           then
-        '' + rcSetupScriptIfDefaultFileOrStoreSymlink +
         ''
+        + rcSetupScriptIfDefaultFileOrStoreSymlink
+        + ''
           else
-        '' + rcSetupScriptIfCustomFile +
         ''
+        + rcSetupScriptIfCustomFile
+        + ''
           fi
 
           if [ ! -d repositories ]; then
@@ -228,7 +235,8 @@ in
         '';
     };
 
-    environment.systemPackages = [ pkgs.gitolite pkgs.git ]
-        ++ optional cfg.enableGitAnnex pkgs.git-annex;
+    environment.systemPackages =
+      [pkgs.gitolite pkgs.git]
+      ++ optional cfg.enableGitAnnex pkgs.git-annex;
   });
 }

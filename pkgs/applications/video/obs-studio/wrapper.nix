@@ -1,12 +1,13 @@
-{ obs-studio, symlinkJoin, makeWrapper }:
-
-{ plugins ? [] }:
-
+{
+  obs-studio,
+  symlinkJoin,
+  makeWrapper,
+}: {plugins ? []}:
 symlinkJoin {
   name = "wrapped-${obs-studio.name}";
 
-  nativeBuildInputs = [ makeWrapper ];
-  paths = [ obs-studio ] ++ plugins;
+  nativeBuildInputs = [makeWrapper];
+  paths = [obs-studio] ++ plugins;
 
   postBuild = ''
     wrapProgram $out/bin/obs \
@@ -15,7 +16,9 @@ symlinkJoin {
   '';
 
   inherit (obs-studio) meta;
-  passthru = obs-studio.passthru // {
-    passthru.unwrapped = obs-studio;
-  };
+  passthru =
+    obs-studio.passthru
+    // {
+      passthru.unwrapped = obs-studio;
+    };
 }

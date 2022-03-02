@@ -1,12 +1,13 @@
-{ config, pkgs, lib, ... }:
-
-with lib;
-
-let
-
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+with lib; let
   eachBitcoind = config.services.bitcoind;
 
-  rpcUserOpts = { name, ... }: {
+  rpcUserOpts = {name, ...}: {
     options = {
       name = mkOption {
         type = types.str;
@@ -32,9 +33,13 @@ let
     };
   };
 
-  bitcoindOpts = { config, lib, name, ...}: {
+  bitcoindOpts = {
+    config,
+    lib,
+    name,
+    ...
+  }: {
     options = {
-
       enable = mkEnableOption "Bitcoin daemon";
 
       package = mkOption {
@@ -126,10 +131,12 @@ let
 
       prune = mkOption {
         type = types.nullOr (types.coercedTo
-          (types.enum [ "disable" "manual" ])
-          (x: if x == "disable" then 0 else 1)
-          types.ints.unsigned
-        );
+          (types.enum ["disable" "manual"])
+          (x:
+            if x == "disable"
+            then 0
+            else 1)
+          types.ints.unsigned);
         default = null;
         example = 10000;
         description = ''
@@ -154,9 +161,7 @@ let
       };
     };
   };
-in
-{
-
+in {
   options = {
     services.bitcoind = mkOption {
       type = types.attrsOf (types.submodule bitcoindOpts);
@@ -166,36 +171,37 @@ in
   };
 
   config = mkIf (eachBitcoind != {}) {
-
     assertions = flatten (mapAttrsToList (bitcoindName: cfg: [
-    {
-      assertion = (cfg.prune != null) -> (builtins.elem cfg.prune [ "disable" "manual" 0 1 ] || (builtins.isInt cfg.prune && cfg.prune >= 550));
-      message = ''
-        If set, services.bitcoind.${bitcoindName}.prune has to be "disable", "manual", 0 , 1 or >= 550.
-      '';
-    }
-    {
-      assertion = (cfg.rpc.users != {}) -> (cfg.configFile == null);
-      message = ''
-        You cannot set both services.bitcoind.${bitcoindName}.rpc.users and services.bitcoind.${bitcoindName}.configFile
-        as they are exclusive. RPC user setting would have no effect if custom configFile would be used.
-      '';
-    }
-    ]) eachBitcoind);
+        {
+          assertion = (cfg.prune != null) -> (builtins.elem cfg.prune ["disable" "manual" 0 1] || (builtins.isInt cfg.prune && cfg.prune >= 550));
+          message = ''
+            If set, services.bitcoind.${bitcoindName}.prune has to be "disable", "manual", 0 , 1 or >= 550.
+          '';
+        }
+        {
+          assertion = (cfg.rpc.users != {}) -> (cfg.configFile == null);
+          message = ''
+            You cannot set both services.bitcoind.${bitcoindName}.rpc.users and services.bitcoind.${bitcoindName}.configFile
+            as they are exclusive. RPC user setting would have no effect if custom configFile would be used.
+          '';
+        }
+      ])
+      eachBitcoind);
 
     environment.systemPackages = flatten (mapAttrsToList (bitcoindName: cfg: [
-      cfg.package
-    ]) eachBitcoind);
+        cfg.package
+      ])
+      eachBitcoind);
 
-    systemd.services = mapAttrs' (bitcoindName: cfg: (
-      nameValuePair "bitcoind-${bitcoindName}" (
-      let
+    systemd.services =
+      mapAttrs' (bitcoindName: cfg: (nameValuePair "bitcoind-${bitcoindName}" (let
         configFile = pkgs.writeText "bitcoin.conf" ''
           # If Testnet is enabled, we need to add [test] section
           # otherwise, some options (e.g.: custom RPC port) will not work
           ${optionalString cfg.testnet "[test]"}
           # RPC users
-          ${concatMapStringsSep  "\n"
+          ${
+            concatMapStringsSep "\n"
             (rpcUser: "rpcauth=${rpcUser.name}:${rpcUser.passwordHMAC}")
             (attrValues cfg.rpc.users)
           }
@@ -204,17 +210,17 @@ in
         '';
       in {
         description = "Bitcoin daemon";
-        after = [ "network.target" ];
-        wantedBy = [ "multi-user.target" ];
+        after = ["network.target"];
+        wantedBy = ["multi-user.target"];
         serviceConfig = {
           User = cfg.user;
           Group = cfg.group;
           ExecStart = ''
             ${cfg.package}/bin/bitcoind \
-            ${if (cfg.configFile != null) then
-              "-conf=${cfg.configFile}"
-            else
-              "-conf=${configFile}"
+            ${
+              if (cfg.configFile != null)
+              then "-conf=${cfg.configFile}"
+              else "-conf=${configFile}"
             } \
             -datadir=${cfg.dataDir} \
             -pid=${cfg.pidFile} \
@@ -234,28 +240,26 @@ in
           PrivateDevices = "true";
           MemoryDenyWriteExecute = "true";
         };
-      }
-    ))) eachBitcoind;
+      })))
+      eachBitcoind;
 
     systemd.tmpfiles.rules = flatten (mapAttrsToList (bitcoindName: cfg: [
-      "d '${cfg.dataDir}' 0770 '${cfg.user}' '${cfg.group}' - -"
-    ]) eachBitcoind);
+        "d '${cfg.dataDir}' 0770 '${cfg.user}' '${cfg.group}' - -"
+      ])
+      eachBitcoind);
 
-    users.users = mapAttrs' (bitcoindName: cfg: (
-      nameValuePair "bitcoind-${bitcoindName}" {
-      name = cfg.user;
-      group = cfg.group;
-      description = "Bitcoin daemon user";
-      home = cfg.dataDir;
-      isSystemUser = true;
-    })) eachBitcoind;
+    users.users =
+      mapAttrs' (bitcoindName: cfg: (nameValuePair "bitcoind-${bitcoindName}" {
+        name = cfg.user;
+        group = cfg.group;
+        description = "Bitcoin daemon user";
+        home = cfg.dataDir;
+        isSystemUser = true;
+      }))
+      eachBitcoind;
 
-    users.groups = mapAttrs' (bitcoindName: cfg: (
-      nameValuePair "${cfg.group}" { }
-    )) eachBitcoind;
-
+    users.groups = mapAttrs' (bitcoindName: cfg: (nameValuePair "${cfg.group}" {})) eachBitcoind;
   };
 
-  meta.maintainers = with maintainers; [ _1000101 ];
-
+  meta.maintainers = with maintainers; [_1000101];
 }

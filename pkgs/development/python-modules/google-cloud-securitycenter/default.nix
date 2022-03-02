@@ -1,16 +1,16 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, grpc-google-iam-v1
-, google-api-core
-, libcst
-, mock
-, proto-plus
-, pytestCheckHook
-, pytest-asyncio
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  grpc-google-iam-v1,
+  google-api-core,
+  libcst,
+  mock,
+  proto-plus,
+  pytestCheckHook,
+  pytest-asyncio,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "google-cloud-securitycenter";
   version = "1.9.0";
@@ -47,6 +47,6 @@ buildPythonPackage rec {
     description = "Cloud Security Command Center API API client library";
     homepage = "https://github.com/googleapis/python-securitycenter";
     license = licenses.asl20;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [SuperSandro2000];
   };
 }

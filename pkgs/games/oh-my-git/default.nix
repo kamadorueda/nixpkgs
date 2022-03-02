@@ -1,28 +1,28 @@
-{ lib
-, copyDesktopItems
-, fetchFromGitHub
-, makeDesktopItem
-, stdenv
-, alsa-lib
-, gcc-unwrapped
-, git
-, godot-export-templates
-, godot-headless
-, libGLU
-, libX11
-, libXcursor
-, libXext
-, libXfixes
-, libXi
-, libXinerama
-, libXrandr
-, libXrender
-, libglvnd
-, libpulseaudio
-, zlib
-, udev # for libudev
+{
+  lib,
+  copyDesktopItems,
+  fetchFromGitHub,
+  makeDesktopItem,
+  stdenv,
+  alsa-lib,
+  gcc-unwrapped,
+  git,
+  godot-export-templates,
+  godot-headless,
+  libGLU,
+  libX11,
+  libXcursor,
+  libXext,
+  libXfixes,
+  libXi,
+  libXinerama,
+  libXrandr,
+  libXrender,
+  libglvnd,
+  libpulseaudio,
+  zlib,
+  udev, # for libudev
 }:
-
 stdenv.mkDerivation rec {
   pname = "oh-my-git";
   version = "0.6.4";
@@ -66,7 +66,7 @@ stdenv.mkDerivation rec {
       desktopName = "oh-my-git";
       comment = "An interactive Git learning game!";
       genericName = "An interactive Git learning game!";
-      categories = [ "Game" ];
+      categories = ["Game"];
     })
   ];
 
@@ -110,8 +110,8 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     homepage = "https://ohmygit.org/";
     description = "An interactive Git learning game";
-    license = with licenses; [ blueOak100 ];
-    platforms   = [ "x86_64-linux" ];
-    maintainers = with maintainers; [ jojosch ];
+    license = with licenses; [blueOak100];
+    platforms = ["x86_64-linux"];
+    maintainers = with maintainers; [jojosch];
   };
 }

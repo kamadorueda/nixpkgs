@@ -1,8 +1,11 @@
-{ config, options, pkgs, lib, ... }:
-
-with lib;
-
-let
+{
+  config,
+  options,
+  pkgs,
+  lib,
+  ...
+}:
+with lib; let
   version = "1.7.1";
   cfg = config.services.kubernetes.addons.dns;
   ports = {
@@ -18,11 +21,7 @@ in {
       description = "Dns addon clusterIP";
 
       # this default is also what kubernetes users
-      default = (
-        concatStringsSep "." (
-          take 3 (splitString "." config.services.kubernetes.apiserver.serviceClusterIpRange
-        ))
-      ) + ".254";
+      default = (concatStringsSep "." (take 3 (splitString "." config.services.kubernetes.apiserver.serviceClusterIpRange))) + ".254";
       defaultText = literalDocBook ''
         The <literal>x.y.z.254</literal> IP of
         <literal>config.${options.services.kubernetes.apiserver.serviceClusterIpRange}</literal>.
@@ -51,7 +50,7 @@ in {
         See: <link xlink:href="https://github.com/kubernetes/kubernetes/blob/master/cluster/addons/addon-manager/README.md"/>.
       '';
       default = "Reconcile";
-      type = types.enum [ "Reconcile" "EnsureExists" ];
+      type = types.enum ["Reconcile" "EnsureExists"];
     };
 
     coredns = mkOption {
@@ -127,14 +126,14 @@ in {
         };
         rules = [
           {
-            apiGroups = [ "" ];
-            resources = [ "endpoints" "services" "pods" "namespaces" ];
-            verbs = [ "list" "watch" ];
+            apiGroups = [""];
+            resources = ["endpoints" "services" "pods" "namespaces"];
+            verbs = ["list" "watch"];
           }
           {
-            apiGroups = [ "" ];
-            resources = [ "nodes" ];
-            verbs = [ "get" ];
+            apiGroups = [""];
+            resources = ["nodes"];
+            verbs = ["get"];
           }
         ];
       };
@@ -217,10 +216,10 @@ in {
         spec = {
           replicas = cfg.replicas;
           selector = {
-            matchLabels = { k8s-app = "kube-dns"; };
+            matchLabels = {k8s-app = "kube-dns";};
           };
           strategy = {
-            rollingUpdate = { maxUnavailable = 1; };
+            rollingUpdate = {maxUnavailable = 1;};
             type = "RollingUpdate";
           };
           template = {
@@ -232,7 +231,7 @@ in {
             spec = {
               containers = [
                 {
-                  args = [ "-conf" "/etc/coredns/Corefile" ];
+                  args = ["-conf" "/etc/coredns/Corefile"];
                   image = with cfg.coredns; "${imageName}:${finalImageTag}";
                   imagePullPolicy = "Never";
                   livenessProbe = {
@@ -276,7 +275,7 @@ in {
                   securityContext = {
                     allowPrivilegeEscalation = false;
                     capabilities = {
-                      drop = [ "all" ];
+                      drop = ["all"];
                     };
                     readOnlyRootFilesystem = true;
                   };
@@ -356,7 +355,7 @@ in {
               protocol = "TCP";
             }
           ];
-          selector = { k8s-app = "kube-dns"; };
+          selector = {k8s-app = "kube-dns";};
         };
       };
     };

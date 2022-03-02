@@ -1,21 +1,24 @@
-import ./make-test-python.nix ({ pkgs, lib, ... }:
-let
+import ./make-test-python.nix ({
+  pkgs,
+  lib,
+  ...
+}: let
   host = "smoke.test";
   port = "8065";
   url = "http://${host}:${port}";
   siteName = "NixOS Smoke Tests, Inc.";
 
-  makeMattermost = mattermostConfig:
-    { config, ... }: {
-      environment.systemPackages = [
-        pkgs.mattermost
-        pkgs.curl
-        pkgs.jq
-      ];
-      networking.hosts = {
-        "127.0.0.1" = [ host ];
-      };
-      services.mattermost = lib.recursiveUpdate {
+  makeMattermost = mattermostConfig: {config, ...}: {
+    environment.systemPackages = [
+      pkgs.mattermost
+      pkgs.curl
+      pkgs.jq
+    ];
+    networking.hosts = {
+      "127.0.0.1" = [host];
+    };
+    services.mattermost =
+      lib.recursiveUpdate {
         enable = true;
         inherit siteName;
         listenAddress = "0.0.0.0:${port}";
@@ -23,10 +26,10 @@ let
         extraConfig = {
           SupportSettings.AboutLink = "https://nixos.org";
         };
-      } mattermostConfig;
-    };
-in
-{
+      }
+      mattermostConfig;
+  };
+in {
   name = "mattermost";
 
   nodes = {
@@ -53,24 +56,25 @@ in
   };
 
   testScript = let
-    expectConfig = jqExpression: pkgs.writeShellScript "expect-config" ''
-      set -euo pipefail
-      echo "Expecting config to match: "${lib.escapeShellArg jqExpression} >&2
-      curl ${lib.escapeShellArg url} >/dev/null
-      config="$(curl ${lib.escapeShellArg "${url}/api/v4/config/client?format=old"})"
-      echo "Config: $(echo "$config" | ${pkgs.jq}/bin/jq)" >&2
-      [[ "$(echo "$config" | ${pkgs.jq}/bin/jq -r ${lib.escapeShellArg ".SiteName == $siteName and .Version == ($mattermostName / $sep)[-1] and (${jqExpression})"} --arg siteName ${lib.escapeShellArg siteName} --arg mattermostName ${lib.escapeShellArg pkgs.mattermost.name} --arg sep '-')" = "true" ]]
-    '';
+    expectConfig = jqExpression:
+      pkgs.writeShellScript "expect-config" ''
+        set -euo pipefail
+        echo "Expecting config to match: "${lib.escapeShellArg jqExpression} >&2
+        curl ${lib.escapeShellArg url} >/dev/null
+        config="$(curl ${lib.escapeShellArg "${url}/api/v4/config/client?format=old"})"
+        echo "Config: $(echo "$config" | ${pkgs.jq}/bin/jq)" >&2
+        [[ "$(echo "$config" | ${pkgs.jq}/bin/jq -r ${lib.escapeShellArg ".SiteName == $siteName and .Version == ($mattermostName / $sep)[-1] and (${jqExpression})"} --arg siteName ${lib.escapeShellArg siteName} --arg mattermostName ${lib.escapeShellArg pkgs.mattermost.name} --arg sep '-')" = "true" ]]
+      '';
 
-    setConfig = jqExpression: pkgs.writeShellScript "set-config" ''
-      set -euo pipefail
-      mattermostConfig=/var/lib/mattermost/config/config.json
-      newConfig="$(${pkgs.jq}/bin/jq -r ${lib.escapeShellArg jqExpression} $mattermostConfig)"
-      rm -f $mattermostConfig
-      echo "$newConfig" > "$mattermostConfig"
-    '';
-  in
-  ''
+    setConfig = jqExpression:
+      pkgs.writeShellScript "set-config" ''
+        set -euo pipefail
+        mattermostConfig=/var/lib/mattermost/config/config.json
+        newConfig="$(${pkgs.jq}/bin/jq -r ${lib.escapeShellArg jqExpression} $mattermostConfig)"
+        rm -f $mattermostConfig
+        echo "$newConfig" > "$mattermostConfig"
+      '';
+  in ''
     start_all()
 
     ## Mutable node tests ##

@@ -1,10 +1,10 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, pytestCheckHook
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  pytestCheckHook,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "beartype";
   version = "0.10.2";
@@ -29,6 +29,6 @@ buildPythonPackage rec {
     description = "Fast runtime type checking for Python";
     homepage = "https://github.com/beartype/beartype";
     license = licenses.mit;
-    maintainers = with maintainers; [ bcdarwin ];
+    maintainers = with maintainers; [bcdarwin];
   };
 }

@@ -1,14 +1,14 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, substituteAll
-, wrapQtAppsHook
-, qmake
-, qtsvg
-, qtx11extras
-, graphviz
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  substituteAll,
+  wrapQtAppsHook,
+  qmake,
+  qtsvg,
+  qtx11extras,
+  graphviz,
 }:
-
 stdenv.mkDerivation rec {
   pname = "qvge";
   version = "0.6.3";
@@ -22,20 +22,23 @@ stdenv.mkDerivation rec {
 
   sourceRoot = "${src.name}/src";
 
-  patches = (substituteAll {
+  patches = substituteAll {
     src = ./set-graphviz-path.patch;
     inherit graphviz;
-  });
+  };
 
-  nativeBuildInputs = [ wrapQtAppsHook qmake ];
+  nativeBuildInputs = [wrapQtAppsHook qmake];
 
-  buildInputs = if stdenv.isDarwin then [ qtsvg ] else [ qtx11extras ];
+  buildInputs =
+    if stdenv.isDarwin
+    then [qtsvg]
+    else [qtx11extras];
 
   meta = with lib; {
     description = "Qt Visual Graph Editor";
     homepage = "https://github.com/ArsMasiuk/qvge";
     license = licenses.mit;
-    maintainers = with maintainers; [ sikmir ];
+    maintainers = with maintainers; [sikmir];
     platforms = platforms.unix;
   };
 }

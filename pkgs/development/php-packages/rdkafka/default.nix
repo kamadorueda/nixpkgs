@@ -1,12 +1,16 @@
-{ buildPecl, lib, rdkafka, pcre2 }:
-
+{
+  buildPecl,
+  lib,
+  rdkafka,
+  pcre2,
+}:
 buildPecl {
   pname = "rdkafka";
 
   version = "6.0.1";
   sha256 = "sha256-ikq+cB5ZPRBCwhB0YQT0sEsVrJjbYzGEju2RrK388ZI=";
 
-  buildInputs = [ rdkafka pcre2 ];
+  buildInputs = [rdkafka pcre2];
 
   postPhpize = ''
     substituteInPlace configure \

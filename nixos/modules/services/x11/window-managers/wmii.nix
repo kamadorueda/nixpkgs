@@ -1,17 +1,20 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.xserver.windowManager.wmii;
   wmii = pkgs.wmii_hg;
-in
-{
+in {
   options = {
     services.xserver.windowManager.wmii.enable = mkEnableOption "wmii";
   };
 
   config = mkIf cfg.enable {
-    services.xserver.windowManager.session = singleton
+    services.xserver.windowManager.session =
+      singleton
       # stop wmii by
       #   $wmiir xwrite /ctl quit
       # this will cause wmii exiting with exit code 0
@@ -26,7 +29,8 @@ in
       # Another use case is kill -9 wmii; after rotating screen.
       # Note: we don't like kill for that purpose. But it works (->
       # subject "wmii and xrandr" on mailinglist)
-      { name = "wmii";
+      {
+        name = "wmii";
         start = ''
           while :; do
             ${wmii}/bin/wmii && break
@@ -34,6 +38,6 @@ in
         '';
       };
 
-    environment.systemPackages = [ wmii ];
+    environment.systemPackages = [wmii];
   };
 }

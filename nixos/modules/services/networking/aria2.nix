@@ -1,8 +1,10 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.aria2;
 
   homeDir = "/var/lib/aria2";
@@ -11,18 +13,17 @@ let
   sessionFile = "${homeDir}/aria2.session";
   downloadDir = "${homeDir}/Downloads";
 
-  rangesToStringList = map (x: builtins.toString x.from +"-"+ builtins.toString x.to);
+  rangesToStringList = map (x: builtins.toString x.from + "-" + builtins.toString x.to);
 
-  settingsFile = pkgs.writeText "aria2.conf"
-  ''
-    dir=${cfg.downloadDir}
-    listen-port=${concatStringsSep "," (rangesToStringList cfg.listenPortRange)}
-    rpc-listen-port=${toString cfg.rpcListenPort}
-    rpc-secret=${cfg.rpcSecret}
-  '';
-
-in
-{
+  settingsFile =
+    pkgs.writeText "aria2.conf"
+    ''
+      dir=${cfg.downloadDir}
+      listen-port=${concatStringsSep "," (rangesToStringList cfg.listenPortRange)}
+      rpc-listen-port=${toString cfg.rpcListenPort}
+      rpc-secret=${cfg.rpcSecret}
+    '';
+in {
   options = {
     services.aria2 = {
       enable = mkOption {
@@ -55,7 +56,12 @@ in
       };
       listenPortRange = mkOption {
         type = types.listOf types.attrs;
-        default = [ { from = 6881; to = 6999; } ];
+        default = [
+          {
+            from = 6881;
+            to = 6999;
+          }
+        ];
         description = ''
           Set UDP listening port range used by DHT(IPv4, IPv6) and UDP tracker.
         '';
@@ -85,11 +91,10 @@ in
   };
 
   config = mkIf cfg.enable {
-
     # Need to open ports for proper functioning
     networking.firewall = mkIf cfg.openPorts {
       allowedUDPPortRanges = config.services.aria2.listenPortRange;
-      allowedTCPPorts = [ config.services.aria2.rpcListenPort ];
+      allowedTCPPorts = [config.services.aria2.rpcListenPort];
     };
 
     users.users.aria2 = {
@@ -109,8 +114,8 @@ in
 
     systemd.services.aria2 = {
       description = "aria2 Service";
-      after = [ "network.target" ];
-      wantedBy = [ "multi-user.target" ];
+      after = ["network.target"];
+      wantedBy = ["multi-user.target"];
       preStart = ''
         if [[ ! -e "${sessionFile}" ]]
         then

@@ -1,14 +1,14 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, fetchpatch
-, cython
-, numpy
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  fetchpatch,
+  cython,
+  numpy,
   # Check Inputs
-, pytestCheckHook
-, python
+  pytestCheckHook,
+  python,
 }:
-
 buildPythonPackage rec {
   pname = "fastdtw";
   version = "0.3.4";
@@ -37,9 +37,9 @@ buildPythonPackage rec {
     numpy
   ];
 
-  pythonImportsCheck = [ "fastdtw.fastdtw" ];
-  checkInputs = [ pytestCheckHook ];
-  dontUseSetuptoolsCheck = true;  # looks for pytest-runner
+  pythonImportsCheck = ["fastdtw.fastdtw"];
+  checkInputs = [pytestCheckHook];
+  dontUseSetuptoolsCheck = true; # looks for pytest-runner
   preCheck = ''
     echo "Temporarily moving tests to $OUT to find cython modules"
     export PACKAGEDIR=$out/${python.sitePackages}
@@ -51,7 +51,6 @@ buildPythonPackage rec {
     popd
   '';
 
-
   meta = with lib; {
     description = "Python implementation of FastDTW (Dynamic Time Warping)";
     longDescription = ''
@@ -60,6 +59,6 @@ buildPythonPackage rec {
     '';
     homepage = "https://github.com/slaypni/fastdtw";
     license = licenses.mit;
-    maintainers = with maintainers; [ drewrisinger ];
+    maintainers = with maintainers; [drewrisinger];
   };
 }

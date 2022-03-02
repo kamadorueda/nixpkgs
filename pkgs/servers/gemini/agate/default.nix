@@ -1,5 +1,13 @@
-{ lib, stdenv, nixosTests, fetchFromGitHub, fetchpatch, rustPlatform, libiconv, Security }:
-
+{
+  lib,
+  stdenv,
+  nixosTests,
+  fetchFromGitHub,
+  fetchpatch,
+  rustPlatform,
+  libiconv,
+  Security,
+}:
 rustPlatform.buildRustPackage rec {
   pname = "agate";
   version = "3.2.3";
@@ -21,7 +29,7 @@ rustPlatform.buildRustPackage rec {
     })
   ];
 
-  buildInputs = lib.optionals stdenv.isDarwin [ libiconv Security ];
+  buildInputs = lib.optionals stdenv.isDarwin [libiconv Security];
 
   doInstallCheck = true;
   installCheckPhase = ''
@@ -31,7 +39,7 @@ rustPlatform.buildRustPackage rec {
     runHook postInstallCheck
   '';
 
-  passthru.tests = { inherit (nixosTests) agate; };
+  passthru.tests = {inherit (nixosTests) agate;};
 
   meta = with lib; {
     homepage = "https://github.com/mbrubeck/agate";
@@ -43,7 +51,13 @@ rustPlatform.buildRustPackage rec {
       static files. It uses async I/O, and should be quite efficient even when
       running on low-end hardware and serving many concurrent requests.
     '';
-    license = with licenses; [ asl20 /* or */ mit ];
-    maintainers = with maintainers; [ jk ];
+    license = with licenses; [
+      asl20
+      /*
+       or
+       */
+      mit
+    ];
+    maintainers = with maintainers; [jk];
   };
 }

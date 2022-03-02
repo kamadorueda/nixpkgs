@@ -1,19 +1,19 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, filelock
-, idna
-, pytest-mock
-, pytestCheckHook
-, pythonOlder
-, requests
-, requests-file
-, responses
-, setuptools-scm
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  filelock,
+  idna,
+  pytest-mock,
+  pytestCheckHook,
+  pythonOlder,
+  requests,
+  requests-file,
+  responses,
+  setuptools-scm,
 }:
-
 buildPythonPackage rec {
-  pname   = "tldextract";
+  pname = "tldextract";
   version = "3.2.0";
   format = "setuptools";
 
@@ -57,7 +57,7 @@ buildPythonPackage rec {
       from the registered domain and subdomains of a URL.
     '';
     homepage = "https://github.com/john-kurkowski/tldextract";
-    license = with licenses; [ bsd3 ];
-    maintainers = with maintainers; [ fab ];
+    license = with licenses; [bsd3];
+    maintainers = with maintainers; [fab];
   };
 }

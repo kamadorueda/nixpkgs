@@ -1,20 +1,20 @@
-{ lib
-, stdenv
-, buildDunePackage
-, fetchFromGitHub
-, cmdliner
-, ctypes
-, dune-configurator
-, npy
-, ocaml-compiler-libs
-, ppx_custom_printf
-, ppx_expect
-, ppx_sexp_conv
-, sexplib
-, stdio
-, pytorch
+{
+  lib,
+  stdenv,
+  buildDunePackage,
+  fetchFromGitHub,
+  cmdliner,
+  ctypes,
+  dune-configurator,
+  npy,
+  ocaml-compiler-libs,
+  ppx_custom_printf,
+  ppx_expect,
+  ppx_sexp_conv,
+  sexplib,
+  stdio,
+  pytorch,
 }:
-
 buildDunePackage rec {
   pname = "torch";
   version = "0.14";
@@ -25,12 +25,12 @@ buildDunePackage rec {
 
   src = fetchFromGitHub {
     owner = "LaurentMazare";
-    repo   = "ocaml-${pname}";
-    rev    = version;
+    repo = "ocaml-${pname}";
+    rev = version;
     sha256 = "sha256:039anfvzsalbqi5cdp95bbixcwr2ngharihgd149hcr0wa47y700";
   };
 
-  buildInputs = [ dune-configurator ];
+  buildInputs = [dune-configurator];
 
   propagatedBuildInputs = [
     cmdliner
@@ -54,7 +54,7 @@ buildDunePackage rec {
   meta = with lib; {
     inherit (src.meta) homepage;
     description = "Ocaml bindings to Pytorch";
-    maintainers = [ maintainers.bcdarwin ];
+    maintainers = [maintainers.bcdarwin];
     license = licenses.asl20;
   };
 }

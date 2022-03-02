@@ -1,23 +1,23 @@
-{ lib
-, stdenv
-, fetchurl
-, SDL2
-, SDL2_net
-, alsa-lib
-, flac
-, freeglut
-, libGL
-, libGLU
-, libX11
-, libcdio
-, libjack2
-, libsamplerate
-, libsndfile
-, pkg-config
-, zlib
-, libiconv
+{
+  lib,
+  stdenv,
+  fetchurl,
+  SDL2,
+  SDL2_net,
+  alsa-lib,
+  flac,
+  freeglut,
+  libGL,
+  libGLU,
+  libX11,
+  libcdio,
+  libjack2,
+  libsamplerate,
+  libsndfile,
+  pkg-config,
+  zlib,
+  libiconv,
 }:
-
 stdenv.mkDerivation rec {
   pname = "mednafen";
   version = "1.29.0";
@@ -27,28 +27,31 @@ stdenv.mkDerivation rec {
     hash = "sha256-2j+88Ch3+b4PAov6XRy1npU6QEm5D+fjk4ijOG2fNi4=";
   };
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [pkg-config];
 
-  buildInputs = [
-    SDL2
-    SDL2_net
-    flac
-    freeglut
-    libcdio
-    libjack2
-    libsamplerate
-    libsndfile
-    zlib
-  ] ++ lib.optionals stdenv.hostPlatform.isLinux [
-    alsa-lib
-    libGL
-    libGLU
-    libX11
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    libiconv
-  ];
+  buildInputs =
+    [
+      SDL2
+      SDL2_net
+      flac
+      freeglut
+      libcdio
+      libjack2
+      libsamplerate
+      libsndfile
+      zlib
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [
+      alsa-lib
+      libGL
+      libGLU
+      libX11
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      libiconv
+    ];
 
-  hardeningDisable = [ "pic" "format" ];
+  hardeningDisable = ["pic" "format"];
 
   enableParallelBuilding = true;
 
@@ -92,7 +95,7 @@ stdenv.mkDerivation rec {
       - Sony PlayStation
     '';
     license = licenses.gpl2Plus;
-    maintainers = with maintainers; [ AndersonTorres ];
+    maintainers = with maintainers; [AndersonTorres];
     platforms = platforms.unix;
   };
 }

@@ -1,14 +1,14 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, mock
-, google-api-core
-, google-cloud-testutils
-, proto-plus
-, pytestCheckHook
-, pytest-asyncio
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  mock,
+  google-api-core,
+  google-cloud-testutils,
+  proto-plus,
+  pytestCheckHook,
+  pytest-asyncio,
 }:
-
 buildPythonPackage rec {
   pname = "google-cloud-videointelligence";
   version = "2.6.0";
@@ -18,9 +18,9 @@ buildPythonPackage rec {
     sha256 = "sha256-blkNMdh9ehRM9sidgGajIkrHgrJCT96hzG3nVU0DBo4=";
   };
 
-  propagatedBuildInputs = [ google-api-core proto-plus ];
+  propagatedBuildInputs = [google-api-core proto-plus];
 
-  checkInputs = [ google-cloud-testutils mock pytestCheckHook pytest-asyncio ];
+  checkInputs = [google-cloud-testutils mock pytestCheckHook pytest-asyncio];
 
   disabledTests = [
     # require credentials
@@ -40,6 +40,6 @@ buildPythonPackage rec {
     description = "Google Cloud Video Intelligence API client library";
     homepage = "https://github.com/googleapis/python-videointelligence";
     license = licenses.asl20;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [SuperSandro2000];
   };
 }

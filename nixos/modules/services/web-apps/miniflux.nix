@@ -1,7 +1,10 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.miniflux;
 
   defaultAddress = "localhost:8080";
@@ -14,9 +17,7 @@ let
     #!${pkgs.runtimeShell}
     ${pgbin}/psql "${dbName}" -c "CREATE EXTENSION IF NOT EXISTS hstore"
   '';
-in
-
-{
+in {
   options = {
     services.miniflux = {
       enable = mkEnableOption "miniflux and creates a local postgres database for it";
@@ -39,7 +40,7 @@ in
         '';
       };
 
-      adminCredentialsFile = mkOption  {
+      adminCredentialsFile = mkOption {
         type = types.path;
         description = ''
           File containing the ADMIN_USERNAME and
@@ -52,8 +53,7 @@ in
   };
 
   config = mkIf cfg.enable {
-
-    services.miniflux.config =  {
+    services.miniflux.config = {
       LISTEN_ADDR = mkDefault defaultAddress;
       DATABASE_URL = "user=${dbUser} host=/run/postgresql dbname=${dbName}";
       RUN_MIGRATIONS = "1";
@@ -62,19 +62,21 @@ in
 
     services.postgresql = {
       enable = true;
-      ensureUsers = [ {
-        name = dbUser;
-        ensurePermissions = {
-          "DATABASE ${dbName}" = "ALL PRIVILEGES";
-        };
-      } ];
-      ensureDatabases = [ dbName ];
+      ensureUsers = [
+        {
+          name = dbUser;
+          ensurePermissions = {
+            "DATABASE ${dbName}" = "ALL PRIVILEGES";
+          };
+        }
+      ];
+      ensureDatabases = [dbName];
     };
 
     systemd.services.miniflux-dbsetup = {
       description = "Miniflux database setup";
-      requires = [ "postgresql.service" ];
-      after = [ "network.target" "postgresql.service" ];
+      requires = ["postgresql.service"];
+      after = ["network.target" "postgresql.service"];
       serviceConfig = {
         Type = "oneshot";
         User = config.services.postgresql.superUser;
@@ -84,9 +86,9 @@ in
 
     systemd.services.miniflux = {
       description = "Miniflux service";
-      wantedBy = [ "multi-user.target" ];
-      requires = [ "miniflux-dbsetup.service" ];
-      after = [ "network.target" "postgresql.service" "miniflux-dbsetup.service" ];
+      wantedBy = ["multi-user.target"];
+      requires = ["miniflux-dbsetup.service"];
+      after = ["network.target" "postgresql.service" "miniflux-dbsetup.service"];
 
       serviceConfig = {
         ExecStart = "${pkgs.miniflux}/bin/miniflux";
@@ -96,8 +98,8 @@ in
         RuntimeDirectoryMode = "0700";
         EnvironmentFile = cfg.adminCredentialsFile;
         # Hardening
-        CapabilityBoundingSet = [ "" ];
-        DeviceAllow = [ "" ];
+        CapabilityBoundingSet = [""];
+        DeviceAllow = [""];
         LockPersonality = true;
         MemoryDenyWriteExecute = true;
         PrivateDevices = true;
@@ -111,17 +113,17 @@ in
         ProtectKernelModules = true;
         ProtectKernelTunables = true;
         ProtectProc = "invisible";
-        RestrictAddressFamilies = [ "AF_INET" "AF_INET6" "AF_UNIX" ];
+        RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_UNIX"];
         RestrictNamespaces = true;
         RestrictRealtime = true;
         RestrictSUIDSGID = true;
         SystemCallArchitectures = "native";
-        SystemCallFilter = [ "@system-service" "~@privileged" "~@resources" ];
+        SystemCallFilter = ["@system-service" "~@privileged" "~@resources"];
         UMask = "0077";
       };
 
       environment = cfg.config;
     };
-    environment.systemPackages = [ pkgs.miniflux ];
+    environment.systemPackages = [pkgs.miniflux];
   };
 }

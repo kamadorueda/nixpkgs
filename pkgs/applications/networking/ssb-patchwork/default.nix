@@ -1,6 +1,10 @@
-{ appimageTools, symlinkJoin, lib, fetchurl, makeDesktopItem }:
-
-let
+{
+  appimageTools,
+  symlinkJoin,
+  lib,
+  fetchurl,
+  makeDesktopItem,
+}: let
   pname = "ssb-patchwork";
   version = "3.18.1";
   name = "Patchwork-${version}";
@@ -26,13 +30,12 @@ let
     comment = "Client for the decentralized social network Secure Scuttlebutt";
     desktopName = "Patchwork";
     genericName = "Patchwork";
-    categories = [ "Network" ];
+    categories = ["Network"];
   };
-
 in
   symlinkJoin {
     inherit name;
-    paths = [ binary ];
+    paths = [binary];
 
     postBuild = ''
       mkdir -p $out/share/pixmaps/ $out/share/applications
@@ -47,7 +50,7 @@ in
       '';
       homepage = "https://www.scuttlebutt.nz/";
       license = licenses.agpl3;
-      maintainers = with maintainers; [ asymmetric ninjatrappeur cyplo ];
-      platforms = [ "x86_64-linux" ];
+      maintainers = with maintainers; [asymmetric ninjatrappeur cyplo];
+      platforms = ["x86_64-linux"];
     };
   }

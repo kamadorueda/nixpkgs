@@ -1,8 +1,13 @@
-{ config, lib, pkgs, ... }:
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
   cfg = config.services.onedrive;
 
-  onedriveLauncher =  pkgs.writeShellScriptBin
+  onedriveLauncher =
+    pkgs.writeShellScriptBin
     "onedrive-launcher"
     ''
       # XDG_CONFIG_HOME is not recognized in the environment here.
@@ -16,9 +21,7 @@ let
       else
         systemctl --user start onedrive@onedrive
       fi
-    ''
-  ;
-
+    '';
 in {
   ### Documentation
   # meta.doc = ./onedrive.xml;
@@ -32,19 +35,19 @@ in {
       description = "Enable OneDrive service";
     };
 
-     package = lib.mkOption {
-       type = lib.types.package;
-       default = pkgs.onedrive;
-       defaultText = lib.literalExpression "pkgs.onedrive";
-       description = ''
-         OneDrive package to use.
-       '';
-     };
+    package = lib.mkOption {
+      type = lib.types.package;
+      default = pkgs.onedrive;
+      defaultText = lib.literalExpression "pkgs.onedrive";
+      description = ''
+        OneDrive package to use.
+      '';
+    };
   };
-### Implementation
+  ### Implementation
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = [ cfg.package ];
+    environment.systemPackages = [cfg.package];
 
     systemd.user.services."onedrive@" = {
       description = "Onedrive sync service";
@@ -54,14 +57,14 @@ in {
         ExecStart = ''
           ${cfg.package}/bin/onedrive --monitor --confdir=%h/.config/%i
         '';
-        Restart="on-failure";
-        RestartSec=3;
-        RestartPreventExitStatus=3;
+        Restart = "on-failure";
+        RestartSec = 3;
+        RestartPreventExitStatus = 3;
       };
     };
 
     systemd.user.services.onedrive-launcher = {
-      wantedBy = [ "default.target" ];
+      wantedBy = ["default.target"];
       serviceConfig = {
         Type = "oneshot";
         ExecStart = "${onedriveLauncher}/bin/onedrive-launcher";

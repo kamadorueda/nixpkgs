@@ -1,5 +1,9 @@
-{ stdenv, lib, fetchurl, cabextract }:
-
+{
+  stdenv,
+  lib,
+  fetchurl,
+  cabextract,
+}:
 stdenv.mkDerivation rec {
   pname = "xow_dongle-firmware";
   version = "2017-07";
@@ -12,7 +16,7 @@ stdenv.mkDerivation rec {
     sha256 = "013g1zngxffavqrk5jy934q3bdhsv6z05ilfixdn8dj0zy26lwv5";
   };
 
-  nativeBuildInputs = [ cabextract ];
+  nativeBuildInputs = [cabextract];
 
   buildPhase = ''
     cabextract -F FW_ACC_00U.bin ${src}
@@ -24,9 +28,7 @@ stdenv.mkDerivation rec {
     description = "Xbox One wireless dongle firmware";
     homepage = "https://www.xbox.com/en-NZ/accessories/adapters/wireless-adapter-windows";
     license = licenses.unfree;
-    maintainers = with lib.maintainers; [ rhysmdnz ];
+    maintainers = with lib.maintainers; [rhysmdnz];
     platforms = platforms.linux;
   };
 }
-
-

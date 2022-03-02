@@ -1,17 +1,17 @@
-{ lib
-, fetchFromGitHub
-, rustPlatform
-, stdenv
-, installShellFiles
-, pkg-config
-, libiconv
-, openssl
-, DiskArbitration
-, Foundation
-, zellij
-, testVersion
+{
+  lib,
+  fetchFromGitHub,
+  rustPlatform,
+  stdenv,
+  installShellFiles,
+  pkg-config,
+  libiconv,
+  openssl,
+  DiskArbitration,
+  Foundation,
+  zellij,
+  testVersion,
 }:
-
 rustPlatform.buildRustPackage rec {
   pname = "zellij";
   version = "0.25.0";
@@ -30,13 +30,15 @@ rustPlatform.buildRustPackage rec {
     pkg-config
   ];
 
-  buildInputs = [
-    openssl
-  ] ++ lib.optionals stdenv.isDarwin [
-    libiconv
-    DiskArbitration
-    Foundation
-  ];
+  buildInputs =
+    [
+      openssl
+    ]
+    ++ lib.optionals stdenv.isDarwin [
+      libiconv
+      DiskArbitration
+      Foundation
+    ];
 
   preCheck = ''
     HOME=$TMPDIR
@@ -49,13 +51,13 @@ rustPlatform.buildRustPackage rec {
       --zsh <($out/bin/zellij setup --generate-completion zsh)
   '';
 
-  passthru.tests.version = testVersion { package = zellij; };
+  passthru.tests.version = testVersion {package = zellij;};
 
   meta = with lib; {
     description = "A terminal workspace with batteries included";
     homepage = "https://zellij.dev/";
     changelog = "https://github.com/zellij-org/zellij/blob/v${version}/Changelog.md";
-    license = with licenses; [ mit ];
-    maintainers = with maintainers; [ therealansh _0x4A6F abbe ];
+    license = with licenses; [mit];
+    maintainers = with maintainers; [therealansh _0x4A6F abbe];
   };
 }

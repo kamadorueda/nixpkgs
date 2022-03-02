@@ -1,14 +1,16 @@
 # This module defines the packages that appear in
 # /run/current-system/sw.
-
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
-
-  requiredPackages = map (pkg: setPrio ((pkg.meta.priority or 5) + 3) pkg)
-    [ pkgs.acl
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
+  requiredPackages =
+    map (pkg: setPrio ((pkg.meta.priority or 5) + 3) pkg)
+    [
+      pkgs.acl
       pkgs.attr
       pkgs.bashInteractive # bash with ncurses support
       pkgs.bzip2
@@ -41,25 +43,20 @@ let
       pkgs.zstd
     ];
 
-  defaultPackageNames =
-    [ "nano"
-      "perl"
-      "rsync"
-      "strace"
-    ];
+  defaultPackageNames = [
+    "nano"
+    "perl"
+    "rsync"
+    "strace"
+  ];
   defaultPackages =
     map
-      (n: let pkg = pkgs.${n}; in setPrio ((pkg.meta.priority or 5) + 3) pkg)
-      defaultPackageNames;
-  defaultPackagesText = "[ ${concatMapStringsSep " " (n: "pkgs.${n}") defaultPackageNames } ]";
-
-in
-
-{
+    (n: let pkg = pkgs.${n}; in setPrio ((pkg.meta.priority or 5) + 3) pkg)
+    defaultPackageNames;
+  defaultPackagesText = "[ ${concatMapStringsSep " " (n: "pkgs.${n}") defaultPackageNames} ]";
+in {
   options = {
-
     environment = {
-
       systemPackages = mkOption {
         type = types.listOf types.package;
         default = [];
@@ -114,8 +111,8 @@ in
 
       extraOutputsToInstall = mkOption {
         type = types.listOf types.str;
-        default = [ ];
-        example = [ "doc" "info" "devdoc" ];
+        default = [];
+        example = ["doc" "info" "devdoc"];
         description = "List of additional package outputs to be symlinked into <filename>/run/current-system/sw</filename>.";
       };
 
@@ -124,46 +121,41 @@ in
         default = "";
         description = "Shell fragments to be run after the system environment has been created. This should only be used for things that need to modify the internals of the environment, e.g. generating MIME caches. The environment being built can be accessed at $out.";
       };
-
     };
 
     system = {
-
       path = mkOption {
         internal = true;
         description = ''
           The packages you want in the boot environment.
         '';
       };
-
     };
-
   };
 
   config = {
-
     environment.systemPackages = requiredPackages ++ config.environment.defaultPackages;
 
-    environment.pathsToLink =
-      [ "/bin"
-        "/etc/xdg"
-        "/etc/gtk-2.0"
-        "/etc/gtk-3.0"
-        "/lib" # FIXME: remove and update debug-info.nix
-        "/sbin"
-        "/share/emacs"
-        "/share/hunspell"
-        "/share/nano"
-        "/share/org"
-        "/share/themes"
-        "/share/vim-plugins"
-        "/share/vulkan"
-        "/share/kservices5"
-        "/share/kservicetypes5"
-        "/share/kxmlgui5"
-        "/share/systemd"
-        "/share/thumbnailers"
-      ];
+    environment.pathsToLink = [
+      "/bin"
+      "/etc/xdg"
+      "/etc/gtk-2.0"
+      "/etc/gtk-3.0"
+      "/lib" # FIXME: remove and update debug-info.nix
+      "/sbin"
+      "/share/emacs"
+      "/share/hunspell"
+      "/share/nano"
+      "/share/org"
+      "/share/themes"
+      "/share/vim-plugins"
+      "/share/vulkan"
+      "/share/kservices5"
+      "/share/kservicetypes5"
+      "/share/kxmlgui5"
+      "/share/systemd"
+      "/share/thumbnailers"
+    ];
 
     system.path = pkgs.buildEnv {
       name = "system-path";
@@ -172,18 +164,16 @@ in
       ignoreCollisions = true;
       # !!! Hacky, should modularise.
       # outputs TODO: note that the tools will often not be linked by default
-      postBuild =
-        ''
-          # Remove wrapped binaries, they shouldn't be accessible via PATH.
-          find $out/bin -maxdepth 1 -name ".*-wrapped" -type l -delete
+      postBuild = ''
+        # Remove wrapped binaries, they shouldn't be accessible via PATH.
+        find $out/bin -maxdepth 1 -name ".*-wrapped" -type l -delete
 
-          if [ -x $out/bin/glib-compile-schemas -a -w $out/share/glib-2.0/schemas ]; then
-              $out/bin/glib-compile-schemas $out/share/glib-2.0/schemas
-          fi
+        if [ -x $out/bin/glib-compile-schemas -a -w $out/share/glib-2.0/schemas ]; then
+            $out/bin/glib-compile-schemas $out/share/glib-2.0/schemas
+        fi
 
-          ${config.environment.extraSetup}
-        '';
+        ${config.environment.extraSetup}
+      '';
     };
-
   };
 }

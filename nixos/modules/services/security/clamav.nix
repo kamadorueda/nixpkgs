@@ -1,6 +1,10 @@
-{ config, lib, pkgs, ... }:
-with lib;
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   clamavUser = "clamav";
   stateDir = "/var/lib/clamav";
   runDir = "/run/clamav";
@@ -9,18 +13,17 @@ let
   pkg = pkgs.clamav;
 
   toKeyValue = generators.toKeyValue {
-    mkKeyValue = generators.mkKeyValueDefault { } " ";
+    mkKeyValue = generators.mkKeyValueDefault {} " ";
     listsAsDuplicateKeys = true;
   };
 
   clamdConfigFile = pkgs.writeText "clamd.conf" (toKeyValue cfg.daemon.settings);
   freshclamConfigFile = pkgs.writeText "freshclam.conf" (toKeyValue cfg.updater.settings);
-in
-{
+in {
   imports = [
-    (mkRemovedOptionModule [ "services" "clamav" "updater" "config" ] "Use services.clamav.updater.settings instead.")
-    (mkRemovedOptionModule [ "services" "clamav" "updater" "extraConfig" ] "Use services.clamav.updater.settings instead.")
-    (mkRemovedOptionModule [ "services" "clamav" "daemon" "extraConfig" ] "Use services.clamav.daemon.settings instead.")
+    (mkRemovedOptionModule ["services" "clamav" "updater" "config"] "Use services.clamav.updater.settings instead.")
+    (mkRemovedOptionModule ["services" "clamav" "updater" "extraConfig"] "Use services.clamav.updater.settings instead.")
+    (mkRemovedOptionModule ["services" "clamav" "daemon" "extraConfig"] "Use services.clamav.daemon.settings instead.")
   ];
 
   options = {
@@ -29,8 +32,8 @@ in
         enable = mkEnableOption "ClamAV clamd daemon";
 
         settings = mkOption {
-          type = with types; attrsOf (oneOf [ bool int str (listOf str) ]);
-          default = { };
+          type = with types; attrsOf (oneOf [bool int str (listOf str)]);
+          default = {};
           description = ''
             ClamAV configuration. Refer to <link xlink:href="https://linux.die.net/man/5/clamd.conf"/>,
             for details on supported values.
@@ -58,8 +61,8 @@ in
         };
 
         settings = mkOption {
-          type = with types; attrsOf (oneOf [ bool int str (listOf str) ]);
-          default = { };
+          type = with types; attrsOf (oneOf [bool int str (listOf str)]);
+          default = {};
           description = ''
             freshclam configuration. Refer to <link xlink:href="https://linux.die.net/man/5/freshclam.conf"/>,
             for details on supported values.
@@ -70,7 +73,7 @@ in
   };
 
   config = mkIf (cfg.updater.enable || cfg.daemon.enable) {
-    environment.systemPackages = [ pkg ];
+    environment.systemPackages = [pkg];
 
     users.users.${clamavUser} = {
       uid = config.ids.uids.clamav;
@@ -79,8 +82,7 @@ in
       home = stateDir;
     };
 
-    users.groups.${clamavGroup} =
-      { gid = config.ids.gids.clamav; };
+    users.groups.${clamavGroup} = {gid = config.ids.gids.clamav;};
 
     services.clamav.daemon.settings = {
       DatabaseDirectory = stateDir;
@@ -95,7 +97,7 @@ in
       DatabaseDirectory = stateDir;
       Foreground = true;
       Checks = cfg.updater.frequency;
-      DatabaseMirror = [ "database.clamav.net" ];
+      DatabaseMirror = ["database.clamav.net"];
     };
 
     environment.etc."clamav/freshclam.conf".source = freshclamConfigFile;
@@ -104,8 +106,8 @@ in
     systemd.services.clamav-daemon = mkIf cfg.daemon.enable {
       description = "ClamAV daemon (clamd)";
       after = optional cfg.updater.enable "clamav-freshclam.service";
-      wantedBy = [ "multi-user.target" ];
-      restartTriggers = [ clamdConfigFile ];
+      wantedBy = ["multi-user.target"];
+      restartTriggers = [clamdConfigFile];
 
       preStart = ''
         mkdir -m 0755 -p ${runDir}
@@ -123,7 +125,7 @@ in
 
     systemd.timers.clamav-freshclam = mkIf cfg.updater.enable {
       description = "Timer for ClamAV virus database updater (freshclam)";
-      wantedBy = [ "timers.target" ];
+      wantedBy = ["timers.target"];
       timerConfig = {
         OnCalendar = cfg.updater.interval;
         Unit = "clamav-freshclam.service";
@@ -132,8 +134,8 @@ in
 
     systemd.services.clamav-freshclam = mkIf cfg.updater.enable {
       description = "ClamAV virus database updater (freshclam)";
-      restartTriggers = [ freshclamConfigFile ];
-      after = [ "network-online.target" ];
+      restartTriggers = [freshclamConfigFile];
+      after = ["network-online.target"];
       preStart = ''
         mkdir -m 0755 -p ${stateDir}
         chown ${clamavUser}:${clamavGroup} ${stateDir}

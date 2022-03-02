@@ -1,10 +1,18 @@
-{ lib, buildPythonPackage, fetchFromGitHub, fetchpatch, isPy3k
-, bitcoinlib, GitPython, pysha3, git }:
-
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  fetchpatch,
+  isPy3k,
+  bitcoinlib,
+  GitPython,
+  pysha3,
+  git,
+}:
 buildPythonPackage rec {
   pname = "opentimestamps";
   version = "0.4.1";
-  disabled = (!isPy3k);
+  disabled = !isPy3k;
 
   # We can't use the pypi source because it doesn't include README.md which is
   # needed in setup.py
@@ -29,8 +37,8 @@ buildPythonPackage rec {
     rm opentimestamps/tests/core/test_git.py
   '';
 
-  checkInputs = [ git ];
-  propagatedBuildInputs = [ bitcoinlib GitPython pysha3 ];
+  checkInputs = [git];
+  propagatedBuildInputs = [bitcoinlib GitPython pysha3];
 
   meta = {
     description = "Create and verify OpenTimestamps proofs";

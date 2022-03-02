@@ -1,9 +1,9 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, setuptools-scm
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  setuptools-scm,
 }:
-
 buildPythonPackage rec {
   pname = "adafruit-platformdetect";
   version = "3.20.1";
@@ -29,7 +29,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Platform detection for use by Adafruit libraries";
     homepage = "https://github.com/adafruit/Adafruit_Python_PlatformDetect";
-    license = with licenses; [ mit ];
-    maintainers = with maintainers; [ fab ];
+    license = with licenses; [mit];
+    maintainers = with maintainers; [fab];
   };
 }

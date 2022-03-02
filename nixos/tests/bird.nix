@@ -1,18 +1,20 @@
 # This test does a basic functionality check for all bird variants and demonstrates a use
 # of the preCheckConfig option.
-
-{ system ? builtins.currentSystem
-, pkgs ? import ../.. { inherit system; config = { }; }
-}:
-
-let
-  inherit (import ../lib/testing-python.nix { inherit system pkgs; }) makeTest;
+{
+  system ? builtins.currentSystem,
+  pkgs ?
+    import ../.. {
+      inherit system;
+      config = {};
+    },
+}: let
+  inherit (import ../lib/testing-python.nix {inherit system pkgs;}) makeTest;
   inherit (pkgs.lib) optionalString;
 
-  makeBird2Host = hostId: { pkgs, ... }: {
-    virtualisation.vlans = [ 1 ];
+  makeBird2Host = hostId: {pkgs, ...}: {
+    virtualisation.vlans = [1];
 
-    environment.systemPackages = with pkgs; [ jq ];
+    environment.systemPackages = with pkgs; [jq];
 
     networking = {
       useNetworkd = true;
@@ -99,31 +101,31 @@ let
     ];
   };
 in
-makeTest {
-  name = "bird2";
+  makeTest {
+    name = "bird2";
 
-  nodes.host1 = makeBird2Host "1";
-  nodes.host2 = makeBird2Host "2";
+    nodes.host1 = makeBird2Host "1";
+    nodes.host2 = makeBird2Host "2";
 
-  testScript = ''
-    start_all()
+    testScript = ''
+      start_all()
 
-    host1.wait_for_unit("bird2.service")
-    host2.wait_for_unit("bird2.service")
-    host1.succeed("systemctl reload bird2.service")
+      host1.wait_for_unit("bird2.service")
+      host2.wait_for_unit("bird2.service")
+      host1.succeed("systemctl reload bird2.service")
 
-    with subtest("Waiting for advertised IPv4 routes"):
-      host1.wait_until_succeeds("ip --json r | jq -e 'map(select(.dst == \"10.10.0.2\")) | any'")
-      host2.wait_until_succeeds("ip --json r | jq -e 'map(select(.dst == \"10.10.0.1\")) | any'")
-    with subtest("Waiting for advertised IPv6 routes"):
-      host1.wait_until_succeeds("ip --json -6 r | jq -e 'map(select(.dst == \"fdff::2\")) | any'")
-      host2.wait_until_succeeds("ip --json -6 r | jq -e 'map(select(.dst == \"fdff::1\")) | any'")
+      with subtest("Waiting for advertised IPv4 routes"):
+        host1.wait_until_succeeds("ip --json r | jq -e 'map(select(.dst == \"10.10.0.2\")) | any'")
+        host2.wait_until_succeeds("ip --json r | jq -e 'map(select(.dst == \"10.10.0.1\")) | any'")
+      with subtest("Waiting for advertised IPv6 routes"):
+        host1.wait_until_succeeds("ip --json -6 r | jq -e 'map(select(.dst == \"fdff::2\")) | any'")
+        host2.wait_until_succeeds("ip --json -6 r | jq -e 'map(select(.dst == \"fdff::1\")) | any'")
 
-    with subtest("Check fake routes in preCheckConfig do not exists"):
-      host1.fail("ip --json r | jq -e 'map(select(.dst == \"1.2.3.4\")) | any'")
-      host2.fail("ip --json r | jq -e 'map(select(.dst == \"1.2.3.4\")) | any'")
+      with subtest("Check fake routes in preCheckConfig do not exists"):
+        host1.fail("ip --json r | jq -e 'map(select(.dst == \"1.2.3.4\")) | any'")
+        host2.fail("ip --json r | jq -e 'map(select(.dst == \"1.2.3.4\")) | any'")
 
-      host1.fail("ip --json -6 r | jq -e 'map(select(.dst == \"fd00::\")) | any'")
-      host2.fail("ip --json -6 r | jq -e 'map(select(.dst == \"fd00::\")) | any'")
-  '';
-}
+        host1.fail("ip --json -6 r | jq -e 'map(select(.dst == \"fd00::\")) | any'")
+        host2.fail("ip --json -6 r | jq -e 'map(select(.dst == \"fd00::\")) | any'")
+    '';
+  }

@@ -1,22 +1,22 @@
-{ lib
-, buildDotnetModule
-, fetchFromGitHub
-, makeDesktopItem
-, copyDesktopItems
-, dotnetCorePackages
-, libX11
-, libgdiplus
-, ffmpeg
-, SDL2_mixer
-, openal
-, libsoundio
-, sndio
-, pulseaudio
-, gtk3
-, gdk-pixbuf
-, wrapGAppsHook
+{
+  lib,
+  buildDotnetModule,
+  fetchFromGitHub,
+  makeDesktopItem,
+  copyDesktopItems,
+  dotnetCorePackages,
+  libX11,
+  libgdiplus,
+  ffmpeg,
+  SDL2_mixer,
+  openal,
+  libsoundio,
+  sndio,
+  pulseaudio,
+  gtk3,
+  gdk-pixbuf,
+  wrapGAppsHook,
 }:
-
 buildDotnetModule rec {
   pname = "ryujinx";
   version = "1.1.54"; # Versioning is based off of the official github actions builds: https://github.com/Ryujinx/Ryujinx/actions/workflows/release.yml
@@ -34,11 +34,11 @@ buildDotnetModule rec {
   projectFile = "Ryujinx.sln";
   nugetDeps = ./deps.nix;
 
-  dotnetFlags = [ "/p:ExtraDefineConstants=DISABLE_UPDATER" ];
+  dotnetFlags = ["/p:ExtraDefineConstants=DISABLE_UPDATER"];
 
   # TODO: Add the headless frontend. Currently errors on the following:
   # System.Exception: SDL2 initlaization failed with error "No available video device"
-  executables = [ "Ryujinx" ];
+  executables = ["Ryujinx"];
 
   nativeBuildInputs = [
     copyDesktopItems
@@ -88,7 +88,7 @@ buildDotnetModule rec {
       icon = "ryujinx";
       comment = meta.description;
       type = "Application";
-      categories = [ "Game" ];
+      categories = ["Game"];
     })
   ];
 
@@ -104,8 +104,8 @@ buildDotnetModule rec {
       2017.
     '';
     license = licenses.mit;
-    maintainers = with maintainers; [ ivar jk ];
-    platforms = [ "x86_64-linux" ];
+    maintainers = with maintainers; [ivar jk];
+    platforms = ["x86_64-linux"];
     mainProgram = "Ryujinx";
   };
   passthru.updateScript = ./updater.sh;

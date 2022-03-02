@@ -1,10 +1,13 @@
-{ config, lib, pkgs, ... }:
-let
-  cfg = config.services.step-ca;
-  settingsFormat = (pkgs.formats.json { });
-in
 {
-  meta.maintainers = with lib.maintainers; [ mohe2015 ];
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  cfg = config.services.step-ca;
+  settingsFormat = pkgs.formats.json {};
+in {
+  meta.maintainers = with lib.maintainers; [mohe2015];
 
   options = {
     services.step-ca = {
@@ -75,72 +78,69 @@ in
     };
   };
 
-  config = lib.mkIf config.services.step-ca.enable (
-    let
-      configFile = settingsFormat.generate "ca.json" (cfg.settings // {
+  config = lib.mkIf config.services.step-ca.enable (let
+    configFile = settingsFormat.generate "ca.json" (cfg.settings
+      // {
         address = cfg.address + ":" + toString cfg.port;
       });
-    in
-    {
-      assertions =
-        [
-          {
-            assertion = !lib.isStorePath cfg.intermediatePasswordFile;
-            message = ''
-              <option>services.step-ca.intermediatePasswordFile</option> points to
-              a file in the Nix store. You should use a quoted absolute path to
-              prevent this.
-            '';
-          }
+  in {
+    assertions = [
+      {
+        assertion = !lib.isStorePath cfg.intermediatePasswordFile;
+        message = ''
+          <option>services.step-ca.intermediatePasswordFile</option> points to
+          a file in the Nix store. You should use a quoted absolute path to
+          prevent this.
+        '';
+      }
+    ];
+
+    systemd.packages = [cfg.package];
+
+    # configuration file indirection is needed to support reloading
+    environment.etc."smallstep/ca.json".source = configFile;
+
+    systemd.services."step-ca" = {
+      wantedBy = ["multi-user.target"];
+      restartTriggers = [configFile];
+      unitConfig = {
+        ConditionFileNotEmpty = ""; # override upstream
+      };
+      serviceConfig = {
+        User = "step-ca";
+        Group = "step-ca";
+        UMask = "0077";
+        Environment = "HOME=%S/step-ca";
+        WorkingDirectory = ""; # override upstream
+        ReadWriteDirectories = ""; # override upstream
+
+        # LocalCredential handles file permission problems arising from the use of DynamicUser.
+        LoadCredential = "intermediate_password:${cfg.intermediatePasswordFile}";
+
+        ExecStart = [
+          "" # override upstream
+          "${cfg.package}/bin/step-ca /etc/smallstep/ca.json --password-file \${CREDENTIALS_DIRECTORY}/intermediate_password"
         ];
 
-      systemd.packages = [ cfg.package ];
+        # ProtectProc = "invisible"; # not supported by upstream yet
+        # ProcSubset = "pid"; # not supported by upstream yet
+        # PrivateUsers = true; # doesn't work with privileged ports therefore not supported by upstream
 
-      # configuration file indirection is needed to support reloading
-      environment.etc."smallstep/ca.json".source = configFile;
-
-      systemd.services."step-ca" = {
-        wantedBy = [ "multi-user.target" ];
-        restartTriggers = [ configFile ];
-        unitConfig = {
-          ConditionFileNotEmpty = ""; # override upstream
-        };
-        serviceConfig = {
-          User = "step-ca";
-          Group = "step-ca";
-          UMask = "0077";
-          Environment = "HOME=%S/step-ca";
-          WorkingDirectory = ""; # override upstream
-          ReadWriteDirectories = ""; # override upstream
-
-          # LocalCredential handles file permission problems arising from the use of DynamicUser.
-          LoadCredential = "intermediate_password:${cfg.intermediatePasswordFile}";
-
-          ExecStart = [
-            "" # override upstream
-            "${cfg.package}/bin/step-ca /etc/smallstep/ca.json --password-file \${CREDENTIALS_DIRECTORY}/intermediate_password"
-          ];
-
-          # ProtectProc = "invisible"; # not supported by upstream yet
-          # ProcSubset = "pid"; # not supported by upstream yet
-          # PrivateUsers = true; # doesn't work with privileged ports therefore not supported by upstream
-
-          DynamicUser = true;
-          StateDirectory = "step-ca";
-        };
+        DynamicUser = true;
+        StateDirectory = "step-ca";
       };
+    };
 
-      users.users.step-ca = {
-        home = "/var/lib/step-ca";
-        group = "step-ca";
-        isSystemUser = true;
-      };
+    users.users.step-ca = {
+      home = "/var/lib/step-ca";
+      group = "step-ca";
+      isSystemUser = true;
+    };
 
-      users.groups.step-ca = {};
+    users.groups.step-ca = {};
 
-      networking.firewall = lib.mkIf cfg.openFirewall {
-        allowedTCPPorts = [ cfg.port ];
-      };
-    }
-  );
+    networking.firewall = lib.mkIf cfg.openFirewall {
+      allowedTCPPorts = [cfg.port];
+    };
+  });
 }

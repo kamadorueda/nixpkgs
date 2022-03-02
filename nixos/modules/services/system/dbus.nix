@@ -1,11 +1,12 @@
 # D-Bus configuration and system bus daemon.
-
-{ config, lib, options, pkgs, ... }:
-
-with lib;
-
-let
-
+{
+  config,
+  lib,
+  options,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.dbus;
 
   homeDir = "/run/dbus";
@@ -15,16 +16,11 @@ let
     suidHelper = "${config.security.wrapperDir}/dbus-daemon-launch-helper";
     serviceDirectories = cfg.packages;
   };
-
-in
-
-{
+in {
   ###### interface
 
   options = {
-
     services.dbus = {
-
       enable = mkOption {
         type = types.bool;
         default = false;
@@ -37,7 +33,7 @@ in
 
       packages = mkOption {
         type = types.listOf types.path;
-        default = [ ];
+        default = [];
         description = ''
           Packages whose D-Bus configuration files should be included in
           the configuration of the D-Bus system-wide or session-wide
@@ -53,7 +49,7 @@ in
       };
 
       apparmor = mkOption {
-        type = types.enum [ "enabled" "disabled" "required" ];
+        type = types.enum ["enabled" "disabled" "required"];
         description = ''
           AppArmor mode for dbus.
 
@@ -80,16 +76,14 @@ in
   ###### implementation
 
   config = mkIf cfg.enable {
-    warnings = optional (cfg.socketActivated != null) (
-      let
-        files = showFiles options.services.dbus.socketActivated.files;
-      in
-        "The option 'services.dbus.socketActivated' in ${files} no longer has"
-        + " any effect and can be safely removed: the user D-Bus session is"
-        + " now always socket activated."
-    );
+    warnings = optional (cfg.socketActivated != null) (let
+      files = showFiles options.services.dbus.socketActivated.files;
+    in
+      "The option 'services.dbus.socketActivated' in ${files} no longer has"
+      + " any effect and can be safely removed: the user D-Bus session is"
+      + " now always socket activated.");
 
-    environment.systemPackages = [ pkgs.dbus.daemon pkgs.dbus ];
+    environment.systemPackages = [pkgs.dbus.daemon pkgs.dbus];
 
     environment.etc."dbus-1".source = configDir;
 
@@ -102,7 +96,7 @@ in
 
     users.groups.messagebus.gid = config.ids.gids.messagebus;
 
-    systemd.packages = [ pkgs.dbus.daemon ];
+    systemd.packages = [pkgs.dbus.daemon];
 
     security.wrappers.dbus-daemon-launch-helper = {
       source = "${pkgs.dbus.daemon}/libexec/dbus-daemon-launch-helper";
@@ -121,19 +115,19 @@ in
     systemd.services.dbus = {
       # Don't restart dbus-daemon. Bad things tend to happen if we do.
       reloadIfChanged = true;
-      restartTriggers = [ configDir ];
-      environment = { LD_LIBRARY_PATH = config.system.nssModules.path; };
+      restartTriggers = [configDir];
+      environment = {LD_LIBRARY_PATH = config.system.nssModules.path;};
     };
 
     systemd.user = {
       services.dbus = {
         # Don't restart dbus-daemon. Bad things tend to happen if we do.
         reloadIfChanged = true;
-        restartTriggers = [ configDir ];
+        restartTriggers = [configDir];
       };
-      sockets.dbus.wantedBy = [ "sockets.target" ];
+      sockets.dbus.wantedBy = ["sockets.target"];
     };
 
-    environment.pathsToLink = [ "/etc/dbus-1" "/share/dbus-1" ];
+    environment.pathsToLink = ["/etc/dbus-1" "/share/dbus-1"];
   };
 }

@@ -1,5 +1,13 @@
-{ lib, fetchFromGitHub, stdenv, rustPlatform, coreutils, bash, installShellFiles, libiconv }:
-
+{
+  lib,
+  fetchFromGitHub,
+  stdenv,
+  rustPlatform,
+  coreutils,
+  bash,
+  installShellFiles,
+  libiconv,
+}:
 rustPlatform.buildRustPackage rec {
   pname = "just";
   version = "1.0.1";
@@ -13,10 +21,10 @@ rustPlatform.buildRustPackage rec {
 
   cargoSha256 = "sha256-ynYK37nCfIiy1CHBEQ/vMHOAPY/pp/lF/tSl9MJD7fY=";
 
-  nativeBuildInputs = [ installShellFiles ];
-  buildInputs = lib.optionals stdenv.isDarwin [ libiconv ];
+  nativeBuildInputs = [installShellFiles];
+  buildInputs = lib.optionals stdenv.isDarwin [libiconv];
 
-  checkInputs = [ coreutils bash ];
+  checkInputs = [coreutils bash];
 
   preCheck = ''
     # USER must not be empty
@@ -56,6 +64,6 @@ rustPlatform.buildRustPackage rec {
     changelog = "https://github.com/casey/just/blob/${version}/CHANGELOG.md";
     description = "A handy way to save and run project-specific commands";
     license = licenses.cc0;
-    maintainers = with maintainers; [ xrelkd jk ];
+    maintainers = with maintainers; [xrelkd jk];
   };
 }

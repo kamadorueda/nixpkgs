@@ -1,17 +1,17 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, rx
-, certifi
-, six
-, python-dateutil
-, setuptools
-, urllib3
-, ciso8601
-, pytz
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  rx,
+  certifi,
+  six,
+  python-dateutil,
+  setuptools,
+  urllib3,
+  ciso8601,
+  pytz,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "influxdb-client";
   version = "1.26.0";
@@ -48,6 +48,6 @@ buildPythonPackage rec {
     description = "InfluxDB 2.0 Python client library";
     homepage = "https://github.com/influxdata/influxdb-client-python";
     license = licenses.mit;
-    maintainers = with maintainers; [ mic92 ];
+    maintainers = with maintainers; [mic92];
   };
 }

@@ -1,7 +1,13 @@
-{ stdenv, mkDerivation, lib, fetchFromGitHub, substituteAll
-, qmake, qttools, qttranslations
+{
+  stdenv,
+  mkDerivation,
+  lib,
+  fetchFromGitHub,
+  substituteAll,
+  qmake,
+  qttools,
+  qttranslations,
 }:
-
 mkDerivation rec {
   pname = "gpxlab";
   version = "0.7.0";
@@ -13,13 +19,13 @@ mkDerivation rec {
     sha256 = "080vnwcciqblfrbfyz9gjhl2lqw1hkdpbgr5qfrlyglkd4ynjd84";
   };
 
-  patches = (substituteAll {
+  patches = substituteAll {
     # See https://github.com/NixOS/nixpkgs/issues/86054
     src = ./fix-qttranslations-path.patch;
     inherit qttranslations;
-  });
+  };
 
-  nativeBuildInputs = [ qmake qttools ];
+  nativeBuildInputs = [qmake qttools];
 
   preConfigure = ''
     lrelease GPXLab/locale/*.ts
@@ -38,7 +44,7 @@ mkDerivation rec {
       previously recorded with a GPS tracker.
     '';
     license = licenses.gpl3Only;
-    maintainers = with maintainers; [ sikmir ];
+    maintainers = with maintainers; [sikmir];
     platforms = platforms.unix;
   };
 }

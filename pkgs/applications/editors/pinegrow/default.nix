@@ -1,16 +1,16 @@
-{ stdenv
-, lib
-, fetchurl
-, unzip
-, udev
-, nwjs
-, gcc-unwrapped
-, autoPatchelfHook
-, gsettings-desktop-schemas
-, gtk3
-, wrapGAppsHook
+{
+  stdenv,
+  lib,
+  fetchurl,
+  unzip,
+  udev,
+  nwjs,
+  gcc-unwrapped,
+  autoPatchelfHook,
+  gsettings-desktop-schemas,
+  gtk3,
+  wrapGAppsHook,
 }:
-
 stdenv.mkDerivation rec {
   pname = "pinegrow";
   version = "6.3";
@@ -57,14 +57,14 @@ stdenv.mkDerivation rec {
 
   preFixup = ''
     export XDG_DATA_DIRS=${gsettings-desktop-schemas}/share/gsettings-schemas/${gsettings-desktop-schemas.name}:${gtk3}/share/gsettings-schemas/${gtk3.name}:$XDG_DATA_DIRS
-    wrapGApp "$out/opt/pinegrow/PinegrowLibrary" --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ udev ]}
+    wrapGApp "$out/opt/pinegrow/PinegrowLibrary" --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [udev]}
   '';
 
   meta = with lib; {
     homepage = "https://pinegrow.com";
     description = "UI Web Editor";
     platforms = platforms.linux;
-    license = with licenses; [ unfreeRedistributable ];
-    maintainers = with maintainers; [ gador ];
+    license = with licenses; [unfreeRedistributable];
+    maintainers = with maintainers; [gador];
   };
 }

@@ -1,24 +1,23 @@
-{ stdenv
-, lib
-, fetchFromGitHub
-, which
-, go
-, makeWrapper
-, rsync
-, installShellFiles
-, kubectl
-, nixosTests
-
-, components ? [
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  which,
+  go,
+  makeWrapper,
+  rsync,
+  installShellFiles,
+  kubectl,
+  nixosTests,
+  components ? [
     "cmd/kubelet"
     "cmd/kube-apiserver"
     "cmd/kube-controller-manager"
     "cmd/kube-proxy"
     "cmd/kube-scheduler"
     "test/e2e/e2e.test"
-  ]
+  ],
 }:
-
 stdenv.mkDerivation rec {
   pname = "kubernetes";
   version = "1.23.4";
@@ -30,11 +29,11 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-srJHW/wvrFKKgxVwJB4h0FGeaT7iSJYOTtSeTkcR3FE=";
   };
 
-  nativeBuildInputs = [ makeWrapper which go rsync installShellFiles ];
+  nativeBuildInputs = [makeWrapper which go rsync installShellFiles];
 
-  outputs = [ "out" "man" "pause" ];
+  outputs = ["out" "man" "pause"];
 
-  patches = [ ./fixup-addonmanager-lib-path.patch ];
+  patches = [./fixup-addonmanager-lib-path.patch];
 
   postPatch = ''
     # go env breaks the sandbox
@@ -50,8 +49,9 @@ stdenv.mkDerivation rec {
   '';
 
   WHAT = lib.concatStringsSep " " ([
-    "cmd/kubeadm"
-  ] ++ components);
+      "cmd/kubeadm"
+    ]
+    ++ components);
 
   postBuild = ''
     ./hack/update-generated-docs.sh
@@ -88,15 +88,15 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-  disallowedReferences = [ go ];
+  disallowedReferences = [go];
 
-  GOFLAGS = [ "-trimpath" ];
+  GOFLAGS = ["-trimpath"];
 
   meta = with lib; {
     description = "Production-Grade Container Scheduling and Management";
     license = licenses.asl20;
     homepage = "https://kubernetes.io";
-    maintainers = with maintainers; [ ] ++ teams.kubernetes.members;
+    maintainers = with maintainers; [] ++ teams.kubernetes.members;
     platforms = platforms.linux;
   };
 

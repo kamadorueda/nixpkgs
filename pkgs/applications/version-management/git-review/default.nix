@@ -1,12 +1,12 @@
-{ lib
-, fetchFromGitea
-, buildPythonApplication
-, pbr
-, requests
-, setuptools
-, gitUpdater
+{
+  lib,
+  fetchFromGitea,
+  buildPythonApplication,
+  pbr,
+  requests,
+  setuptools,
+  gitUpdater,
 }:
-
 buildPythonApplication rec {
   pname = "git-review";
   version = "2.2.0";
@@ -23,7 +23,7 @@ buildPythonApplication rec {
     sha256 = "sha256-2+X5fPxB2FIp1fwqEUc+W0gH2NjhF/V+La+maE+XEpo=";
   };
 
-  outputs = [ "out" "man" ];
+  outputs = ["out" "man"];
 
   nativeBuildInputs = [
     pbr
@@ -39,14 +39,14 @@ buildPythonApplication rec {
   # out how to work around this yet.
   doCheck = false;
 
-  pythonImportsCheck = [ "git_review" ];
+  pythonImportsCheck = ["git_review"];
 
-  passthru.updateScript = gitUpdater { inherit pname version; };
+  passthru.updateScript = gitUpdater {inherit pname version;};
 
   meta = with lib; {
     description = "Tool to submit code to Gerrit";
     homepage = "https://opendev.org/opendev/git-review";
     license = licenses.asl20;
-    maintainers = with maintainers; [ kira-bruneau ];
+    maintainers = with maintainers; [kira-bruneau];
   };
 }

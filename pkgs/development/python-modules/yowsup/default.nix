@@ -1,15 +1,15 @@
-{ lib
-, buildPythonPackage
-, isPy3k
-, fetchFromGitHub
-, appdirs
-, consonance
-, protobuf
-, python-axolotl
-, six
-, pytestCheckHook
+{
+  lib,
+  buildPythonPackage,
+  isPy3k,
+  fetchFromGitHub,
+  appdirs,
+  consonance,
+  protobuf,
+  python-axolotl,
+  six,
+  pytestCheckHook,
 }:
-
 buildPythonPackage rec {
   pname = "yowsup";
   version = "3.3.0";
@@ -47,6 +47,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/tgalal/yowsup";
     description = "The python WhatsApp library";
     license = licenses.gpl3Plus;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [SuperSandro2000];
   };
 }

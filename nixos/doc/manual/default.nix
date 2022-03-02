@@ -1,17 +1,15 @@
-{ pkgs
-, options
-, config
-, version
-, revision
-, extraSources ? []
-, baseOptionsJSON ? null
-, warningsAreErrors ? true
-, prefix ? ../../..
+{
+  pkgs,
+  options,
+  config,
+  version,
+  revision,
+  extraSources ? [],
+  baseOptionsJSON ? null,
+  warningsAreErrors ? true,
+  prefix ? ../../..,
 }:
-
-with pkgs;
-
-let
+with pkgs; let
   lib = pkgs.lib;
 
   # We need to strip references to /nix/store/* from options,
@@ -20,24 +18,28 @@ let
   #
   # E.g. if some `options` came from modules in ${pkgs.customModules}/nix,
   # you'd need to include `extraSources = [ pkgs.customModules ]`
-  prefixesToStrip = map (p: "${toString p}/") ([ prefix ] ++ extraSources);
+  prefixesToStrip = map (p: "${toString p}/") ([prefix] ++ extraSources);
   stripAnyPrefixes = lib.flip (lib.foldr lib.removePrefix) prefixesToStrip;
 
   optionsDoc = buildPackages.nixosOptionsDoc {
     inherit options revision baseOptionsJSON warningsAreErrors;
-    transformOptions = opt: opt // {
-      # Clean up declaration sites to not refer to the NixOS source tree.
-      declarations = map stripAnyPrefixes opt.declarations;
-    };
+    transformOptions = opt:
+      opt
+      // {
+        # Clean up declaration sites to not refer to the NixOS source tree.
+        declarations = map stripAnyPrefixes opt.declarations;
+      };
   };
 
   sources = lib.sourceFilesBySuffices ./. [".xml"];
 
   modulesDoc = builtins.toFile "modules.xml" ''
     <section xmlns:xi="http://www.w3.org/2001/XInclude" id="modules">
-    ${(lib.concatMapStrings (path: ''
-      <xi:include href="${path}" />
-    '') (lib.catAttrs "value" config.meta.doc))}
+    ${
+      (lib.concatMapStrings (path: ''
+        <xi:include href="${path}" />
+      '') (lib.catAttrs "value" config.meta.doc))
+    }
     </section>
   '';
 
@@ -48,14 +50,14 @@ let
     printf "%s" "${version}" > $out/version
   '';
 
-  copySources =
-    ''
-      cp -prd $sources/* . # */
-      ln -s ${generatedSources} ./generated
-      chmod -R u+w .
-    '';
+  copySources = ''
+    cp -prd $sources/* . # */
+    ln -s ${generatedSources} ./generated
+    chmod -R u+w .
+  '';
 
-  toc = builtins.toFile "toc.xml"
+  toc =
+    builtins.toFile "toc.xml"
     ''
       <toc role="chunk-toc">
         <d:tocentry xmlns:d="http://docbook.org/ns/docbook" linkend="book-nixos-manual"><?dbhtml filename="index.html"?>
@@ -82,9 +84,11 @@ let
     "--stringparam chunk.toc ${toc}"
   ];
 
-  manual-combined = runCommand "nixos-manual-combined"
-    { inherit sources;
-      nativeBuildInputs = [ buildPackages.libxml2.bin buildPackages.libxslt.bin ];
+  manual-combined =
+    runCommand "nixos-manual-combined"
+    {
+      inherit sources;
+      nativeBuildInputs = [buildPackages.libxml2.bin buildPackages.libxslt.bin];
       meta.description = "The NixOS manual as plain docbook XML";
     }
     ''
@@ -137,9 +141,11 @@ let
       cp man-pages-combined.xml $out/
     '';
 
-  olinkDB = runCommand "manual-olinkdb"
-    { inherit sources;
-      nativeBuildInputs = [ buildPackages.libxml2.bin buildPackages.libxslt.bin ];
+  olinkDB =
+    runCommand "manual-olinkdb"
+    {
+      inherit sources;
+      nativeBuildInputs = [buildPackages.libxml2.bin buildPackages.libxslt.bin];
     }
     ''
       xsltproc \
@@ -166,16 +172,17 @@ let
       </targetset>
       EOF
     '';
-
 in rec {
   inherit generatedSources;
 
   inherit (optionsDoc) optionsJSON optionsNix optionsDocBook;
 
   # Generate the NixOS manual.
-  manualHTML = runCommand "nixos-manual-html"
-    { inherit sources;
-      nativeBuildInputs = [ buildPackages.libxml2.bin buildPackages.libxslt.bin ];
+  manualHTML =
+    runCommand "nixos-manual-html"
+    {
+      inherit sources;
+      nativeBuildInputs = [buildPackages.libxml2.bin buildPackages.libxslt.bin];
       meta.description = "The NixOS manual in HTML format";
       allowedReferences = ["out"];
     }
@@ -212,9 +219,11 @@ in rec {
   # Index page of the NixOS manual.
   manualHTMLIndex = "${manualHTML}/share/doc/nixos/index.html";
 
-  manualEpub = runCommand "nixos-manual-epub"
-    { inherit sources;
-      nativeBuildInputs = [ buildPackages.libxml2.bin buildPackages.libxslt.bin buildPackages.zip ];
+  manualEpub =
+    runCommand "nixos-manual-epub"
+    {
+      inherit sources;
+      nativeBuildInputs = [buildPackages.libxml2.bin buildPackages.libxslt.bin buildPackages.zip];
     }
     ''
       # Generate the epub manual.
@@ -240,11 +249,12 @@ in rec {
       echo "doc-epub manual $manual" >> $out/nix-support/hydra-build-products
     '';
 
-
   # Generate the NixOS manpages.
-  manpages = runCommand "nixos-manpages"
-    { inherit sources;
-      nativeBuildInputs = [ buildPackages.libxml2.bin buildPackages.libxslt.bin ];
+  manpages =
+    runCommand "nixos-manpages"
+    {
+      inherit sources;
+      nativeBuildInputs = [buildPackages.libxml2.bin buildPackages.libxslt.bin];
       allowedReferences = ["out"];
     }
     ''
@@ -260,5 +270,4 @@ in rec {
         ${docbook_xsl_ns}/xml/xsl/docbook/manpages/docbook.xsl \
         ${manual-combined}/man-pages-combined.xml
     '';
-
 }

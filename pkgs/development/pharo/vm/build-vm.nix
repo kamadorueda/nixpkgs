@@ -1,50 +1,71 @@
-{ lib, stdenv
-, fetchurl
-, bash
-, unzip
-, glibc
-, openssl
-, libgit2
-, libGLU, libGL
-, freetype
-, xorg
-, alsa-lib
-, cairo
-, libuuid
-, autoreconfHook
-, gcc48
-, runtimeShell
-, ... }:
-
-{ name, src, version, source-date, source-url, ... }:
-
+{
+  lib,
+  stdenv,
+  fetchurl,
+  bash,
+  unzip,
+  glibc,
+  openssl,
+  libgit2,
+  libGLU,
+  libGL,
+  freetype,
+  xorg,
+  alsa-lib,
+  cairo,
+  libuuid,
+  autoreconfHook,
+  gcc48,
+  runtimeShell,
+  ...
+}: {
+  name,
+  src,
+  version,
+  source-date,
+  source-url,
+  ...
+}:
 # Build the Pharo VM
 stdenv.mkDerivation rec {
   inherit name src;
 
   # Command line invocation name.
   # Distinct name for 64-bit builds because they only work with 64-bit images.
-  cmd = if stdenv.is64bit then "pharo-spur64" else "pharo-spur";
+  cmd =
+    if stdenv.is64bit
+    then "pharo-spur64"
+    else "pharo-spur";
 
   # Choose desired VM sources. Separate for 32-bit and 64-bit VM.
   # (Could extent to building more VM variants e.g. SpurV3, Sista, etc.)
-  vm = if stdenv.is64bit then "spur64src" else "spursrc";
+  vm =
+    if stdenv.is64bit
+    then "spur64src"
+    else "spursrc";
 
   # Choose target platform name in the format used by the vm.
   flavor =
-    if      stdenv.isLinux && stdenv.isi686    then "linux32x86"
-    else if stdenv.isLinux && stdenv.isx86_64  then "linux64x64"
-    else if stdenv.isDarwin && stdenv.isi686   then "macos32x86"
-    else if stdenv.isDarwin && stdenv.isx86_64 then "macos64x64"
+    if stdenv.isLinux && stdenv.isi686
+    then "linux32x86"
+    else if stdenv.isLinux && stdenv.isx86_64
+    then "linux64x64"
+    else if stdenv.isDarwin && stdenv.isi686
+    then "macos32x86"
+    else if stdenv.isDarwin && stdenv.isx86_64
+    then "macos64x64"
     else throw "Unsupported platform: only Linux/Darwin x86/x64 are supported.";
 
   # Shared data (for the sources file)
-  pharo-share = import ./share.nix { inherit lib stdenv fetchurl unzip; };
+  pharo-share = import ./share.nix {inherit lib stdenv fetchurl unzip;};
 
   # Note: -fPIC causes the VM to segfault.
-  hardeningDisable = [ "format" "pic"
-                       # while the VM depends on <= gcc48:
-                       "stackprotector" ];
+  hardeningDisable = [
+    "format"
+    "pic"
+    # while the VM depends on <= gcc48:
+    "stackprotector"
+  ];
 
   # gcc 4.8 used for the build:
   #
@@ -53,13 +74,14 @@ stdenv.mkDerivation rec {
   # http://forum.world.st/OSProcess-fork-issue-with-Debian-built-VM-td4947326.html
   #
   # (stack protection is disabled above for gcc 4.8 compatibility.)
-  nativeBuildInputs = [ autoreconfHook unzip ];
+  nativeBuildInputs = [autoreconfHook unzip];
   buildInputs = [
     bash
     glibc
     openssl
     gcc48
-    libGLU libGL
+    libGLU
+    libGL
     freetype
     xorg.libX11
     xorg.libICE
@@ -82,9 +104,11 @@ stdenv.mkDerivation rec {
 
   # Configure with options modeled on the 'mvm' build script from the vm.
   configureScript = "platforms/unix/config/configure";
-  configureFlags = [ "--without-npsqueak"
-                     "--with-vmversion=5.0"
-                     "--with-src=${vm}" ];
+  configureFlags = [
+    "--without-npsqueak"
+    "--with-vmversion=5.0"
+    "--with-src=${vm}"
+  ];
   CFLAGS = "-DPharoVM -DIMMUTABILITY=1 -msse2 -D_GNU_SOURCE -DCOGMTVM=0 -g -O2 -DNDEBUG -DDEBUGVM=0";
   LDFLAGS = "-Wl,-z,now";
 
@@ -111,7 +135,8 @@ stdenv.mkDerivation rec {
     libs = [
       cairo
       libgit2
-      libGLU libGL
+      libGLU
+      libGL
       freetype
       openssl
       libuuid
@@ -166,7 +191,7 @@ stdenv.mkDerivation rec {
       packaging (ppa:pharo/stable)' project.
     '';
     license = licenses.mit;
-    maintainers = [ maintainers.lukego ];
-    platforms = [ "i686-linux" "x86_64-linux" ];
+    maintainers = [maintainers.lukego];
+    platforms = ["i686-linux" "x86_64-linux"];
   };
 }

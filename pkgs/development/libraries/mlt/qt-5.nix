@@ -1,29 +1,29 @@
-{ lib
-, fetchFromGitHub
-, cmake
-, SDL
-, ffmpeg
-, frei0r
-, libjack2
-, libdv
-, libsamplerate
-, libvorbis
-, libxml2
-, movit
-, pkg-config
-, sox
-, qtbase
-, qtsvg
-, fftw
-, vid-stab
-, opencv3
-, ladspa-sdk
-, gitUpdater
-, ladspaPlugins
-, mkDerivation
-, which
+{
+  lib,
+  fetchFromGitHub,
+  cmake,
+  SDL,
+  ffmpeg,
+  frei0r,
+  libjack2,
+  libdv,
+  libsamplerate,
+  libvorbis,
+  libxml2,
+  movit,
+  pkg-config,
+  sox,
+  qtbase,
+  qtsvg,
+  fftw,
+  vid-stab,
+  opencv3,
+  ladspa-sdk,
+  gitUpdater,
+  ladspaPlugins,
+  mkDerivation,
+  which,
 }:
-
 mkDerivation rec {
   pname = "mlt";
   version = "7.0.1";
@@ -56,9 +56,9 @@ mkDerivation rec {
     ladspaPlugins
   ];
 
-  nativeBuildInputs = [ cmake which ];
+  nativeBuildInputs = [cmake which];
 
-  outputs = [ "out" "dev" ];
+  outputs = ["out" "dev"];
 
   qtWrapperArgs = [
     "--prefix FREI0R_PATH : ${frei0r}/lib/frei0r-1"
@@ -78,7 +78,7 @@ mkDerivation rec {
     description = "Open source multimedia framework, designed for television broadcasting";
     homepage = "https://www.mltframework.org/";
     license = licenses.gpl3;
-    maintainers = [ maintainers.goibhniu ];
+    maintainers = [maintainers.goibhniu];
     platforms = platforms.linux;
   };
 }

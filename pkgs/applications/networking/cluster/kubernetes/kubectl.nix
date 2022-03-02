@@ -1,9 +1,13 @@
-{ lib, stdenv, kubernetes }:
-
+{
+  lib,
+  stdenv,
+  kubernetes,
+}:
 stdenv.mkDerivation rec {
   pname = "kubectl";
 
-  inherit (kubernetes)
+  inherit
+    (kubernetes)
     disallowedReferences
     GOFLAGS
     nativeBuildInputs
@@ -13,7 +17,7 @@ stdenv.mkDerivation rec {
     version
     ;
 
-  outputs = [ "out" "man" ];
+  outputs = ["out" "man"];
 
   WHAT = "cmd/kubectl";
 
@@ -29,9 +33,11 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-  meta = kubernetes.meta // {
-    description = "Kubernetes CLI";
-    homepage = "https://github.com/kubernetes/kubectl";
-    platforms = lib.platforms.unix;
-  };
+  meta =
+    kubernetes.meta
+    // {
+      description = "Kubernetes CLI";
+      homepage = "https://github.com/kubernetes/kubectl";
+      platforms = lib.platforms.unix;
+    };
 }

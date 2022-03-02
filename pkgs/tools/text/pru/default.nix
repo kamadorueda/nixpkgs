@@ -1,12 +1,12 @@
-{ lib
-, bundlerApp
-, bundlerUpdateScript
+{
+  lib,
+  bundlerApp,
+  bundlerUpdateScript,
 }:
-
 bundlerApp rec {
   pname = "pru";
   gemdir = ./.;
-  exes = [ "pru" ];
+  exes = ["pru"];
 
   meta = with lib; {
     homepage = "https://github.com/grosser/pru";
@@ -17,7 +17,7 @@ bundlerApp rec {
       grep etc.).
     '';
     license = licenses.mit;
-    maintainers = with maintainers; [ AndersonTorres ];
+    maintainers = with maintainers; [AndersonTorres];
   };
 
   passthru.updateScript = bundlerUpdateScript pname;

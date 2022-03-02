@@ -1,26 +1,28 @@
-{ stdenv, lib, fetchzip }:
-
+{
+  stdenv,
+  lib,
+  fetchzip,
+}:
 stdenv.mkDerivation rec {
   pname = "boundary";
   version = "0.7.5";
 
-  src =
-    let
-      inherit (stdenv.hostPlatform) system;
-      selectSystem = attrs: attrs.${system} or (throw "Unsupported system: ${system}");
-      suffix = selectSystem {
-        x86_64-linux = "linux_amd64";
-        aarch64-linux = "linux_arm64";
-        x86_64-darwin = "darwin_amd64";
-        aarch64-darwin = "darwin_arm64";
-      };
-      sha256 = selectSystem {
-        x86_64-linux = "sha256-wqNeeEQhR8cj7Gpbzp7UQV0j+w0peo41uKqgK9BoLH4=";
-        aarch64-linux = "sha256-HK/6eMBWUW1IbYE5RpInhcQuIw16X9vQEZmOBje9Yzk=";
-        x86_64-darwin = "sha256-ghgkPlEN9DHFviQzcGS/+oG+9Qqy2AfJ2IEyiSMJwwY=";
-        aarch64-darwin = "sha256-F4iOCxAm8s34KktuS5PRPkIg9A0179H6zlOM3OuTyUw=";
-      };
-    in
+  src = let
+    inherit (stdenv.hostPlatform) system;
+    selectSystem = attrs: attrs.${system} or (throw "Unsupported system: ${system}");
+    suffix = selectSystem {
+      x86_64-linux = "linux_amd64";
+      aarch64-linux = "linux_arm64";
+      x86_64-darwin = "darwin_amd64";
+      aarch64-darwin = "darwin_arm64";
+    };
+    sha256 = selectSystem {
+      x86_64-linux = "sha256-wqNeeEQhR8cj7Gpbzp7UQV0j+w0peo41uKqgK9BoLH4=";
+      aarch64-linux = "sha256-HK/6eMBWUW1IbYE5RpInhcQuIw16X9vQEZmOBje9Yzk=";
+      x86_64-darwin = "sha256-ghgkPlEN9DHFviQzcGS/+oG+9Qqy2AfJ2IEyiSMJwwY=";
+      aarch64-darwin = "sha256-F4iOCxAm8s34KktuS5PRPkIg9A0179H6zlOM3OuTyUw=";
+    };
+  in
     fetchzip {
       url = "https://releases.hashicorp.com/boundary/${version}/boundary_${version}_${suffix}.zip";
       inherit sha256;
@@ -62,6 +64,6 @@ stdenv.mkDerivation rec {
       and does not require an agent to be installed on every end host.
     '';
     license = licenses.mpl20;
-    maintainers = with maintainers; [ jk techknowlogick ];
+    maintainers = with maintainers; [jk techknowlogick];
   };
 }

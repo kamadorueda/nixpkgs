@@ -1,13 +1,22 @@
-{ stdenv, lib, fetchFromGitHub, ocaml, findlib, utop, python3, stdcompat, ncurses }:
-
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  ocaml,
+  findlib,
+  utop,
+  python3,
+  stdcompat,
+  ncurses,
+}:
 stdenv.mkDerivation rec {
   pname = "pyml";
   version = "20211015";
 
   src = fetchFromGitHub {
-    owner  = "thierry-martinez";
-    repo   = pname;
-    rev    = version;
+    owner = "thierry-martinez";
+    repo = pname;
+    rev = version;
     sha256 = "sha256-GCO6KlRhJmADFjQ5QF4naMQBskF63yqnJnLnuQsagEk=";
   };
 

@@ -1,8 +1,10 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.go-neb;
 
   settingsFormat = pkgs.formats.yaml {};
@@ -47,11 +49,14 @@ in {
 
   config = mkIf cfg.enable {
     systemd.services.go-neb = let
-      finalConfigFile = if cfg.secretFile == null then configFile else "/var/run/go-neb/config.yaml";
+      finalConfigFile =
+        if cfg.secretFile == null
+        then configFile
+        else "/var/run/go-neb/config.yaml";
     in {
       description = "Extensible matrix bot written in Go";
-      after = [ "network.target" ];
-      wantedBy = [ "multi-user.target" ];
+      after = ["network.target"];
+      wantedBy = ["multi-user.target"];
       environment = {
         BASE_URL = cfg.baseUrl;
         BIND_ADDRESS = cfg.bindAddress;
@@ -59,7 +64,8 @@ in {
       };
 
       serviceConfig = {
-        ExecStartPre = lib.optional (cfg.secretFile != null)
+        ExecStartPre =
+          lib.optional (cfg.secretFile != null)
           (pkgs.writeShellScript "pre-start" ''
             umask 077
             export $(xargs < ${cfg.secretFile})
@@ -75,5 +81,5 @@ in {
     };
   };
 
-  meta.maintainers = with maintainers; [ hexa maralorn ];
+  meta.maintainers = with maintainers; [hexa maralorn];
 }

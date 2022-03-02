@@ -1,14 +1,13 @@
-{ stdenv
-, fetchFromGitHub
-, python3Packages
-, makeWrapper
-, patch
+{
+  stdenv,
+  fetchFromGitHub,
+  python3Packages,
+  makeWrapper,
+  patch,
+}: {
+  rev,
+  sha256,
 }:
-
-{ rev
-, sha256
-}:
-
 stdenv.mkDerivation rec {
   pname = "ungoogled-chromium";
 

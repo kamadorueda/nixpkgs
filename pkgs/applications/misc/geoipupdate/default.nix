@@ -1,5 +1,8 @@
-{ lib, buildGoModule, fetchFromGitHub }:
-
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+}:
 buildGoModule rec {
   pname = "geoipupdate";
   version = "4.9.0";
@@ -13,14 +16,14 @@ buildGoModule rec {
 
   vendorSha256 = "sha256-S+CnIPoyGM7dEQICOIlAWBIC24Fyt7q+OY382evDgQc=";
 
-  ldflags = [ "-X main.version=${version}" ];
+  ldflags = ["-X main.version=${version}"];
 
   doCheck = false;
 
   meta = with lib; {
     description = "Automatic GeoIP database updater";
     homepage = "https://github.com/maxmind/geoipupdate";
-    license = with licenses; [ asl20 ];
-    maintainers = with maintainers; [ das_j ];
+    license = with licenses; [asl20];
+    maintainers = with maintainers; [das_j];
   };
 }

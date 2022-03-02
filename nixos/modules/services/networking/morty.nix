@@ -1,22 +1,18 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
-
-  cfg = config.services.morty;
-
-in
-
 {
-
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
+  cfg = config.services.morty;
+in {
   ###### interface
 
   options = {
-
     services.morty = {
-
-      enable = mkEnableOption
+      enable =
+        mkEnableOption
         "Morty proxy server. See https://github.com/asciimoo/morty";
 
       ipv6 = mkOption {
@@ -60,39 +56,34 @@ in
         default = "127.0.0.1";
         description = "The address on which the service listens";
       };
-
     };
-
   };
 
   ###### Service definition
 
   config = mkIf config.services.morty.enable {
-
-    users.users.morty =
-      { description = "Morty user";
-        createHome = true;
-        home = "/var/lib/morty";
-        isSystemUser = true;
-        group = "morty";
-      };
+    users.users.morty = {
+      description = "Morty user";
+      createHome = true;
+      home = "/var/lib/morty";
+      isSystemUser = true;
+      group = "morty";
+    };
     users.groups.morty = {};
 
-    systemd.services.morty =
-      {
-        description = "Morty sanitizing proxy server.";
-        after = [ "network.target" ];
-        wantedBy = [ "multi-user.target" ];
-        serviceConfig = {
-          User = "morty";
-          ExecStart = ''${cfg.package}/bin/morty              \
-            -listen ${cfg.listenAddress}:${toString cfg.port} \
-            ${optionalString cfg.ipv6 "-ipv6"}                \
-            ${optionalString (cfg.key != "") "-key " + cfg.key} \
-          '';
-        };
+    systemd.services.morty = {
+      description = "Morty sanitizing proxy server.";
+      after = ["network.target"];
+      wantedBy = ["multi-user.target"];
+      serviceConfig = {
+        User = "morty";
+        ExecStart = ''          ${cfg.package}/bin/morty              \
+                      -listen ${cfg.listenAddress}:${toString cfg.port} \
+                      ${optionalString cfg.ipv6 "-ipv6"}                \
+                      ${optionalString (cfg.key != "") "-key " + cfg.key} \
+        '';
       };
-    environment.systemPackages = [ cfg.package ];
-
+    };
+    environment.systemPackages = [cfg.package];
   };
 }

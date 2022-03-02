@@ -1,5 +1,13 @@
-{ lib, stdenv, fetchurl, jre, makeWrapper, copyDesktopItems, makeDesktopItem, unzip }:
-
+{
+  lib,
+  stdenv,
+  fetchurl,
+  jre,
+  makeWrapper,
+  copyDesktopItems,
+  makeDesktopItem,
+  unzip,
+}:
 stdenv.mkDerivation rec {
   pname = "logisim";
   version = "2.7.1";
@@ -11,7 +19,7 @@ stdenv.mkDerivation rec {
 
   dontUnpack = true;
 
-  nativeBuildInputs = [ makeWrapper copyDesktopItems unzip ];
+  nativeBuildInputs = [makeWrapper copyDesktopItems unzip];
 
   desktopItems = [
     (makeDesktopItem {
@@ -20,7 +28,7 @@ stdenv.mkDerivation rec {
       exec = "logisim";
       icon = "logisim";
       comment = meta.description;
-      categories = [ "Education" ];
+      categories = ["Education"];
     })
   ];
 
@@ -43,7 +51,7 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     homepage = "http://www.cburch.com/logisim/";
     description = "Educational tool for designing and simulating digital logic circuits";
-    maintainers = with maintainers; [ emilytrau ];
+    maintainers = with maintainers; [emilytrau];
     license = licenses.gpl2Plus;
     platforms = platforms.unix;
   };

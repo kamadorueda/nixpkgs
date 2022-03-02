@@ -1,13 +1,13 @@
-{ stdenv
-, lib
-, fetchurl
-, pkg-config
-, hidapi
-, libftdi1
-, libusb1
-, libgpiod
+{
+  stdenv,
+  lib,
+  fetchurl,
+  pkg-config,
+  hidapi,
+  libftdi1,
+  libusb1,
+  libgpiod,
 }:
-
 stdenv.mkDerivation rec {
   pname = "openocd";
   version = "0.11.0";
@@ -16,9 +16,10 @@ stdenv.mkDerivation rec {
     sha256 = "0z8y7mmv0mhn2l5gs3vz6l7cnwak7agklyc7ml33f7gz99rwx8s3";
   };
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [pkg-config];
 
-  buildInputs = [ hidapi libftdi1 libusb1 ]
+  buildInputs =
+    [hidapi libftdi1 libusb1]
     ++ lib.optional stdenv.isLinux libgpiod;
 
   configureFlags = [
@@ -63,7 +64,7 @@ stdenv.mkDerivation rec {
     '';
     homepage = "https://openocd.sourceforge.net/";
     license = licenses.gpl2Plus;
-    maintainers = with maintainers; [ bjornfor prusnak ];
+    maintainers = with maintainers; [bjornfor prusnak];
     platforms = platforms.unix;
   };
 }

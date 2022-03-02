@@ -1,9 +1,9 @@
-{ lib
-, buildPythonPackage
-, sage-src
-, pkgconfig # the python module, not the pkg-config alias
+{
+  lib,
+  buildPythonPackage,
+  sage-src,
+  pkgconfig, # the python module, not the pkg-config alias
 }:
-
 buildPythonPackage rec {
   version = src.version;
   pname = "sage-setup";

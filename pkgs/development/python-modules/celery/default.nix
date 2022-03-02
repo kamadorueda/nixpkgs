@@ -1,27 +1,27 @@
-{ lib
-, billiard
-, boto3
-, buildPythonPackage
-, case
-, click
-, click-didyoumean
-, click-plugins
-, click-repl
-, dnspython
-, fetchPypi
-, kombu
-, moto
-, pymongo
-, pytest-celery
-, pytest-subtests
-, pytest-timeout
-, pytestCheckHook
-, pythonOlder
-, pytz
-, vine
-, nixosTests
+{
+  lib,
+  billiard,
+  boto3,
+  buildPythonPackage,
+  case,
+  click,
+  click-didyoumean,
+  click-plugins,
+  click-repl,
+  dnspython,
+  fetchPypi,
+  kombu,
+  moto,
+  pymongo,
+  pytest-celery,
+  pytest-subtests,
+  pytest-timeout,
+  pytestCheckHook,
+  pythonOlder,
+  pytz,
+  vine,
+  nixosTests,
 }:
-
 buildPythonPackage rec {
   pname = "celery";
   version = "5.2.3";
@@ -87,6 +87,6 @@ buildPythonPackage rec {
     description = "Distributed task queue";
     homepage = "https://github.com/celery/celery/";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ fab ];
+    maintainers = with maintainers; [fab];
   };
 }

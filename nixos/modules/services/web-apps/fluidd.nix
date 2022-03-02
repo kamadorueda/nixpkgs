@@ -1,10 +1,13 @@
-{ config, lib, pkgs, ... }:
-with lib;
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.fluidd;
   moonraker = config.services.moonraker;
-in
-{
+in {
   options.services.fluidd = {
     enable = mkEnableOption "Fluidd, a Klipper web interface for managing your 3d printer";
 
@@ -22,9 +25,10 @@ in
     };
 
     nginx = mkOption {
-      type = types.submodule
-        (import ../web-servers/nginx/vhost-options.nix { inherit config lib; });
-      default = { };
+      type =
+        types.submodule
+        (import ../web-servers/nginx/vhost-options.nix {inherit config lib;});
+      default = {};
       example = literalExpression ''
         {
           serverAliases = [ "fluidd.''${config.networking.domain}" ];
@@ -37,7 +41,7 @@ in
   config = mkIf cfg.enable {
     services.nginx = {
       enable = true;
-      upstreams.fluidd-apiserver.servers."${moonraker.address}:${toString moonraker.port}" = { };
+      upstreams.fluidd-apiserver.servers."${moonraker.address}:${toString moonraker.port}" = {};
       virtualHosts."${cfg.hostName}" = mkMerge [
         cfg.nginx
         {

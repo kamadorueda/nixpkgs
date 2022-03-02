@@ -1,9 +1,9 @@
-{ buildGoModule
-, fetchFromGitHub
-, lib
-, stdenv
+{
+  buildGoModule,
+  fetchFromGitHub,
+  lib,
+  stdenv,
 }:
-
 buildGoModule rec {
   pname = "opentelemetry-collector-contrib";
   version = "0.45.1";
@@ -18,11 +18,14 @@ buildGoModule rec {
   proxyVendor = true;
   vendorSha256 = "sha256-e33EV1DGpR3XL70sjfCSMeuOSyh334+AkHnE+vqHrh0=";
 
-  subPackages = [ "cmd/otelcontribcol" ];
+  subPackages = ["cmd/otelcontribcol"];
 
   # CGO_ENABLED=0 required for mac - "error: 'TARGET_OS_MAC' is not defined, evaluates to 0"
   # https://github.com/shirou/gopsutil/issues/976
-  CGO_ENABLED = if stdenv.isLinux then 1 else 0;
+  CGO_ENABLED =
+    if stdenv.isLinux
+    then 1
+    else 0;
 
   ldflags = [
     "-s"
@@ -45,6 +48,6 @@ buildGoModule rec {
       is multiple times larger as a result.
     '';
     license = licenses.asl20;
-    maintainers = with maintainers; [ uri-canva jk ];
+    maintainers = with maintainers; [uri-canva jk];
   };
 }

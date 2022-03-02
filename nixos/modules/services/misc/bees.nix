@@ -1,12 +1,22 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
-
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.beesd;
 
-  logLevels = { emerg = 0; alert = 1; crit = 2; err = 3; warning = 4; notice = 5; info = 6; debug = 7; };
+  logLevels = {
+    emerg = 0;
+    alert = 1;
+    crit = 2;
+    err = 3;
+    warning = 4;
+    notice = 5;
+    info = 6;
+    debug = 7;
+  };
 
   fsOptions = with types; {
     options.spec = mkOption {
@@ -45,7 +55,10 @@ let
     };
     options.verbosity = mkOption {
       type = types.enum (attrNames logLevels ++ attrValues logLevels);
-      apply = v: if isString v then logLevels.${v} else v;
+      apply = v:
+        if isString v
+        then logLevels.${v}
+        else v;
       default = "info";
       description = "Log verbosity (syslog keyword/level).";
     };
@@ -59,7 +72,7 @@ let
     };
     options.extraOptions = mkOption {
       type = listOf str;
-      default = [ ];
+      default = [];
       description = ''
         Extra command-line options passed to the daemon. See upstream bees documentation.
       '';
@@ -68,15 +81,12 @@ let
       '';
     };
   };
-
-in
-{
-
+in {
   options.services.beesd = {
     filesystems = mkOption {
       type = with types; attrsOf (submodule fsOptions);
       description = "BTRFS filesystems to run block-level deduplication on.";
-      default = { };
+      default = {};
       example = literalExpression ''
         {
           root = {
@@ -90,13 +100,14 @@ in
     };
   };
   config = {
-    systemd.services = mapAttrs'
-      (name: fs: nameValuePair "beesd@${name}" {
-        description = "Block-level BTRFS deduplication for %i";
-        after = [ "sysinit.target" ];
+    systemd.services =
+      mapAttrs'
+      (name: fs:
+        nameValuePair "beesd@${name}" {
+          description = "Block-level BTRFS deduplication for %i";
+          after = ["sysinit.target"];
 
-        serviceConfig =
-          let
+          serviceConfig = let
             configOpts = [
               fs.spec
               "verbosity=${toString fs.verbosity}"
@@ -104,8 +115,7 @@ in
               "workDir=${fs.workDir}"
             ];
             configOptsStr = escapeShellArgs configOpts;
-          in
-          {
+          in {
             # Values from https://github.com/Zygo/bees/blob/v0.6.5/scripts/beesd@.service.in
             ExecStart = "${pkgs.bees}/bin/bees-service-wrapper run ${configOptsStr} -- --no-timestamps ${escapeShellArgs fs.extraOptions}";
             ExecStopPost = "${pkgs.bees}/bin/bees-service-wrapper cleanup ${configOptsStr}";
@@ -124,9 +134,9 @@ in
             StartupIOWeight = 25;
             SyslogIdentifier = "beesd"; # would otherwise be "bees-service-wrapper"
           };
-        unitConfig.RequiresMountsFor = lib.mkIf (lib.hasPrefix "/" fs.spec) fs.spec;
-        wantedBy = [ "multi-user.target" ];
-      })
+          unitConfig.RequiresMountsFor = lib.mkIf (lib.hasPrefix "/" fs.spec) fs.spec;
+          wantedBy = ["multi-user.target"];
+        })
       cfg.filesystems;
   };
 }

@@ -1,14 +1,14 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, giflib
-, imlib2
-, libXft
-, libexif
-, libwebp
-, conf ? null
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  giflib,
+  imlib2,
+  libXft,
+  libexif,
+  libwebp,
+  conf ? null,
 }:
-
 stdenv.mkDerivation rec {
   pname = "nsxiv";
   version = "28";
@@ -28,7 +28,7 @@ stdenv.mkDerivation rec {
     libwebp
   ];
 
-  preBuild = lib.optionalString (conf!=null) ''
+  preBuild = lib.optionalString (conf != null) ''
     cp ${(builtins.toFile "config.def.h" conf)} config.def.h
   '';
 
@@ -54,7 +54,7 @@ stdenv.mkDerivation rec {
       - Display image name/path in X title
     '';
     license = licenses.gpl2Plus;
-    maintainers = with maintainers; [ AndersonTorres ];
+    maintainers = with maintainers; [AndersonTorres];
     platforms = platforms.unix;
     broken = stdenv.isDarwin;
   };

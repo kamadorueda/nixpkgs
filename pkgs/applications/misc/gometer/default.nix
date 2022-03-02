@@ -1,5 +1,11 @@
-{ lib, stdenv, fetchurl, rpmextract, wrapGAppsHook, nwjs }:
-
+{
+  lib,
+  stdenv,
+  fetchurl,
+  rpmextract,
+  wrapGAppsHook,
+  nwjs,
+}:
 stdenv.mkDerivation rec {
   pname = "gometer";
   version = "5.2.0";
@@ -42,6 +48,6 @@ stdenv.mkDerivation rec {
     description = "Analytic-Tracking tool for GoLance";
     homepage = "https://golance.com/download-gometer";
     license = licenses.unfree;
-    maintainers = with maintainers; [ wolfangaukang ];
+    maintainers = with maintainers; [wolfangaukang];
   };
 }

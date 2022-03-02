@@ -1,17 +1,17 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, google-api-core
-, google-cloud-testutils
-, libcst
-, proto-plus
-, pytestCheckHook
-, pytest-asyncio
-, pytz
-, mock
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  google-api-core,
+  google-cloud-testutils,
+  libcst,
+  proto-plus,
+  pytestCheckHook,
+  pytest-asyncio,
+  pytz,
+  mock,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "google-cloud-dlp";
   version = "3.6.1";
@@ -52,6 +52,6 @@ buildPythonPackage rec {
     description = "Cloud Data Loss Prevention (DLP) API API client library";
     homepage = "https://github.com/googleapis/python-dlp";
     license = licenses.asl20;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [SuperSandro2000];
   };
 }

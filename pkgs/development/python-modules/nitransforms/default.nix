@@ -1,14 +1,14 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, pythonOlder
-, h5py
-, nibabel
-, numpy
-, setuptools-scm
-, toml
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  pythonOlder,
+  h5py,
+  nibabel,
+  numpy,
+  setuptools-scm,
+  toml,
 }:
-
 buildPythonPackage rec {
   pname = "nitransforms";
   version = "22.0.0";
@@ -19,8 +19,8 @@ buildPythonPackage rec {
     sha256 = "sha256-iV9TEIGogIfbj+fmOGftoQqEdtZiewbHEw3hYlMEP4c=";
   };
 
-  buildInputs = [ setuptools-scm toml ];
-  propagatedBuildInputs = [ h5py nibabel numpy ];
+  buildInputs = [setuptools-scm toml];
+  propagatedBuildInputs = [h5py nibabel numpy];
 
   doCheck = false;
   # relies on data repo (https://github.com/nipreps-data/nitransforms-tests);
@@ -40,6 +40,6 @@ buildPythonPackage rec {
     homepage = "https://nitransforms.readthedocs.io";
     description = "Geometric transformations for images and surfaces";
     license = licenses.mit;
-    maintainers = with maintainers; [ bcdarwin ];
+    maintainers = with maintainers; [bcdarwin];
   };
 }

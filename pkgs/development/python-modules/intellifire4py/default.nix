@@ -1,14 +1,14 @@
-{ lib
-, aenum
-, aiohttp
-, buildPythonPackage
-, fetchFromGitHub
-, pydantic
-, pytestCheckHook
-, pythonOlder
-, requests
+{
+  lib,
+  aenum,
+  aiohttp,
+  buildPythonPackage,
+  fetchFromGitHub,
+  pydantic,
+  pytestCheckHook,
+  pythonOlder,
+  requests,
 }:
-
 buildPythonPackage rec {
   pname = "intellifire4py";
   version = "0.9.10";
@@ -46,7 +46,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Module to read Intellifire fireplace status data";
     homepage = "https://github.com/jeeftor/intellifire4py";
-    license = with licenses; [ mit ];
-    maintainers = with maintainers; [ fab ];
+    license = with licenses; [mit];
+    maintainers = with maintainers; [fab];
   };
 }

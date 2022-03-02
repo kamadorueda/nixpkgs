@@ -1,18 +1,18 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, installShellFiles
-, gnustep
-, bzip2
-, zlib
-, icu
-, openssl
-, wavpack
-, xcbuildHook
-, Foundation
-, AppKit
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  installShellFiles,
+  gnustep,
+  bzip2,
+  zlib,
+  icu,
+  openssl,
+  wavpack,
+  xcbuildHook,
+  Foundation,
+  AppKit,
 }:
-
 stdenv.mkDerivation rec {
   pname = "unar";
   version = "1.10.7";
@@ -26,10 +26,12 @@ stdenv.mkDerivation rec {
   };
 
   postPatch =
-    if stdenv.isDarwin then ''
+    if stdenv.isDarwin
+    then ''
       substituteInPlace "./XADMaster.xcodeproj/project.pbxproj" \
         --replace "libstdc++.6.dylib" "libc++.1.dylib"
-    '' else ''
+    ''
+    else ''
       for f in Makefile.linux ../UniversalDetector/Makefile.linux ; do
         substituteInPlace $f \
           --replace "= gcc" "=${stdenv.cc.targetPrefix}cc" \
@@ -42,13 +44,15 @@ stdenv.mkDerivation rec {
       chmod +w ../UniversalDetector -R
     '';
 
-  buildInputs = [ bzip2 icu openssl wavpack zlib ] ++
-    lib.optionals stdenv.isLinux [ gnustep.base ] ++
-    lib.optionals stdenv.isDarwin [ Foundation AppKit ];
+  buildInputs =
+    [bzip2 icu openssl wavpack zlib]
+    ++ lib.optionals stdenv.isLinux [gnustep.base]
+    ++ lib.optionals stdenv.isDarwin [Foundation AppKit];
 
-  nativeBuildInputs = [ installShellFiles ] ++
-    lib.optionals stdenv.isLinux [ gnustep.make ] ++
-    lib.optionals stdenv.isDarwin [ xcbuildHook ];
+  nativeBuildInputs =
+    [installShellFiles]
+    ++ lib.optionals stdenv.isLinux [gnustep.make]
+    ++ lib.optionals stdenv.isDarwin [xcbuildHook];
 
   xcbuildFlags = lib.optionals stdenv.isDarwin [
     "-target unar"
@@ -92,7 +96,7 @@ stdenv.mkDerivation rec {
       ADF, DMS, LZX, PowerPacker, LBR, Squeeze, Crunch, and other old formats.
     '';
     license = licenses.lgpl21Plus;
-    maintainers = with maintainers; [ peterhoeg thiagokokada ];
+    maintainers = with maintainers; [peterhoeg thiagokokada];
     platforms = platforms.unix;
   };
 }

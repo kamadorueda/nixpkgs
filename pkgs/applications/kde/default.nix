@@ -1,69 +1,69 @@
 /*
-
-# New packages
-
-READ THIS FIRST
-
-This module is for official packages in the KDE Gear. All available
-packages are listed in `./srcs.nix`, although some are not yet
-packaged in Nixpkgs (see below).
-
-IF YOUR PACKAGE IS NOT LISTED IN `./srcs.nix`, IT DOES NOT GO HERE.
-
-Many of the packages released upstream are not yet built in Nixpkgs due to lack
-of demand. To add a Nixpkgs build for an upstream package, copy one of the
-existing packages here and modify it as necessary. A simple example package that
-still shows most of the available features is in `./gwenview.nix`.
-
-# Updates
-
-1. Update the URL in `./fetch.sh`.
-2. Run `./maintainers/scripts/fetch-kde-qt.sh pkgs/applications/kde`
-   from the top of the Nixpkgs tree.
-3. Use `nox-review wip` to check that everything builds.
-4. Commit the changes and open a pull request.
-
-*/
-
+ 
+ # New packages
+ 
+ READ THIS FIRST
+ 
+ This module is for official packages in the KDE Gear. All available
+ packages are listed in `./srcs.nix`, although some are not yet
+ packaged in Nixpkgs (see below).
+ 
+ IF YOUR PACKAGE IS NOT LISTED IN `./srcs.nix`, IT DOES NOT GO HERE.
+ 
+ Many of the packages released upstream are not yet built in Nixpkgs due to lack
+ of demand. To add a Nixpkgs build for an upstream package, copy one of the
+ existing packages here and modify it as necessary. A simple example package that
+ still shows most of the available features is in `./gwenview.nix`.
+ 
+ # Updates
+ 
+ 1. Update the URL in `./fetch.sh`.
+ 2. Run `./maintainers/scripts/fetch-kde-qt.sh pkgs/applications/kde`
+    from the top of the Nixpkgs tree.
+ 3. Use `nox-review wip` to check that everything builds.
+ 4. Commit the changes and open a pull request.
+ */
 {
-  lib, libsForQt5, fetchurl,
-}:
-
-let
+  lib,
+  libsForQt5,
+  fetchurl,
+}: let
   minQtVersion = "5.15";
   broken = lib.versionOlder libsForQt5.qtbase.version minQtVersion;
 
   mirror = "mirror://kde";
-  srcs = import ./srcs.nix { inherit fetchurl mirror; };
+  srcs = import ./srcs.nix {inherit fetchurl mirror;};
 
-  mkDerivation = args:
-    let
-      inherit (args) pname;
-      inherit (srcs.${pname}) src version;
-      mkDerivation =
-        libsForQt5.callPackage ({ mkDerivation }: mkDerivation) {};
-    in
-      mkDerivation (args // {
+  mkDerivation = args: let
+    inherit (args) pname;
+    inherit (srcs.${pname}) src version;
+    mkDerivation =
+      libsForQt5.callPackage ({mkDerivation}: mkDerivation) {};
+  in
+    mkDerivation (args
+      // {
         inherit pname version src;
 
-        outputs = args.outputs or [ "out" ];
+        outputs = args.outputs or ["out"];
 
-        meta =
-          let meta = args.meta or {}; in
-          meta // {
+        meta = let
+          meta = args.meta or {};
+        in
+          meta
+          // {
             homepage = meta.homepage or "http://www.kde.org";
             platforms = meta.platforms or lib.platforms.linux;
             broken = meta.broken or broken;
           };
       });
 
-  packages = self: with self;
-    let
+  packages = self:
+    with self; let
       callPackage = self.newScope {
         inherit mkDerivation;
 
         # Team of maintainers assigned to the KDE PIM suite
-        kdepimTeam = with lib.maintainers; [ ttuegel vandenoever nyanloutre ];
+        kdepimTeam = with lib.maintainers; [ttuegel vandenoever nyanloutre];
       };
     in {
       akonadi = callPackage ./akonadi {};
@@ -86,7 +86,7 @@ let
       dragon = callPackage ./dragon.nix {};
       elisa = callPackage ./elisa.nix {};
       eventviews = callPackage ./eventviews.nix {};
-      ffmpegthumbs = callPackage ./ffmpegthumbs.nix { };
+      ffmpegthumbs = callPackage ./ffmpegthumbs.nix {};
       filelight = callPackage ./filelight.nix {};
       granatier = callPackage ./granatier.nix {};
       grantleetheme = callPackage ./grantleetheme {};
@@ -101,7 +101,7 @@ let
       kalzium = callPackage ./kalzium.nix {};
       kamoso = callPackage ./kamoso.nix {};
       kapman = callPackage ./kapman.nix {};
-      kapptemplate = callPackage ./kapptemplate.nix { };
+      kapptemplate = callPackage ./kapptemplate.nix {};
       kate = callPackage ./kate.nix {};
       katomic = callPackage ./katomic.nix {};
       kblackbox = callPackage ./kblackbox.nix {};
@@ -223,5 +223,5 @@ let
       yakuake = callPackage ./yakuake.nix {};
       zanshin = callPackage ./zanshin.nix {};
     };
-
-in lib.makeScope libsForQt5.newScope packages
+in
+  lib.makeScope libsForQt5.newScope packages

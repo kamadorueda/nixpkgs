@@ -1,7 +1,10 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.security.doas;
 
   inherit (pkgs) doas;
@@ -10,46 +13,41 @@ let
 
   mkGrpString = group: ":${toString group}";
 
-  mkOpts = rule: concatStringsSep " " [
-    (optionalString rule.noPass "nopass")
-    (optionalString rule.noLog "nolog")
-    (optionalString rule.persist "persist")
-    (optionalString rule.keepEnv "keepenv")
-    "setenv { SSH_AUTH_SOCK TERMINFO TERMINFO_DIRS ${concatStringsSep " " rule.setEnv} }"
-  ];
+  mkOpts = rule:
+    concatStringsSep " " [
+      (optionalString rule.noPass "nopass")
+      (optionalString rule.noLog "nolog")
+      (optionalString rule.persist "persist")
+      (optionalString rule.keepEnv "keepenv")
+      "setenv { SSH_AUTH_SOCK TERMINFO TERMINFO_DIRS ${concatStringsSep " " rule.setEnv} }"
+    ];
 
   mkArgs = rule:
-    if (isNull rule.args) then ""
-    else if (length rule.args == 0) then "args"
+    if (isNull rule.args)
+    then ""
+    else if (length rule.args == 0)
+    then "args"
     else "args ${concatStringsSep " " rule.args}";
 
-  mkRule = rule:
-    let
-      opts = mkOpts rule;
+  mkRule = rule: let
+    opts = mkOpts rule;
 
-      as = optionalString (!isNull rule.runAs) "as ${rule.runAs}";
+    as = optionalString (!isNull rule.runAs) "as ${rule.runAs}";
 
-      cmd = optionalString (!isNull rule.cmd) "cmd ${rule.cmd}";
+    cmd = optionalString (!isNull rule.cmd) "cmd ${rule.cmd}";
 
-      args = mkArgs rule;
-    in
+    args = mkArgs rule;
+  in
     optionals (length cfg.extraRules > 0) [
-      (
-        optionalString (length rule.users > 0)
-          (map (usr: "permit ${opts} ${mkUsrString usr} ${as} ${cmd} ${args}") rule.users)
-      )
-      (
-        optionalString (length rule.groups > 0)
-          (map (grp: "permit ${opts} ${mkGrpString grp} ${as} ${cmd} ${args}") rule.groups)
-      )
+      (optionalString (length rule.users > 0)
+        (map (usr: "permit ${opts} ${mkUsrString usr} ${as} ${cmd} ${args}") rule.users))
+      (optionalString (length rule.groups > 0)
+        (map (grp: "permit ${opts} ${mkGrpString grp} ${as} ${cmd} ${args}") rule.groups))
     ];
-in
-{
-
+in {
   ###### interface
 
   options.security.doas = {
-
     enable = mkOption {
       type = with types; bool;
       default = false;
@@ -106,10 +104,9 @@ in
             setEnv = [ "-SSH_AUTH_SOCK" "ALPHA=1" "BETA" ]; }
         ]
       '';
-      type = with types; listOf (
-        submodule {
+      type = with types;
+        listOf (submodule {
           options = {
-
             noPass = mkOption {
               type = with types; bool;
               default = false;
@@ -216,8 +213,7 @@ in
               '';
             };
           };
-        }
-      );
+        });
     };
 
     extraConfig = mkOption {
@@ -229,24 +225,22 @@ in
     };
   };
 
-
   ###### implementation
 
   config = mkIf cfg.enable {
-
     security.doas.extraRules = mkOrder 600 [
       {
-        groups = [ "wheel" ];
+        groups = ["wheel"];
         noPass = !cfg.wheelNeedsPassword;
       }
     ];
 
-    security.wrappers.doas =
-      { setuid = true;
-        owner = "root";
-        group = "root";
-        source = "${doas}/bin/doas";
-      };
+    security.wrappers.doas = {
+      setuid = true;
+      owner = "root";
+      group = "root";
+      source = "${doas}/bin/doas";
+    };
 
     environment.systemPackages = [
       doas
@@ -258,7 +252,8 @@ in
     };
 
     environment.etc."doas.conf" = {
-      source = pkgs.runCommand "doas-conf"
+      source =
+        pkgs.runCommand "doas-conf"
         {
           src = pkgs.writeText "doas-conf-in" ''
             # To modify this file, set the NixOS options
@@ -281,8 +276,7 @@ in
         "${pkgs.buildPackages.doas}/bin/doas -C $src && cp $src $out";
       mode = "0440";
     };
-
   };
 
-  meta.maintainers = with maintainers; [ cole-h ];
+  meta.maintainers = with maintainers; [cole-h];
 }

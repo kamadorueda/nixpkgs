@@ -1,21 +1,21 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, numpy
-, scipy
-, filelock
-, etuples
-, logical-unification
-, minikanren
-, cons
-, numba
-, numba-scipy
-, libgpuarray
-, sympy
-, cython
-, pytestCheckHook
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  numpy,
+  scipy,
+  filelock,
+  etuples,
+  logical-unification,
+  minikanren,
+  cons,
+  numba,
+  numba-scipy,
+  libgpuarray,
+  sympy,
+  cython,
+  pytestCheckHook,
 }:
-
 buildPythonPackage rec {
   pname = "aesara";
   version = "2.4.0";
@@ -53,13 +53,13 @@ buildPythonPackage rec {
     export HOME=$(mktemp -d)
   '';
 
-  pythonImportsCheck = [ "aesara" ];
+  pythonImportsCheck = ["aesara"];
 
   meta = with lib; {
     description = "Python library to define, optimize, and efficiently evaluate mathematical expressions involving multi-dimensional arrays";
     homepage = "https://github.com/aesara-devs/aesara";
     changelog = "https://github.com/aesara-devs/aesara/releases";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ Etjean ];
+    maintainers = with maintainers; [Etjean];
   };
 }

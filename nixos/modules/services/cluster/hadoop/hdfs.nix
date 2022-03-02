@@ -1,9 +1,13 @@
-{ config, lib, pkgs, ...}:
-with lib;
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.hadoop;
-  hadoopConf = "${import ./conf.nix { inherit cfg pkgs lib; }}/";
-  restartIfChanged  = mkOption {
+  hadoopConf = "${import ./conf.nix {inherit cfg pkgs lib;}}/";
+  restartIfChanged = mkOption {
     type = types.bool;
     description = ''
       Automatically restart the service on config change.
@@ -13,8 +17,7 @@ let
     '';
     default = false;
   };
-in
-{
+in {
   options.services.hadoop.hdfs = {
     namenode = {
       enable = mkEnableOption "Whether to run the HDFS NameNode";
@@ -86,12 +89,12 @@ in
     (mkIf cfg.hdfs.namenode.enable {
       systemd.services.hdfs-namenode = {
         description = "Hadoop HDFS NameNode";
-        wantedBy = [ "multi-user.target" ];
+        wantedBy = ["multi-user.target"];
         inherit (cfg.hdfs.namenode) restartIfChanged;
 
-        preStart = (mkIf cfg.hdfs.namenode.formatOnInit ''
+        preStart = mkIf cfg.hdfs.namenode.formatOnInit ''
           ${cfg.package}/bin/hdfs --config ${hadoopConf} namenode -format -nonInteractive || true
-        '');
+        '';
 
         serviceConfig = {
           User = "hdfs";
@@ -101,16 +104,16 @@ in
         };
       };
 
-      networking.firewall.allowedTCPPorts = (mkIf cfg.hdfs.namenode.openFirewall [
+      networking.firewall.allowedTCPPorts = mkIf cfg.hdfs.namenode.openFirewall [
         9870 # namenode.http-address
         8020 # namenode.rpc-address
         8022 # namenode. servicerpc-address
-      ]);
+      ];
     })
     (mkIf cfg.hdfs.datanode.enable {
       systemd.services.hdfs-datanode = {
         description = "Hadoop HDFS DataNode";
-        wantedBy = [ "multi-user.target" ];
+        wantedBy = ["multi-user.target"];
         inherit (cfg.hdfs.datanode) restartIfChanged;
 
         serviceConfig = {
@@ -121,16 +124,16 @@ in
         };
       };
 
-      networking.firewall.allowedTCPPorts = (mkIf cfg.hdfs.datanode.openFirewall [
+      networking.firewall.allowedTCPPorts = mkIf cfg.hdfs.datanode.openFirewall [
         9864 # datanode.http.address
         9866 # datanode.address
         9867 # datanode.ipc.address
-      ]);
+      ];
     })
     (mkIf cfg.hdfs.journalnode.enable {
       systemd.services.hdfs-journalnode = {
         description = "Hadoop HDFS JournalNode";
-        wantedBy = [ "multi-user.target" ];
+        wantedBy = ["multi-user.target"];
         inherit (cfg.hdfs.journalnode) restartIfChanged;
 
         serviceConfig = {
@@ -141,15 +144,15 @@ in
         };
       };
 
-      networking.firewall.allowedTCPPorts = (mkIf cfg.hdfs.journalnode.openFirewall [
+      networking.firewall.allowedTCPPorts = mkIf cfg.hdfs.journalnode.openFirewall [
         8480 # dfs.journalnode.http-address
         8485 # dfs.journalnode.rpc-address
-      ]);
+      ];
     })
     (mkIf cfg.hdfs.zkfc.enable {
       systemd.services.hdfs-zkfc = {
         description = "Hadoop HDFS ZooKeeper failover controller";
-        wantedBy = [ "multi-user.target" ];
+        wantedBy = ["multi-user.target"];
         inherit (cfg.hdfs.zkfc) restartIfChanged;
 
         serviceConfig = {
@@ -163,7 +166,7 @@ in
     (mkIf cfg.hdfs.httpfs.enable {
       systemd.services.hdfs-httpfs = {
         description = "Hadoop httpfs";
-        wantedBy = [ "multi-user.target" ];
+        wantedBy = ["multi-user.target"];
         inherit (cfg.hdfs.httpfs) restartIfChanged;
 
         environment.HTTPFS_TEMP = cfg.hdfs.httpfs.tempPath;
@@ -179,13 +182,11 @@ in
           Restart = "always";
         };
       };
-      networking.firewall.allowedTCPPorts = (mkIf cfg.hdfs.httpfs.openFirewall [
+      networking.firewall.allowedTCPPorts = mkIf cfg.hdfs.httpfs.openFirewall [
         14000 # httpfs.http.port
-      ]);
+      ];
     })
-    (mkIf (
-        cfg.hdfs.namenode.enable || cfg.hdfs.datanode.enable || cfg.hdfs.journalnode.enable || cfg.hdfs.zkfc.enable
-    ) {
+    (mkIf (cfg.hdfs.namenode.enable || cfg.hdfs.datanode.enable || cfg.hdfs.journalnode.enable || cfg.hdfs.zkfc.enable) {
       users.users.hdfs = {
         description = "Hadoop HDFS user";
         group = "hadoop";

@@ -1,62 +1,67 @@
-{ lib
-, callPackage
-, makeSetupHook
-, makeWrapper
-, dotnet-sdk
-, dotnet-test-sdk
-, disabledTests
-, nuget-source
-, dotnet-runtime
-, runtimeDeps
-, buildType
-}:
-
 {
-  dotnetConfigureHook = callPackage ({ }:
+  lib,
+  callPackage,
+  makeSetupHook,
+  makeWrapper,
+  dotnet-sdk,
+  dotnet-test-sdk,
+  disabledTests,
+  nuget-source,
+  dotnet-runtime,
+  runtimeDeps,
+  buildType,
+}: {
+  dotnetConfigureHook = callPackage ({}:
     makeSetupHook {
       name = "dotnet-configure-hook";
-      deps = [ dotnet-sdk nuget-source ];
+      deps = [dotnet-sdk nuget-source];
       substitutions = {
         nugetSource = nuget-source;
       };
-    } ./dotnet-configure-hook.sh) { };
+    }
+    ./dotnet-configure-hook.sh) {};
 
-  dotnetBuildHook = callPackage ({ }:
+  dotnetBuildHook = callPackage ({}:
     makeSetupHook {
       name = "dotnet-build-hook";
-      deps = [ dotnet-sdk ];
+      deps = [dotnet-sdk];
       substitutions = {
         inherit buildType;
       };
-    } ./dotnet-build-hook.sh) { };
+    }
+    ./dotnet-build-hook.sh) {};
 
-  dotnetCheckHook = callPackage ({ }:
+  dotnetCheckHook = callPackage ({}:
     makeSetupHook {
       name = "dotnet-check-hook";
-      deps = [ dotnet-test-sdk ];
+      deps = [dotnet-test-sdk];
       substitutions = {
         inherit buildType;
-        disabledTests = lib.optionalString (disabledTests != [])
+        disabledTests =
+          lib.optionalString (disabledTests != [])
           (lib.concatStringsSep "&FullyQualifiedName!=" disabledTests);
       };
-    } ./dotnet-check-hook.sh) { };
+    }
+    ./dotnet-check-hook.sh) {};
 
-  dotnetInstallHook = callPackage ({ }:
+  dotnetInstallHook = callPackage ({}:
     makeSetupHook {
       name = "dotnet-install-hook";
-      deps = [ dotnet-sdk ];
+      deps = [dotnet-sdk];
       substitutions = {
         inherit buildType;
       };
-    } ./dotnet-install-hook.sh) { };
+    }
+    ./dotnet-install-hook.sh) {};
 
-  dotnetFixupHook = callPackage ({ }:
+  dotnetFixupHook = callPackage ({}:
     makeSetupHook {
       name = "dotnet-fixup-hook";
-      deps = [ dotnet-runtime makeWrapper ];
+      deps = [dotnet-runtime makeWrapper];
       substitutions = {
         dotnetRuntime = dotnet-runtime;
         runtimeDeps = lib.makeLibraryPath runtimeDeps;
       };
-    } ./dotnet-fixup-hook.sh) { };
+    }
+    ./dotnet-fixup-hook.sh) {};
 }

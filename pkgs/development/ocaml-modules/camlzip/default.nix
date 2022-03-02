@@ -1,6 +1,11 @@
-{lib, stdenv, fetchurl, zlib, ocaml, findlib}:
-
-let
+{
+  lib,
+  stdenv,
+  fetchurl,
+  zlib,
+  ocaml,
+  findlib,
+}: let
   param =
     if lib.versionAtLeast ocaml.version "4.02"
     then {
@@ -12,7 +17,8 @@ let
         cp META-zip META-camlzip
         echo 'directory="../zip"' >> META-camlzip
       '';
-    } else {
+    }
+    else {
       version = "1.05";
       download_id = "1037";
       url = "http://forge.ocamlcore.org/frs/download.php/${param.download_id}/camlzip-${param.version}.tar.gz";
@@ -23,48 +29,49 @@ let
       '';
     };
 in
+  stdenv.mkDerivation {
+    pname = "camlzip";
+    version = param.version;
 
-stdenv.mkDerivation {
-  pname = "camlzip";
-  version = param.version;
+    src = fetchurl {
+      inherit (param) url;
+      inherit (param) sha256;
+    };
 
-  src = fetchurl {
-    inherit (param) url;
-    inherit (param) sha256;
-  };
+    nativeBuildInputs = [ocaml findlib];
 
-  nativeBuildInputs = [ ocaml findlib ];
+    propagatedBuildInputs = [zlib];
 
-  propagatedBuildInputs = [zlib];
+    strictDeps = true;
 
-  strictDeps = true;
+    inherit (param) patches;
 
-  inherit (param) patches;
+    createFindlibDestdir = true;
 
-  createFindlibDestdir = true;
+    postPatch =
+      param.postPatchInit
+      + ''
+        substituteInPlace Makefile \
+          --subst-var-by ZLIB_LIBDIR "${zlib.out}/lib" \
+          --subst-var-by ZLIB_INCLUDE "${zlib.dev}/include"
+      '';
 
-  postPatch = param.postPatchInit + ''
-    substituteInPlace Makefile \
-      --subst-var-by ZLIB_LIBDIR "${zlib.out}/lib" \
-      --subst-var-by ZLIB_INCLUDE "${zlib.dev}/include"
-  '';
+    buildFlags = ["all" "allopt"];
 
-  buildFlags = [ "all" "allopt" ];
-
-  postInstall = ''
-    ln -s $out/lib/ocaml/${ocaml.version}/site-lib/{,caml}zip
-  '';
-
-  meta = with lib; {
-    homepage = "http://cristal.inria.fr/~xleroy/software.html#camlzip";
-    description = "A library for handling ZIP and GZIP files in OCaml";
-    longDescription = ''
-      This Objective Caml library provides easy access to compressed files in
-      ZIP and GZIP format, as well as to Java JAR files.  It provides functions
-      for reading from and writing to compressed files in these formats.
+    postInstall = ''
+      ln -s $out/lib/ocaml/${ocaml.version}/site-lib/{,caml}zip
     '';
-    license = "LGPL+linking exceptions";
-    platforms = ocaml.meta.platforms or [];
-    maintainers = with maintainers; [ maggesi ];
-  };
-}
+
+    meta = with lib; {
+      homepage = "http://cristal.inria.fr/~xleroy/software.html#camlzip";
+      description = "A library for handling ZIP and GZIP files in OCaml";
+      longDescription = ''
+        This Objective Caml library provides easy access to compressed files in
+        ZIP and GZIP format, as well as to Java JAR files.  It provides functions
+        for reading from and writing to compressed files in these formats.
+      '';
+      license = "LGPL+linking exceptions";
+      platforms = ocaml.meta.platforms or [];
+      maintainers = with maintainers; [maggesi];
+    };
+  }

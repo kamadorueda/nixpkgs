@@ -1,18 +1,21 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
-
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.boot.initrd.network;
 
   dhcpInterfaces = lib.attrNames (lib.filterAttrs (iface: v: v.useDHCP == true) (config.networking.interfaces or {}));
   doDhcp = config.networking.useDHCP || dhcpInterfaces != [];
-  dhcpIfShellExpr = if config.networking.useDHCP
-                      then "$(ls /sys/class/net/ | grep -v ^lo$)"
-                      else lib.concatMapStringsSep " " lib.escapeShellArg dhcpInterfaces;
+  dhcpIfShellExpr =
+    if config.networking.useDHCP
+    then "$(ls /sys/class/net/ | grep -v ^lo$)"
+    else lib.concatMapStringsSep " " lib.escapeShellArg dhcpInterfaces;
 
-  udhcpcScript = pkgs.writeScript "udhcp-script"
+  udhcpcScript =
+    pkgs.writeScript "udhcp-script"
     ''
       #! /bin/sh
       if [ "$1" = bound ]; then
@@ -40,13 +43,8 @@ let
     '';
 
   udhcpcArgs = toString cfg.udhcpc.extraArgs;
-
-in
-
-{
-
+in {
   options = {
-
     boot.initrd.network.enable = mkOption {
       type = types.bool;
       default = false;
@@ -94,13 +92,10 @@ in
         boot has initialised the network.
       '';
     };
-
-
   };
 
   config = mkIf cfg.enable {
-
-    boot.initrd.kernelModules = [ "af_packet" ];
+    boot.initrd.kernelModules = ["af_packet"];
 
     boot.initrd.extraUtilsCommands = ''
       copy_bin_and_libs ${pkgs.klibc}/lib/klibc/bin.static/ipconfig
@@ -118,7 +113,6 @@ in
           esac
         done
       ''
-
       # Otherwise, use DHCP.
       + optionalString doDhcp ''
         # Bring up all interfaces.
@@ -133,8 +127,8 @@ in
           udhcpc --quit --now -i $iface -O staticroutes --script ${udhcpcScript} ${udhcpcArgs}
         done
       ''
-
-      + cfg.postCommands);
+      + cfg.postCommands
+    );
 
     boot.initrd.postMountCommands = mkIf cfg.flushBeforeStage2 ''
       for iface in $ifaces; do
@@ -142,7 +136,5 @@ in
         ip link set "$iface" down
       done
     '';
-
   };
-
 }

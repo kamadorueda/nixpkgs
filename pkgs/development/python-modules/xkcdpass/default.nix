@@ -1,12 +1,12 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, installShellFiles
-, pytestCheckHook
-, pythonAtLeast
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  installShellFiles,
+  pytestCheckHook,
+  pythonAtLeast,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "xkcdpass";
   version = "1.19.3";
@@ -45,6 +45,6 @@ buildPythonPackage rec {
     description = "Generate secure multiword passwords/passphrases, inspired by XKCD";
     homepage = "https://github.com/redacted/XKCD-password-generator";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ peterhoeg ];
+    maintainers = with maintainers; [peterhoeg];
   };
 }

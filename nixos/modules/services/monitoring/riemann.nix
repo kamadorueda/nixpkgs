@@ -1,19 +1,16 @@
-{ config, pkgs, lib, ... }:
-
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 with pkgs;
-with lib;
-
-let
-
+with lib; let
   cfg = config.services.riemann;
 
-  classpath = concatStringsSep ":" (
-    cfg.extraClasspathEntries ++ [ "${riemann}/share/java/riemann.jar" ]
-  );
+  classpath = concatStringsSep ":" (cfg.extraClasspathEntries ++ ["${riemann}/share/java/riemann.jar"]);
 
-  riemannConfig = concatStringsSep "\n" (
-    [cfg.config] ++ (map (f: ''(load-file "${f}")'') cfg.configFiles)
-  );
+  riemannConfig = concatStringsSep "\n" ([cfg.config] ++ (map (f: ''(load-file "${f}")'') cfg.configFiles));
 
   launcher = writeScriptBin "riemann" ''
     #!/bin/sh
@@ -21,11 +18,8 @@ let
       -cp ${classpath} \
       riemann.bin ${cfg.configFile}
   '';
-
 in {
-
   options = {
-
     services.riemann = {
       enable = mkOption {
         type = types.bool;
@@ -77,7 +71,6 @@ in {
   };
 
   config = mkIf cfg.enable {
-
     users.groups.riemann.gid = config.ids.gids.riemann;
 
     users.users.riemann = {
@@ -86,20 +79,16 @@ in {
       group = "riemann";
     };
 
-    services.riemann.configFile = mkDefault (
-      writeText "riemann-config.clj" riemannConfig
-    );
+    services.riemann.configFile = mkDefault (writeText "riemann-config.clj" riemannConfig);
 
     systemd.services.riemann = {
-      wantedBy = [ "multi-user.target" ];
-      path = [ inetutils ];
+      wantedBy = ["multi-user.target"];
+      path = [inetutils];
       serviceConfig = {
         User = "riemann";
         ExecStart = "${launcher}/bin/riemann";
       };
       serviceConfig.LimitNOFILE = 65536;
     };
-
   };
-
 }

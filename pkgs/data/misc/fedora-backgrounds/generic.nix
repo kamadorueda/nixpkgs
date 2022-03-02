@@ -1,13 +1,12 @@
-{ lib
-, stdenvNoCC
-, coreutils
+{
+  lib,
+  stdenvNoCC,
+  coreutils,
+}: {
+  version,
+  src,
+  patches ? [],
 }:
-
-{ version
-, src
-, patches ? [ ]
-}:
-
 stdenvNoCC.mkDerivation {
   inherit patches src version;
 
@@ -38,6 +37,6 @@ stdenvNoCC.mkDerivation {
     description = "A set of default and supplemental wallpapers for Fedora";
     license = licenses.cc-by-sa-40;
     platforms = platforms.unix;
-    maintainers = with maintainers; [ ];
+    maintainers = with maintainers; [];
   };
 }

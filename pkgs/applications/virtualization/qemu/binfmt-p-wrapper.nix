@@ -4,11 +4,12 @@
 #
 # The wrapper has to be static so LD_* environment variables
 # cannot affect the execution of the wrapper itself.
-
-{ lib, stdenv, pkgsStatic, enableDebug ? false }:
-
-name: emulator:
-
+{
+  lib,
+  stdenv,
+  pkgsStatic,
+  enableDebug ? false,
+}: name: emulator:
 pkgsStatic.stdenv.mkDerivation {
   inherit name;
 

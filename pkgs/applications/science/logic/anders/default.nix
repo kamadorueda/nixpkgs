@@ -1,5 +1,8 @@
-{ lib, fetchFromGitHub, ocamlPackages }:
-
+{
+  lib,
+  fetchFromGitHub,
+  ocamlPackages,
+}:
 ocamlPackages.buildDunePackage rec {
   pname = "anders";
   version = "1.1.1";
@@ -15,13 +18,13 @@ ocamlPackages.buildDunePackage rec {
 
   strictDeps = true;
 
-  nativeBuildInputs = [ ocamlPackages.menhir ];
-  buildInputs = [ ocamlPackages.zarith ];
+  nativeBuildInputs = [ocamlPackages.menhir];
+  buildInputs = [ocamlPackages.zarith];
 
   meta = with lib; {
     description = "Modal Homotopy Type System";
     homepage = "https://homotopy.dev/";
     license = licenses.isc;
-    maintainers = [ maintainers.suhr ];
+    maintainers = [maintainers.suhr];
   };
 }

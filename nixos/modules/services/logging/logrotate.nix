@@ -1,11 +1,13 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.logrotate;
 
-  pathOpts = { name, ... }:  {
+  pathOpts = {name, ...}: {
     options = {
       enable = mkOption {
         type = types.bool;
@@ -49,7 +51,7 @@ let
       };
 
       frequency = mkOption {
-        type = types.enum [ "hourly" "daily" "weekly" "monthly" "yearly" ];
+        type = types.enum ["hourly" "daily" "weekly" "monthly" "yearly"];
         default = "daily";
         description = ''
           How often to rotate the logs.
@@ -97,24 +99,20 @@ let
   '';
 
   paths = sortProperties (attrValues (filterAttrs (_: pathOpts: pathOpts.enable) cfg.paths));
-  configFile = pkgs.writeText "logrotate.conf" (
-    concatStringsSep "\n" (
-      [ "missingok" "notifempty" cfg.extraConfig ] ++ (map mkConf paths)
-    )
-  );
-
-in
-{
+  configFile = pkgs.writeText "logrotate.conf" (concatStringsSep "\n" (["missingok" "notifempty" cfg.extraConfig] ++ (map mkConf paths)));
+in {
   imports = [
-    (mkRenamedOptionModule [ "services" "logrotate" "config" ] [ "services" "logrotate" "extraConfig" ])
+    (mkRenamedOptionModule ["services" "logrotate" "config"] ["services" "logrotate" "extraConfig"])
   ];
 
   options = {
     services.logrotate = {
-      enable = mkEnableOption "the logrotate systemd service" // {
-        default = foldr (n: a: a || n.enable) false (attrValues cfg.paths);
-        defaultText = literalExpression "cfg.paths != {}";
-      };
+      enable =
+        mkEnableOption "the logrotate systemd service"
+        // {
+          default = foldr (n: a: a || n.enable) false (attrValues cfg.paths);
+          defaultText = literalExpression "cfg.paths != {}";
+        };
 
       paths = mkOption {
         type = with types; attrsOf (submodule pathOpts);
@@ -157,13 +155,14 @@ in
   };
 
   config = mkIf cfg.enable {
-    assertions = mapAttrsToList (name: pathOpts:
-      { assertion = (pathOpts.user != null) == (pathOpts.group != null);
+    assertions =
+      mapAttrsToList (name: pathOpts: {
+        assertion = (pathOpts.user != null) == (pathOpts.group != null);
         message = ''
           If either of `services.logrotate.paths.${name}.user` or `services.logrotate.paths.${name}.group` are specified then *both* must be specified.
         '';
-      }
-    ) cfg.paths;
+      })
+      cfg.paths;
 
     systemd.services.logrotate = {
       description = "Logrotate Service";

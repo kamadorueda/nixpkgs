@@ -1,7 +1,13 @@
-{ lib, fetchFromGitHub, buildDunePackage, pkg-config, dune-configurator, stdio, R
-, alcotest
+{
+  lib,
+  fetchFromGitHub,
+  buildDunePackage,
+  pkg-config,
+  dune-configurator,
+  stdio,
+  R,
+  alcotest,
 }:
-
 buildDunePackage rec {
   pname = "ocaml-r";
   version = "0.4.0";
@@ -30,17 +36,16 @@ buildDunePackage rec {
   # This currently fails with dune
   strictDeps = false;
 
-  nativeBuildInputs = [ pkg-config R ];
-  buildInputs = [ dune-configurator stdio R ];
+  nativeBuildInputs = [pkg-config R];
+  buildInputs = [dune-configurator stdio R];
 
   doCheck = true;
-  checkInputs = [ alcotest ];
+  checkInputs = [alcotest];
 
   meta = {
     description = "OCaml bindings for the R interpreter";
     inherit (src.meta) homepage;
     license = lib.licenses.gpl3;
-    maintainers = [ lib.maintainers.bcdarwin ];
+    maintainers = [lib.maintainers.bcdarwin];
   };
-
 }

@@ -1,5 +1,10 @@
-{ lib, buildGoModule, fetchFromGitHub, testVersion, odo }:
-
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  testVersion,
+  odo,
+}:
 buildGoModule rec {
   pname = "odo";
   version = "2.5.0";
@@ -32,7 +37,7 @@ buildGoModule rec {
     description = "Developer-focused CLI for OpenShift and Kubernetes";
     license = licenses.asl20;
     homepage = "odo.dev";
-    maintainers = with maintainers; [ stehessel ];
+    maintainers = with maintainers; [stehessel];
     platforms = platforms.unix;
   };
 }

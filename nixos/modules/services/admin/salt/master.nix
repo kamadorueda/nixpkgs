@@ -1,23 +1,23 @@
-{ config, pkgs, lib, ... }:
-
-with lib;
-
-let
-
-  cfg  = config.services.salt.master;
-
-  fullConfig = lib.recursiveUpdate {
-    # Provide defaults for some directories to allow an immutable config dir
-
-    # Default is equivalent to /etc/salt/master.d/*.conf
-    default_include = "/var/lib/salt/master.d/*.conf";
-    # Default is in /etc/salt/pki/master
-    pki_dir = "/var/lib/salt/pki/master";
-  } cfg.configuration;
-
-in
-
 {
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+with lib; let
+  cfg = config.services.salt.master;
+
+  fullConfig =
+    lib.recursiveUpdate {
+      # Provide defaults for some directories to allow an immutable config dir
+
+      # Default is equivalent to /etc/salt/master.d/*.conf
+      default_include = "/var/lib/salt/master.d/*.conf";
+      # Default is in /etc/salt/pki/master
+      pki_dir = "/var/lib/salt/pki/master";
+    }
+    cfg.configuration;
+in {
   options = {
     services.salt.master = {
       enable = mkEnableOption "Salt master service";
@@ -35,17 +35,15 @@ in
       # The alternatives are
       # - passing --config-dir to all salt commands, not just the master unit,
       # - setting a global environment variable,
-      etc."salt/master".source = pkgs.writeText "master" (
-        builtins.toJSON fullConfig
-      );
-      systemPackages = with pkgs; [ salt ];
+      etc."salt/master".source = pkgs.writeText "master" (builtins.toJSON fullConfig);
+      systemPackages = with pkgs; [salt];
     };
     systemd.services.salt-master = {
       description = "Salt Master";
-      wantedBy = [ "multi-user.target" ];
-      after = [ "network.target" ];
+      wantedBy = ["multi-user.target"];
+      after = ["network.target"];
       path = with pkgs; [
-        util-linux  # for dmesg
+        util-linux # for dmesg
       ];
       serviceConfig = {
         ExecStart = "${pkgs.salt}/bin/salt-master";
@@ -59,5 +57,5 @@ in
     };
   };
 
-  meta.maintainers = with lib.maintainers; [ Flakebi ];
+  meta.maintainers = with lib.maintainers; [Flakebi];
 }

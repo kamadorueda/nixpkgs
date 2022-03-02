@@ -1,8 +1,17 @@
-{ stdenv, lib, fetchurl, cmake, phonon, pkg-config, libvlc
-, extra-cmake-modules, qttools, qtbase, qtx11extras
-, debug ? false
+{
+  stdenv,
+  lib,
+  fetchurl,
+  cmake,
+  phonon,
+  pkg-config,
+  libvlc,
+  extra-cmake-modules,
+  qttools,
+  qtbase,
+  qtx11extras,
+  debug ? false,
 }:
-
 stdenv.mkDerivation rec {
   pname = "phonon-backend-vlc";
   version = "0.11.3";
@@ -29,7 +38,11 @@ stdenv.mkDerivation rec {
   dontWrapQtApps = true;
 
   cmakeFlags = [
-    "-DCMAKE_BUILD_TYPE=${if debug then "Debug" else "Release"}"
+    "-DCMAKE_BUILD_TYPE=${
+      if debug
+      then "Debug"
+      else "Release"
+    }"
   ];
 
   meta = with lib; {
@@ -37,6 +50,6 @@ stdenv.mkDerivation rec {
     # Dev repo is at https://invent.kde.org/libraries/phonon-vlc
     description = "GStreamer backend for Phonon";
     platforms = platforms.linux;
-    license = with licenses; [ bsd3 lgpl21Plus ];
+    license = with licenses; [bsd3 lgpl21Plus];
   };
 }

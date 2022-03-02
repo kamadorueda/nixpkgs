@@ -1,9 +1,29 @@
-{ lib, stdenv, makeDesktopItem, freetype, fontconfig, libX11, libXrender
-, zlib, jdk, glib, gtk, libXtst, libsecret, gsettings-desktop-schemas, webkitgtk
-, makeWrapper, perl, ... }:
-
-{ name, src ? builtins.getAttr stdenv.hostPlatform.system sources, sources ? null, description, productVersion }:
-
+{
+  lib,
+  stdenv,
+  makeDesktopItem,
+  freetype,
+  fontconfig,
+  libX11,
+  libXrender,
+  zlib,
+  jdk,
+  glib,
+  gtk,
+  libXtst,
+  libsecret,
+  gsettings-desktop-schemas,
+  webkitgtk,
+  makeWrapper,
+  perl,
+  ...
+}: {
+  name,
+  src ? builtins.getAttr stdenv.hostPlatform.system sources,
+  sources ? null,
+  description,
+  productVersion,
+}:
 stdenv.mkDerivation rec {
   inherit name src;
 
@@ -14,13 +34,25 @@ stdenv.mkDerivation rec {
     comment = "Integrated Development Environment";
     desktopName = "Eclipse IDE";
     genericName = "Integrated Development Environment";
-    categories = [ "Development" ];
+    categories = ["Development"];
   };
 
-  buildInputs = [
-    fontconfig freetype glib gsettings-desktop-schemas gtk jdk libX11
-    libXrender libXtst libsecret makeWrapper zlib
-  ] ++ lib.optional (webkitgtk != null) webkitgtk;
+  buildInputs =
+    [
+      fontconfig
+      freetype
+      glib
+      gsettings-desktop-schemas
+      gtk
+      jdk
+      libX11
+      libXrender
+      libXtst
+      libsecret
+      makeWrapper
+      zlib
+    ]
+    ++ lib.optional (webkitgtk != null) webkitgtk;
 
   buildCommand = ''
     # Unpack tarball.
@@ -31,7 +63,7 @@ stdenv.mkDerivation rec {
     interpreter=$(echo ${stdenv.glibc.out}/lib/ld-linux*.so.2)
     libCairo=$out/eclipse/libcairo-swt.so
     patchelf --set-interpreter $interpreter $out/eclipse/eclipse
-    [ -f $libCairo ] && patchelf --set-rpath ${lib.makeLibraryPath [ freetype fontconfig libX11 libXrender zlib ]} $libCairo
+    [ -f $libCairo ] && patchelf --set-rpath ${lib.makeLibraryPath [freetype fontconfig libX11 libXrender zlib]} $libCairo
 
     # Create wrapper script.  Pass -configuration to store
     # settings in ~/.eclipse/org.eclipse.platform_<version> rather
@@ -40,7 +72,7 @@ stdenv.mkDerivation rec {
 
     makeWrapper $out/eclipse/eclipse $out/bin/eclipse \
       --prefix PATH : ${jdk}/bin \
-      --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath ([ glib gtk libXtst libsecret ] ++ lib.optional (webkitgtk != null) webkitgtk)} \
+      --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath ([glib gtk libXtst libsecret] ++ lib.optional (webkitgtk != null) webkitgtk)} \
       --prefix XDG_DATA_DIRS : "$GSETTINGS_SCHEMAS_PATH" \
       --add-flags "-configuration \$HOME/.eclipse/''${productId}_${productVersion}/configuration"
 
@@ -57,7 +89,6 @@ stdenv.mkDerivation rec {
   meta = {
     homepage = "http://www.eclipse.org/";
     inherit description;
-    platforms = [ "x86_64-linux" ];
+    platforms = ["x86_64-linux"];
   };
-
 }

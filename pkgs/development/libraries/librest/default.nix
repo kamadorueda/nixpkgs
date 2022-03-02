@@ -1,22 +1,22 @@
-{ lib
-, stdenv
-, fetchurl
-, pkg-config
-, glib
-, libsoup
-, libxml2
-, gobject-introspection
-, gtk-doc
-, docbook-xsl-nons
-, docbook_xml_dtd_412
-, gnome
+{
+  lib,
+  stdenv,
+  fetchurl,
+  pkg-config,
+  glib,
+  libsoup,
+  libxml2,
+  gobject-introspection,
+  gtk-doc,
+  docbook-xsl-nons,
+  docbook_xml_dtd_412,
+  gnome,
 }:
-
 stdenv.mkDerivation rec {
   pname = "rest";
   version = "0.8.1";
 
-  outputs = [ "out" "dev" "devdoc" ];
+  outputs = ["out" "dev" "devdoc"];
 
   src = fetchurl {
     url = "mirror://gnome/sources/${pname}/${lib.versions.majorMinor version}/${pname}-${version}.tar.xz";

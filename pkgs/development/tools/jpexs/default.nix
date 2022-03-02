@@ -1,5 +1,11 @@
-{ lib, stdenv, fetchzip, makeWrapper, makeDesktopItem, jdk8 }:
-
+{
+  lib,
+  stdenv,
+  fetchzip,
+  makeWrapper,
+  makeDesktopItem,
+  jdk8,
+}:
 stdenv.mkDerivation rec {
   pname = "jpexs";
   version = "15.0.0";
@@ -12,7 +18,7 @@ stdenv.mkDerivation rec {
 
   dontBuild = true;
 
-  nativeBuildInputs = [ makeWrapper ];
+  nativeBuildInputs = [makeWrapper];
 
   installPhase = ''
     runHook preInstall
@@ -36,7 +42,7 @@ stdenv.mkDerivation rec {
     desktopName = "JPEXS Free Flash Decompiler";
     genericName = "Flash Decompiler";
     comment = meta.description;
-    categories = [ "Development" "Java" ];
+    categories = ["Development" "Java"];
     startupWMClass = "com-jpexs-decompiler-flash-gui-Main";
   };
 
@@ -50,6 +56,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/jindrapetrik/jpexs-decompiler";
     license = licenses.gpl3;
     platforms = jdk8.meta.platforms;
-    maintainers = [ ];
+    maintainers = [];
   };
 }

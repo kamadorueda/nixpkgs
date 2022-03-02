@@ -1,13 +1,13 @@
-{ stdenv
-, lib
-, buildPythonPackage
-, fetchPypi
-, substituteAll
-, portmidi
-, python-rtmidi
-, pytestCheckHook
+{
+  stdenv,
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  substituteAll,
+  portmidi,
+  python-rtmidi,
+  pytestCheckHook,
 }:
-
 buildPythonPackage rec {
   pname = "mido";
   version = "1.2.10";
@@ -40,6 +40,6 @@ buildPythonPackage rec {
     description = "MIDI Objects for Python";
     homepage = "https://mido.readthedocs.io";
     license = licenses.mit;
-    maintainers = with maintainers; [ ];
+    maintainers = with maintainers; [];
   };
 }

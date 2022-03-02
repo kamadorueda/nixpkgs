@@ -1,5 +1,10 @@
-{ lib, stdenv, fetchFromGitHub, cmake, octave ? null }:
-
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  cmake,
+  octave ? null,
+}:
 stdenv.mkDerivation rec {
   pname = "nlopt";
   version = "2.7.1";
@@ -11,21 +16,23 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-TgieCX7yUdTAEblzXY/gCN0r6F9TVDh4RdNDjQdXZ1o=";
   };
 
-  nativeBuildInputs = [ cmake ];
-  buildInputs = [ octave ];
+  nativeBuildInputs = [cmake];
+  buildInputs = [octave];
 
-  configureFlags = [
-    "--with-cxx"
-    "--enable-shared"
-    "--with-pic"
-    "--without-guile"
-    "--without-python"
-    "--without-matlab"
-  ] ++ lib.optionals (octave != null) [
-    "--with-octave"
-    "M_INSTALL_DIR=$(out)/${octave.sitePath}/m"
-    "OCT_INSTALL_DIR=$(out)/${octave.sitePath}/oct"
-  ];
+  configureFlags =
+    [
+      "--with-cxx"
+      "--enable-shared"
+      "--with-pic"
+      "--without-guile"
+      "--without-python"
+      "--without-matlab"
+    ]
+    ++ lib.optionals (octave != null) [
+      "--with-octave"
+      "M_INSTALL_DIR=$(out)/${octave.sitePath}/m"
+      "OCT_INSTALL_DIR=$(out)/${octave.sitePath}/oct"
+    ];
 
   postFixup = ''
     substituteInPlace $out/lib/cmake/nlopt/NLoptLibraryDepends.cmake --replace \
@@ -38,5 +45,4 @@ stdenv.mkDerivation rec {
     license = lib.licenses.lgpl21Plus;
     hydraPlatforms = lib.platforms.linux;
   };
-
 }

@@ -1,19 +1,19 @@
-{ lib
-, stdenv
-, fetchurl
-, glib
-, gnome
-, librest
-, libsoup
-, pkg-config
-, gobject-introspection
+{
+  lib,
+  stdenv,
+  fetchurl,
+  glib,
+  gnome,
+  librest,
+  libsoup,
+  pkg-config,
+  gobject-introspection,
 }:
-
 stdenv.mkDerivation rec {
   pname = "libgovirt";
   version = "0.3.8";
 
-  outputs = [ "out" "dev" ];
+  outputs = ["out" "dev"];
 
   src = fetchurl {
     url = "mirror://gnome/sources/libgovirt/${lib.versions.majorMinor version}/${pname}-${version}.tar.xz";
@@ -46,7 +46,7 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     homepage = "https://gitlab.gnome.org/GNOME/libgovirt";
     description = "GObject wrapper for the oVirt REST API";
-    maintainers = [ maintainers.amarshall ];
+    maintainers = [maintainers.amarshall];
     platforms = platforms.linux;
     license = licenses.lgpl21Plus;
   };

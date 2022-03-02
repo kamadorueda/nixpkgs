@@ -1,6 +1,4 @@
-import ./make-test-python.nix ({ pkgs, ... }:
-
-let
+import ./make-test-python.nix ({pkgs, ...}: let
   hello-world = pkgs.writeText "hello-world" ''
     {-# OPTIONS --guardedness #-}
     open import IO
@@ -8,17 +6,16 @@ let
 
     main = run {0ℓ} (putStrLn "Hello World!")
   '';
-in
-{
+in {
   name = "agda";
   meta = with pkgs.lib.maintainers; {
-    maintainers = [ alexarice turion ];
+    maintainers = [alexarice turion];
   };
 
-  machine = { pkgs, ... }: {
+  machine = {pkgs, ...}: {
     environment.systemPackages = [
       (pkgs.agda.withPackages {
-        pkgs = p: [ p.standard-library ];
+        pkgs = p: [p.standard-library];
       })
     ];
     virtualisation.memorySize = 2000; # Agda uses a lot of memory
@@ -46,5 +43,4 @@ in
         "./HelloWorld"
     ), "HelloWorld does not run properly"
   '';
-}
-)
+})

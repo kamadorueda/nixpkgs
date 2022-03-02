@@ -1,23 +1,23 @@
-{ lib
-, stdenv
-, copyDesktopItems
-, fetchFromGitHub
-, makeDesktopItem
-, makeWrapper
-, fontconfig
-, freetype
-, glib
-, gtk3
-, jdk
-, libX11
-, libXrender
-, libXtst
-, zlib
-, maven
-, webkitgtk
-, glib-networking
+{
+  lib,
+  stdenv,
+  copyDesktopItems,
+  fetchFromGitHub,
+  makeDesktopItem,
+  makeWrapper,
+  fontconfig,
+  freetype,
+  glib,
+  gtk3,
+  jdk,
+  libX11,
+  libXrender,
+  libXtst,
+  zlib,
+  maven,
+  webkitgtk,
+  glib-networking,
 }:
-
 stdenv.mkDerivation rec {
   pname = "dbeaver";
   version = "21.3.5"; # When updating also update fetchedMavenDeps.sha256
@@ -61,20 +61,22 @@ stdenv.mkDerivation rec {
     maven
   ];
 
-  buildInputs = [
-    fontconfig
-    freetype
-    glib
-    gtk3
-    jdk
-    libX11
-    libXrender
-    libXtst
-    zlib
-  ] ++ lib.optionals stdenv.isLinux [
-    webkitgtk
-    glib-networking
-  ];
+  buildInputs =
+    [
+      fontconfig
+      freetype
+      glib
+      gtk3
+      jdk
+      libX11
+      libXrender
+      libXtst
+      zlib
+    ]
+    ++ lib.optionals stdenv.isLinux [
+      webkitgtk
+      glib-networking
+    ];
 
   desktopItems = [
     (makeDesktopItem {
@@ -84,7 +86,7 @@ stdenv.mkDerivation rec {
       desktopName = "dbeaver";
       comment = "SQL Integrated Development Environment";
       genericName = "SQL Integrated Development Environment";
-      categories = [ "Development" ];
+      categories = ["Development"];
     })
   ];
 
@@ -96,19 +98,19 @@ stdenv.mkDerivation rec {
     runHook postBuild
   '';
 
-  installPhase =
-    let
-      productTargetPath = "product/community/target/products/org.jkiss.dbeaver.core.product";
+  installPhase = let
+    productTargetPath = "product/community/target/products/org.jkiss.dbeaver.core.product";
 
-      platformMap = {
-        aarch64-linux = "aarch64";
-        x86_64-darwin = "x86_64";
-        x86_64-linux  = "x86_64";
-      };
+    platformMap = {
+      aarch64-linux = "aarch64";
+      x86_64-darwin = "x86_64";
+      x86_64-linux = "x86_64";
+    };
 
-      systemPlatform = platformMap.${stdenv.hostPlatform.system} or (throw "dbeaver not supported on ${stdenv.hostPlatform.system}");
-    in
-    if stdenv.isDarwin then ''
+    systemPlatform = platformMap.${stdenv.hostPlatform.system} or (throw "dbeaver not supported on ${stdenv.hostPlatform.system}");
+  in
+    if stdenv.isDarwin
+    then ''
       runHook preInstall
 
       mkdir -p $out/Applications $out/bin
@@ -123,7 +125,8 @@ stdenv.mkDerivation rec {
         --prefix PATH : ${jdk}/bin
 
       runHook postInstall
-    '' else ''
+    ''
+    else ''
       runHook preInstall
 
       mkdir -p $out/
@@ -135,7 +138,7 @@ stdenv.mkDerivation rec {
 
       makeWrapper $out/dbeaver/dbeaver $out/bin/dbeaver \
         --prefix PATH : ${jdk}/bin \
-        --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath ([ glib gtk3 libXtst webkitgtk glib-networking ])} \
+        --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [glib gtk3 libXtst webkitgtk glib-networking]} \
         --prefix GIO_EXTRA_MODULES : "${glib-networking}/lib/gio/modules" \
         --prefix XDG_DATA_DIRS : "$GSETTINGS_SCHEMAS_PATH"
 
@@ -155,7 +158,7 @@ stdenv.mkDerivation rec {
       Teradata, Firebird, Derby, etc.
     '';
     license = licenses.asl20;
-    platforms = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" ];
-    maintainers = with maintainers; [ jojosch mkg20001 ];
+    platforms = ["x86_64-linux" "x86_64-darwin" "aarch64-linux"];
+    maintainers = with maintainers; [jojosch mkg20001];
   };
 }

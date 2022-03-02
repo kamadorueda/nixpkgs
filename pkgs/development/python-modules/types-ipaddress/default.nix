@@ -1,8 +1,8 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
 }:
-
 buildPythonPackage rec {
   pname = "types-ipaddress";
   version = "1.0.8";
@@ -20,6 +20,6 @@ buildPythonPackage rec {
     description = "Typing stubs for ipaddress";
     homepage = "https://github.com/python/typeshed";
     license = licenses.asl20;
-    maintainers = with maintainers; [ jpetrucciani ];
+    maintainers = with maintainers; [jpetrucciani];
   };
 }

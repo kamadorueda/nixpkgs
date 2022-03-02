@@ -1,4 +1,4 @@
-import ./make-test-python.nix ({ pkgs, ... }: {
+import ./make-test-python.nix ({pkgs, ...}: {
   name = "vsftpd";
 
   nodes = {
@@ -7,7 +7,7 @@ import ./make-test-python.nix ({ pkgs, ... }: {
         enable = true;
         userlistDeny = false;
         localUsers = true;
-        userlist = [ "ftp-test-user" ];
+        userlist = ["ftp-test-user"];
         writeEnable = true;
         localRoot = "/tmp";
       };

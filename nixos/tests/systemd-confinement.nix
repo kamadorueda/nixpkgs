@@ -1,7 +1,11 @@
 import ./make-test-python.nix {
   name = "systemd-confinement";
 
-  machine = { pkgs, lib, ... }: let
+  machine = {
+    pkgs,
+    lib,
+    ...
+  }: let
     testServer = pkgs.writeScript "testserver.sh" ''
       #!${pkgs.runtimeShell}
       export PATH=${lib.escapeShellArg "${pkgs.coreutils}/bin"}
@@ -24,28 +28,33 @@ import ./make-test-python.nix {
     }: {
       systemd.sockets.${serviceName} = {
         description = "Socket for Test Service ${toString num}";
-        wantedBy = [ "sockets.target" ];
+        wantedBy = ["sockets.target"];
         socketConfig.ListenStream = "/run/test${toString num}.sock";
         socketConfig.Accept = true;
       };
 
-      systemd.services."${serviceName}@" = {
-        description = "Confined Test Service ${toString num}";
-        confinement = (config.confinement or {}) // { enable = true; };
-        serviceConfig = (config.serviceConfig or {}) // {
-          ExecStart = testServer;
-          StandardInput = "socket";
-        };
-      } // removeAttrs config [ "confinement" "serviceConfig" ];
+      systemd.services."${serviceName}@" =
+        {
+          description = "Confined Test Service ${toString num}";
+          confinement = (config.confinement or {}) // {enable = true;};
+          serviceConfig =
+            (config.serviceConfig or {})
+            // {
+              ExecStart = testServer;
+              StandardInput = "socket";
+            };
+        }
+        // removeAttrs config ["confinement" "serviceConfig"];
 
       __testSteps = lib.mkOrder num (''
-        machine.succeed("echo ${toString num} > /teststep")
-      '' + testScript);
+          machine.succeed("echo ${toString num} > /teststep")
+        ''
+        + testScript);
     };
-
   in {
     imports = lib.imap1 mkTestStep [
-      { config.confinement.mode = "chroot-only";
+      {
+        config.confinement.mode = "chroot-only";
         testScript = ''
           with subtest("chroot-only confinement"):
               paths = machine.succeed('chroot-exec ls -1 / | paste -sd,').strip()
@@ -55,7 +64,8 @@ import ./make-test-python.nix {
               machine.succeed("chroot-exec chown 65534 /bin")
         '';
       }
-      { testScript = ''
+      {
+        testScript = ''
           with subtest("full confinement with APIVFS"):
               machine.fail("chroot-exec ls -l /etc")
               machine.fail("chroot-exec chown 65534 /bin")
@@ -63,14 +73,16 @@ import ./make-test-python.nix {
               machine.succeed("chroot-exec chown 0 /bin")
         '';
       }
-      { config.serviceConfig.BindReadOnlyPaths = [ "/etc" ];
+      {
+        config.serviceConfig.BindReadOnlyPaths = ["/etc"];
         testScript = ''
           with subtest("check existence of bind-mounted /etc"):
               passwd = machine.succeed('chroot-exec cat /etc/passwd').strip()
               assert len(passwd) > 0, "/etc/passwd must not be empty"
         '';
       }
-      { config.serviceConfig.User = "chroot-testuser";
+      {
+        config.serviceConfig.User = "chroot-testuser";
         config.serviceConfig.Group = "chroot-testgroup";
         testScript = ''
           with subtest("check if User/Group really runs as non-root"):
@@ -93,7 +105,8 @@ import ./make-test-python.nix {
               assert_eq(text, "got me")
         '';
       })
-      { config.serviceConfig.User = "chroot-testuser";
+      {
+        config.serviceConfig.User = "chroot-testuser";
         config.serviceConfig.Group = "chroot-testgroup";
         config.serviceConfig.StateDirectory = "testme";
         testScript = ''
@@ -104,7 +117,8 @@ import ./make-test-python.nix {
               machine.succeed("test ! -e /tmp/canary")
         '';
       }
-      { testScript = ''
+      {
+        testScript = ''
           with subtest("check if /bin/sh works"):
               machine.succeed(
                   "chroot-exec test -e /bin/sh",
@@ -112,34 +126,39 @@ import ./make-test-python.nix {
               )
         '';
       }
-      { config.confinement.binSh = null;
+      {
+        config.confinement.binSh = null;
         testScript = ''
           with subtest("check if suppressing /bin/sh works"):
               machine.succeed("chroot-exec test ! -e /bin/sh")
               machine.succeed('test "$(chroot-exec \'/bin/sh -c "echo foo"\')" != foo')
         '';
       }
-      { config.confinement.binSh = "${pkgs.hello}/bin/hello";
+      {
+        config.confinement.binSh = "${pkgs.hello}/bin/hello";
         testScript = ''
           with subtest("check if we can set /bin/sh to something different"):
               machine.succeed("chroot-exec test -e /bin/sh")
               machine.succeed('test "$(chroot-exec /bin/sh -g foo)" = foo')
         '';
       }
-      { config.environment.FOOBAR = pkgs.writeText "foobar" "eek\n";
+      {
+        config.environment.FOOBAR = pkgs.writeText "foobar" "eek\n";
         testScript = ''
           with subtest("check if only Exec* dependencies are included"):
               machine.succeed('test "$(chroot-exec \'cat "$FOOBAR"\')" != eek')
         '';
       }
-      { config.environment.FOOBAR = pkgs.writeText "foobar" "eek\n";
+      {
+        config.environment.FOOBAR = pkgs.writeText "foobar" "eek\n";
         config.confinement.fullUnit = true;
         testScript = ''
           with subtest("check if all unit dependencies are included"):
               machine.succeed('test "$(chroot-exec \'cat "$FOOBAR"\')" = eek')
         '';
       }
-      { serviceName = "shipped-unitfile";
+      {
+        serviceName = "shipped-unitfile";
         config.confinement.mode = "chroot-only";
         testScript = ''
           with subtest("check if shipped unit file still works"):
@@ -175,10 +194,12 @@ import ./make-test-python.nix {
     };
   };
 
-  testScript = { nodes, ... }: ''
-    def assert_eq(a, b):
-        assert a == b, f"{a} != {b}"
+  testScript = {nodes, ...}:
+    ''
+      def assert_eq(a, b):
+          assert a == b, f"{a} != {b}"
 
-    machine.wait_for_unit("multi-user.target")
-  '' + nodes.machine.config.__testSteps;
+      machine.wait_for_unit("multi-user.target")
+    ''
+    + nodes.machine.config.__testSteps;
 }

@@ -1,11 +1,11 @@
-{ lib
-, buildGoModule
-, fetchFromGitHub
-, installShellFiles
-, qemu
-, makeWrapper
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  installShellFiles,
+  qemu,
+  makeWrapper,
 }:
-
 buildGoModule rec {
   pname = "lima";
   version = "0.8.3";
@@ -19,7 +19,7 @@ buildGoModule rec {
 
   vendorSha256 = "sha256-eJnwXXYWMaIfM8SW4MtmG4wsPA/9sx4j2AkOd6GpnsY=";
 
-  nativeBuildInputs = [ makeWrapper installShellFiles ];
+  nativeBuildInputs = [makeWrapper installShellFiles];
 
   buildPhase = ''
     runHook preBuild
@@ -32,7 +32,7 @@ buildGoModule rec {
     mkdir -p $out
     cp -r _output/* $out
     wrapProgram $out/bin/limactl \
-      --prefix PATH : ${lib.makeBinPath [ qemu ]}
+      --prefix PATH : ${lib.makeBinPath [qemu]}
     installShellCompletion --cmd limactl \
       --bash <($out/bin/limactl completion bash) \
       --fish <($out/bin/limactl completion fish) \
@@ -49,6 +49,6 @@ buildGoModule rec {
     homepage = "https://github.com/lima-vm/lima";
     description = "Linux virtual machines (on macOS, in most cases)";
     license = licenses.asl20;
-    maintainers = with maintainers; [ anhduy ];
+    maintainers = with maintainers; [anhduy];
   };
 }

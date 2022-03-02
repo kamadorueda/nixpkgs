@@ -1,26 +1,27 @@
-{ lib, stdenv
-, fetchurl
-, fetchpatch
-, pkg-config
-, meson
-, ninja
-, gettext
-, gobject-introspection
-, gtk-doc
-, docbook_xsl
-, glib
-, libsoup
-, libxml2
-, libxslt
-, check
-, curl
-, perl
-, hwdata
-, osinfo-db
-, substituteAll
-, vala ? null
+{
+  lib,
+  stdenv,
+  fetchurl,
+  fetchpatch,
+  pkg-config,
+  meson,
+  ninja,
+  gettext,
+  gobject-introspection,
+  gtk-doc,
+  docbook_xsl,
+  glib,
+  libsoup,
+  libxml2,
+  libxslt,
+  check,
+  curl,
+  perl,
+  hwdata,
+  osinfo-db,
+  substituteAll,
+  vala ? null,
 }:
-
 stdenv.mkDerivation rec {
   pname = "libosinfo";
   version = "1.10.0";
@@ -30,7 +31,7 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-olLgD8WA3rIdoNqMCqA7jDHoRAuESMi5gUP6tHfTIwU=";
   };
 
-  outputs = [ "out" "dev" "devdoc" ];
+  outputs = ["out" "dev" "devdoc"];
 
   nativeBuildInputs = [
     pkg-config
@@ -80,6 +81,6 @@ stdenv.mkDerivation rec {
     changelog = "https://gitlab.com/libosinfo/libosinfo/-/blob/v${version}/NEWS";
     license = licenses.lgpl2Plus;
     platforms = platforms.linux;
-    maintainers = [ maintainers.bjornfor ];
+    maintainers = [maintainers.bjornfor];
   };
 }

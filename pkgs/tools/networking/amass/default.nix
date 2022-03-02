@@ -1,8 +1,8 @@
-{ buildGoModule
-, fetchFromGitHub
-, lib
+{
+  buildGoModule,
+  fetchFromGitHub,
+  lib,
 }:
-
 buildGoModule rec {
   pname = "amass";
   version = "3.17.0";
@@ -16,7 +16,7 @@ buildGoModule rec {
 
   vendorSha256 = "sha256-tGIZ8D1ecLV2HNXrBvLEVVQbmwoR1arwwLZ0oTx1b7k=";
 
-  outputs = [ "out" "wordlists" ];
+  outputs = ["out" "wordlists"];
 
   postInstall = ''
     mkdir -p $wordlists
@@ -39,9 +39,9 @@ buildGoModule rec {
 
       Amass ships with a set of wordlist (to be used with the amass -w flag)
       that are found under the wordlists output.
-      '';
+    '';
     homepage = "https://owasp.org/www-project-amass/";
     license = licenses.asl20;
-    maintainers = with maintainers; [ kalbasit fab ];
+    maintainers = with maintainers; [kalbasit fab];
   };
 }

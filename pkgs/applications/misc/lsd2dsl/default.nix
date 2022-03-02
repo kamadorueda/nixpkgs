@@ -1,7 +1,18 @@
-{ lib, stdenv, mkDerivation, fetchFromGitHub
-, makeDesktopItem, copyDesktopItems, cmake
-, boost, libvorbis, libsndfile, minizip, gtest, qtwebkit }:
-
+{
+  lib,
+  stdenv,
+  mkDerivation,
+  fetchFromGitHub,
+  makeDesktopItem,
+  copyDesktopItems,
+  cmake,
+  boost,
+  libvorbis,
+  libsndfile,
+  minizip,
+  gtest,
+  qtwebkit,
+}:
 mkDerivation rec {
   pname = "lsd2dsl";
   version = "0.5.4";
@@ -13,9 +24,9 @@ mkDerivation rec {
     sha256 = "sha256-PLgfsVVrNBTxI4J0ukEOFRoBkbmB55/sLNn5KyiHeAc=";
   };
 
-  nativeBuildInputs = [ cmake ] ++ lib.optional stdenv.isLinux copyDesktopItems;
+  nativeBuildInputs = [cmake] ++ lib.optional stdenv.isLinux copyDesktopItems;
 
-  buildInputs = [ boost libvorbis libsndfile minizip gtest qtwebkit ];
+  buildInputs = [boost libvorbis libsndfile minizip gtest qtwebkit];
 
   NIX_CFLAGS_COMPILE = "-Wno-error=unused-result -Wno-error=missing-braces";
 
@@ -25,7 +36,7 @@ mkDerivation rec {
     desktopName = "lsd2dsl";
     genericName = "lsd2dsl";
     comment = meta.description;
-    categories = [ "Dictionary" "FileTools" "Qt" ];
+    categories = ["Dictionary" "FileTools" "Qt"];
   });
 
   installPhase = ''
@@ -39,7 +50,7 @@ mkDerivation rec {
       A decompiler for ABBYY Lingvo’s proprietary dictionaries.
     '';
     license = licenses.mit;
-    maintainers = with maintainers; [ sikmir ];
+    maintainers = with maintainers; [sikmir];
     platforms = platforms.unix;
   };
 }

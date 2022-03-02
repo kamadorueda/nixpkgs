@@ -1,5 +1,8 @@
-{ buildGoModule, lib, fetchFromGitHub }:
-
+{
+  buildGoModule,
+  lib,
+  fetchFromGitHub,
+}:
 buildGoModule rec {
   pname = "argo-rollouts";
   version = "1.1.1";
@@ -16,12 +19,12 @@ buildGoModule rec {
   # Disable tests since some test fail because of missing test data
   doCheck = false;
 
-  subPackages = [ "cmd/rollouts-controller" "cmd/kubectl-argo-rollouts" ];
+  subPackages = ["cmd/rollouts-controller" "cmd/kubectl-argo-rollouts"];
 
   meta = with lib; {
     description = "Kubernetes Progressive Delivery Controller";
     homepage = "https://github.com/argoproj/argo-rollouts/";
     license = licenses.asl20;
-    maintainers = with maintainers; [ psibi ];
+    maintainers = with maintainers; [psibi];
   };
 }

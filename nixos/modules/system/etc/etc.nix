@@ -1,77 +1,81 @@
 # Management of static files in /etc.
-
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
-
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   etc' = filter (f: f.enable) (attrValues config.environment.etc);
 
-  etc = pkgs.runCommandLocal "etc" {
-    # This is needed for the systemd module
-    passthru.targets = map (x: x.target) etc';
-  } /* sh */ ''
-    set -euo pipefail
+  etc =
+    pkgs.runCommandLocal "etc" {
+      # This is needed for the systemd module
+      passthru.targets = map (x: x.target) etc';
+    }
+    /*
+     sh
+     */
+    ''
+      set -euo pipefail
 
-    makeEtcEntry() {
-      src="$1"
-      target="$2"
-      mode="$3"
-      user="$4"
-      group="$5"
+      makeEtcEntry() {
+        src="$1"
+        target="$2"
+        mode="$3"
+        user="$4"
+        group="$5"
 
-      if [[ "$src" = *'*'* ]]; then
-        # If the source name contains '*', perform globbing.
-        mkdir -p "$out/etc/$target"
-        for fn in $src; do
-            ln -s "$fn" "$out/etc/$target/"
-        done
-      else
-
-        mkdir -p "$out/etc/$(dirname "$target")"
-        if ! [ -e "$out/etc/$target" ]; then
-          ln -s "$src" "$out/etc/$target"
+        if [[ "$src" = *'*'* ]]; then
+          # If the source name contains '*', perform globbing.
+          mkdir -p "$out/etc/$target"
+          for fn in $src; do
+              ln -s "$fn" "$out/etc/$target/"
+          done
         else
-          echo "duplicate entry $target -> $src"
-          if [ "$(readlink "$out/etc/$target")" != "$src" ]; then
-            echo "mismatched duplicate entry $(readlink "$out/etc/$target") <-> $src"
-            ret=1
 
-            continue
+          mkdir -p "$out/etc/$(dirname "$target")"
+          if ! [ -e "$out/etc/$target" ]; then
+            ln -s "$src" "$out/etc/$target"
+          else
+            echo "duplicate entry $target -> $src"
+            if [ "$(readlink "$out/etc/$target")" != "$src" ]; then
+              echo "mismatched duplicate entry $(readlink "$out/etc/$target") <-> $src"
+              ret=1
+
+              continue
+            fi
+          fi
+
+          if [ "$mode" != symlink ]; then
+            echo "$mode" > "$out/etc/$target.mode"
+            echo "$user" > "$out/etc/$target.uid"
+            echo "$group" > "$out/etc/$target.gid"
           fi
         fi
+      }
 
-        if [ "$mode" != symlink ]; then
-          echo "$mode" > "$out/etc/$target.mode"
-          echo "$user" > "$out/etc/$target.uid"
-          echo "$group" > "$out/etc/$target.gid"
-        fi
-      fi
-    }
-
-    mkdir -p "$out/etc"
-    ${concatMapStringsSep "\n" (etcEntry: escapeShellArgs [
-      "makeEtcEntry"
-      # Force local source paths to be added to the store
-      "${etcEntry.source}"
-      etcEntry.target
-      etcEntry.mode
-      etcEntry.user
-      etcEntry.group
-    ]) etc'}
-  '';
-
-in
-
-{
-
-  imports = [ ../build.nix ];
+      mkdir -p "$out/etc"
+      ${
+        concatMapStringsSep "\n" (etcEntry:
+          escapeShellArgs [
+            "makeEtcEntry"
+            # Force local source paths to be added to the store
+            "${etcEntry.source}"
+            etcEntry.target
+            etcEntry.mode
+            etcEntry.user
+            etcEntry.group
+          ])
+        etc'
+      }
+    '';
+in {
+  imports = [../build.nix];
 
   ###### interface
 
   options = {
-
     environment.etc = mkOption {
       default = {};
       example = literalExpression ''
@@ -86,10 +90,14 @@ in
         Set of files that have to be linked in <filename>/etc</filename>.
       '';
 
-      type = with types; attrsOf (submodule (
-        { name, config, options, ... }:
-        { options = {
-
+      type = with types;
+        attrsOf (submodule ({
+          name,
+          config,
+          options,
+          ...
+        }: {
+          options = {
             enable = mkOption {
               type = types.bool;
               default = true;
@@ -136,7 +144,7 @@ in
               description = ''
                 UID of created file. Only takes effect when the file is
                 copied (that is, the mode is not 'symlink').
-                '';
+              '';
             };
 
             gid = mkOption {
@@ -167,35 +175,27 @@ in
                 Changing this option takes precedence over <literal>gid</literal>.
               '';
             };
-
           };
 
           config = {
             target = mkDefault name;
-            source = mkIf (config.text != null) (
-              let name' = "etc-" + baseNameOf name;
-              in mkDerivedConfig options.text (pkgs.writeText name')
-            );
+            source = mkIf (config.text != null) (let
+              name' = "etc-" + baseNameOf name;
+            in
+              mkDerivedConfig options.text (pkgs.writeText name'));
           };
-
         }));
-
     };
-
   };
-
 
   ###### implementation
 
   config = {
-
     system.build.etc = etc;
-    system.build.etcActivationCommands =
-      ''
-        # Set up the statically computed bits of /etc.
-        echo "setting up /etc..."
-        ${pkgs.perl.withPackages (p: [ p.FileSlurp ])}/bin/perl ${./setup-etc.pl} ${etc}/etc
-      '';
+    system.build.etcActivationCommands = ''
+      # Set up the statically computed bits of /etc.
+      echo "setting up /etc..."
+      ${pkgs.perl.withPackages (p: [p.FileSlurp])}/bin/perl ${./setup-etc.pl} ${etc}/etc
+    '';
   };
-
 }

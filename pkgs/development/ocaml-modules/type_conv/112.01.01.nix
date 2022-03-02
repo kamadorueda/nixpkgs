@@ -1,5 +1,9 @@
-{ lib, fetchFromGitHub, buildOcaml, camlp4}:
-
+{
+  lib,
+  fetchFromGitHub,
+  buildOcaml,
+  camlp4,
+}:
 buildOcaml rec {
   minimumSupportedOcamlVersion = "4.02";
 
@@ -15,12 +19,12 @@ buildOcaml rec {
 
   strictDeps = true;
 
-  buildInputs = [ camlp4 ];
+  buildInputs = [camlp4];
 
   meta = {
     homepage = "https://github.com/janestreet/type_conv/";
     description = "Support library for preprocessor type conversions";
     license = lib.licenses.asl20;
-    maintainers = with lib.maintainers; [ maggesi ericbmerritt ];
+    maintainers = with lib.maintainers; [maggesi ericbmerritt];
   };
 }

@@ -1,5 +1,4 @@
-{ lib, ... }: {
-
+{lib, ...}: {
   options = {
     processedToplevel = lib.mkOption {
       type = lib.types.raw;

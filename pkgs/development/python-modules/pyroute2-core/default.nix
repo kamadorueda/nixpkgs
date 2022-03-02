@@ -1,10 +1,10 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, pyroute2-core
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  pyroute2-core,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "pyroute2-core";
   version = "0.6.7";
@@ -31,7 +31,7 @@ buildPythonPackage rec {
     description = "Core module for pyroute2";
     homepage = "https://github.com/svinota/pyroute2";
     license = licenses.asl20;
-    maintainers = with maintainers; [ fab ];
+    maintainers = with maintainers; [fab];
     platforms = platforms.unix;
   };
 }

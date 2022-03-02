@@ -1,15 +1,15 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, poetry-core
-, requests-mock
-, pythonOlder
-, pytest-asyncio
-, pytestCheckHook
-, python-dateutil
-, requests
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  poetry-core,
+  requests-mock,
+  pythonOlder,
+  pytest-asyncio,
+  pytestCheckHook,
+  python-dateutil,
+  requests,
 }:
-
 buildPythonPackage rec {
   pname = "flipr-api";
   version = "1.4.2";
@@ -47,6 +47,6 @@ buildPythonPackage rec {
     description = "Python client for Flipr API";
     homepage = "https://github.com/cnico/flipr-api";
     license = licenses.mit;
-    maintainers = with maintainers; [ fab ];
+    maintainers = with maintainers; [fab];
   };
 }

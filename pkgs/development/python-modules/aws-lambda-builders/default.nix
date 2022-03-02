@@ -1,13 +1,13 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, six
-, pytest
-, mock
-, parameterized
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  six,
+  pytest,
+  mock,
+  parameterized,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "aws-lambda-builders";
   version = "1.13.0";
@@ -45,6 +45,6 @@ buildPythonPackage rec {
       AWS Lambda functions for several runtimes & frameworks.
     '';
     license = licenses.asl20;
-    maintainers = with maintainers; [ dhkl ];
+    maintainers = with maintainers; [dhkl];
   };
 }

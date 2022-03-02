@@ -1,5 +1,12 @@
-{ stdenv, lib, fetchFromGitHub, expat, ocaml, findlib, ounit }:
-
+{
+  stdenv,
+  lib,
+  fetchFromGitHub,
+  expat,
+  ocaml,
+  findlib,
+  ounit,
+}:
 stdenv.mkDerivation rec {
   pname = "ocaml${ocaml.version}-expat";
   version = "1.1.0";
@@ -15,8 +22,8 @@ stdenv.mkDerivation rec {
     substituteInPlace Makefile --replace "gcc" "\$(CC)"
   '';
 
-  nativeBuildInputs = [ ocaml findlib ];
-  buildInputs = [ expat ounit ];
+  nativeBuildInputs = [ocaml findlib];
+  buildInputs = [expat ounit];
 
   strictDeps = true;
 
@@ -28,7 +35,7 @@ stdenv.mkDerivation rec {
   meta = {
     description = "OCaml wrapper for the Expat XML parsing library";
     license = lib.licenses.mit;
-    maintainers = [ lib.maintainers.vbgl ];
+    maintainers = [lib.maintainers.vbgl];
     inherit (src.meta) homepage;
     inherit (ocaml.meta) platforms;
   };

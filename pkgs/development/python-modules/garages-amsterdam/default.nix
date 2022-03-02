@@ -1,11 +1,11 @@
-{ lib
-, aiohttp
-, buildPythonPackage
-, fetchFromGitHub
-, poetry-core
-, pythonOlder
+{
+  lib,
+  aiohttp,
+  buildPythonPackage,
+  fetchFromGitHub,
+  poetry-core,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "garages-amsterdam";
   version = "4.0.0";
@@ -44,6 +44,6 @@ buildPythonPackage rec {
     description = "Python client for getting garage occupancy in Amsterdam";
     homepage = "https://github.com/klaasnicolaas/python-garages-amsterdam";
     license = licenses.mit;
-    maintainers = with maintainers; [ fab ];
+    maintainers = with maintainers; [fab];
   };
 }

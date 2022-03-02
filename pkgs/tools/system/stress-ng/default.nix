@@ -1,7 +1,18 @@
-{ lib, stdenv, fetchFromGitHub
-, attr, judy, keyutils, libaio, libapparmor, libbsd, libcap, libgcrypt, lksctp-tools, zlib
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  attr,
+  judy,
+  keyutils,
+  libaio,
+  libapparmor,
+  libbsd,
+  libcap,
+  libgcrypt,
+  lksctp-tools,
+  zlib,
 }:
-
 stdenv.mkDerivation rec {
   pname = "stress-ng";
   version = "0.13.09";
@@ -18,9 +29,15 @@ stdenv.mkDerivation rec {
   ''; # needed because of Darwin patch on libbsd
 
   # All platforms inputs then Linux-only ones
-  buildInputs = [ judy libbsd libgcrypt zlib ]
+  buildInputs =
+    [judy libbsd libgcrypt zlib]
     ++ lib.optionals stdenv.hostPlatform.isLinux [
-      attr keyutils libaio libapparmor libcap lksctp-tools
+      attr
+      keyutils
+      libaio
+      libapparmor
+      libcap
+      lksctp-tools
     ];
 
   makeFlags = [
@@ -36,7 +53,7 @@ stdenv.mkDerivation rec {
   # install phase without checking the dependencies. This will prevent
   # triggering the rebuild. Why this only happens on i686 remains a
   # mystery, though. :-(
-  enableParallelBuilding = (!stdenv.isi686);
+  enableParallelBuilding = !stdenv.isi686;
 
   meta = with lib; {
     description = "Stress test a computer system";
@@ -68,7 +85,7 @@ stdenv.mkDerivation rec {
     downloadPage = "https://github.com/ColinIanKing/stress-ng/tags";
     changelog = "https://github.com/ColinIanKing/stress-ng/raw/V${version}/debian/changelog";
     license = licenses.gpl2Plus;
-    maintainers = with maintainers; [ c0bw3b ];
+    maintainers = with maintainers; [c0bw3b];
     platforms = platforms.unix;
   };
 }

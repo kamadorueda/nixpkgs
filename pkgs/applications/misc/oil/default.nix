@@ -1,5 +1,12 @@
-{ stdenvNoCC, lib, fetchFromGitHub, jq, gawk, peco, makeWrapper }:
-
+{
+  stdenvNoCC,
+  lib,
+  fetchFromGitHub,
+  jq,
+  gawk,
+  peco,
+  makeWrapper,
+}:
 stdenvNoCC.mkDerivation rec {
   pname = "oil-buku";
   version = "0.3.2";
@@ -28,11 +35,11 @@ stdenvNoCC.mkDerivation rec {
       "/usr/bin/env -S awk" "${gawk}/bin/awk"
   '';
 
-  nativeBuildInputs = [ makeWrapper ];
+  nativeBuildInputs = [makeWrapper];
 
   postFixup = ''
     wrapProgram $out/bin/oil \
-        --prefix PATH : ${lib.makeBinPath [ peco ]}
+        --prefix PATH : ${lib.makeBinPath [peco]}
   '';
 
   meta = with lib; {
@@ -40,6 +47,6 @@ stdenvNoCC.mkDerivation rec {
     homepage = "https://github.com/AndreiUlmeyda/oil";
     license = licenses.gpl3Only;
     platforms = platforms.unix;
-    maintainers = with maintainers; [ atila ];
+    maintainers = with maintainers; [atila];
   };
 }

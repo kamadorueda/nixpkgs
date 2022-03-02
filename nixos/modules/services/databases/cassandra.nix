@@ -1,7 +1,11 @@
-{ config, lib, pkgs, ... }:
-
-let
-  inherit (lib)
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
+  inherit
+    (lib)
     concatStringsSep
     flip
     literalDocBook
@@ -20,38 +24,41 @@ let
 
   defaultUser = "cassandra";
 
-  cassandraConfig = flip recursiveUpdate cfg.extraConfig (
-    {
+  cassandraConfig = flip recursiveUpdate cfg.extraConfig ({
       commitlog_sync = "batch";
       commitlog_sync_batch_window_in_ms = 2;
       start_native_transport = cfg.allowClients;
       cluster_name = cfg.clusterName;
       partitioner = "org.apache.cassandra.dht.Murmur3Partitioner";
       endpoint_snitch = "SimpleSnitch";
-      data_file_directories = [ "${cfg.homeDir}/data" ];
+      data_file_directories = ["${cfg.homeDir}/data"];
       commitlog_directory = "${cfg.homeDir}/commitlog";
       saved_caches_directory = "${cfg.homeDir}/saved_caches";
-    } // optionalAttrs (cfg.seedAddresses != [ ]) {
+    }
+    // optionalAttrs (cfg.seedAddresses != []) {
       seed_provider = [
         {
           class_name = "org.apache.cassandra.locator.SimpleSeedProvider";
-          parameters = [{ seeds = concatStringsSep "," cfg.seedAddresses; }];
+          parameters = [{seeds = concatStringsSep "," cfg.seedAddresses;}];
         }
       ];
-    } // optionalAttrs (versionAtLeast cfg.package.version "3") {
-      hints_directory = "${cfg.homeDir}/hints";
     }
-  );
+    // optionalAttrs (versionAtLeast cfg.package.version "3") {
+      hints_directory = "${cfg.homeDir}/hints";
+    });
 
-  cassandraConfigWithAddresses = cassandraConfig // (
-    if cfg.listenAddress == null
-    then { listen_interface = cfg.listenInterface; }
-    else { listen_address = cfg.listenAddress; }
-  ) // (
-    if cfg.rpcAddress == null
-    then { rpc_interface = cfg.rpcInterface; }
-    else { rpc_address = cfg.rpcAddress; }
-  );
+  cassandraConfigWithAddresses =
+    cassandraConfig
+    // (
+      if cfg.listenAddress == null
+      then {listen_interface = cfg.listenInterface;}
+      else {listen_address = cfg.listenAddress;}
+    )
+    // (
+      if cfg.rpcAddress == null
+      then {rpc_interface = cfg.rpcInterface;}
+      else {rpc_address = cfg.rpcAddress;}
+    );
 
   cassandraEtc = pkgs.stdenv.mkDerivation {
     name = "cassandra-etc";
@@ -60,7 +67,7 @@ let
     cassandraEnvPkg = "${cfg.package}/conf/cassandra-env.sh";
     cassandraLogbackConfig = pkgs.writeText "logback.xml" cfg.logbackConfig;
 
-    passAsFile = [ "extraEnvSh" ];
+    passAsFile = ["extraEnvSh"];
     inherit (cfg) extraEnvSh;
 
     buildCommand = ''
@@ -84,22 +91,20 @@ let
 
   defaultJmxRolesFile =
     builtins.foldl'
-      (left: right: left + right) ""
-      (map (role: "${role.username} ${role.password}") cfg.jmxRoles);
+    (left: right: left + right) ""
+    (map (role: "${role.username} ${role.password}") cfg.jmxRoles);
 
   fullJvmOptions =
     cfg.jvmOpts
-    ++ optionals (cfg.jmxRoles != [ ]) [
+    ++ optionals (cfg.jmxRoles != []) [
       "-Dcom.sun.management.jmxremote.authenticate=true"
       "-Dcom.sun.management.jmxremote.password.file=${cfg.jmxRolesFile}"
-    ] ++ optionals cfg.remoteJmx [
+    ]
+    ++ optionals cfg.remoteJmx [
       "-Djava.rmi.server.hostname=${cfg.rpcAddress}"
     ];
-
-in
-{
+in {
   options.services.cassandra = {
-
     enable = mkEnableOption ''
       Apache Cassandra – Scalable and highly available database.
     '';
@@ -146,7 +151,7 @@ in
 
     jvmOpts = mkOption {
       type = types.listOf types.str;
-      default = [ ];
+      default = [];
       description = ''
         Populate the JVM_OPT environment variable.
       '';
@@ -240,7 +245,7 @@ in
 
     seedAddresses = mkOption {
       type = types.listOf types.str;
-      default = [ "127.0.0.1" ];
+      default = ["127.0.0.1"];
       description = ''
         The addresses of hosts designated as contact points in the cluster. A
         joining node contacts one of the nodes in the seeds list to learn the
@@ -264,11 +269,10 @@ in
 
     extraConfig = mkOption {
       type = types.attrs;
-      default = { };
-      example =
-        {
-          commitlog_sync_batch_window_in_ms = 3;
-        };
+      default = {};
+      example = {
+        commitlog_sync_batch_window_in_ms = 3;
+      };
       description = ''
         Extra options to be merged into cassandra.yaml as nix attribute set.
       '';
@@ -299,8 +303,8 @@ in
 
     fullRepairOptions = mkOption {
       type = types.listOf types.str;
-      default = [ ];
-      example = [ "--partitioner-range" ];
+      default = [];
+      example = ["--partitioner-range"];
       description = ''
         Options passed through to the full repair command.
       '';
@@ -322,8 +326,8 @@ in
 
     incrementalRepairOptions = mkOption {
       type = types.listOf types.str;
-      default = [ ];
-      example = [ "--partitioner-range" ];
+      default = [];
+      example = ["--partitioner-range"];
       description = ''
         Options passed through to the incremental repair command.
       '';
@@ -407,7 +411,7 @@ in
     };
 
     jmxRoles = mkOption {
-      default = [ ];
+      default = [];
       description = ''
         Roles that are allowed to access the JMX (e.g. nodetool)
         BEWARE: The passwords will be stored world readable in the nix-store.
@@ -484,17 +488,20 @@ in
 
     systemd.services.cassandra = {
       description = "Apache Cassandra service";
-      after = [ "network.target" ];
+      after = ["network.target"];
       environment = {
         CASSANDRA_CONF = "${cassandraEtc}";
         JVM_OPTS = builtins.concatStringsSep " " fullJvmOptions;
         MAX_HEAP_SIZE = toString cfg.maxHeapSize;
         HEAP_NEWSIZE = toString cfg.heapNewSize;
         MALLOC_ARENA_MAX = toString cfg.mallocArenaMax;
-        LOCAL_JMX = if cfg.remoteJmx then "no" else "yes";
+        LOCAL_JMX =
+          if cfg.remoteJmx
+          then "no"
+          else "yes";
         JMX_PORT = toString cfg.jmxPort;
       };
-      wantedBy = [ "multi-user.target" ];
+      wantedBy = ["multi-user.target"];
       serviceConfig = {
         User = cfg.user;
         Group = cfg.group;
@@ -505,59 +512,59 @@ in
 
     systemd.services.cassandra-full-repair = {
       description = "Perform a full repair on this Cassandra node";
-      after = [ "cassandra.service" ];
-      requires = [ "cassandra.service" ];
+      after = ["cassandra.service"];
+      requires = ["cassandra.service"];
       serviceConfig = {
         User = cfg.user;
         Group = cfg.group;
         ExecStart =
           concatStringsSep " "
-            ([
+          ([
               "${cfg.package}/bin/nodetool"
               "repair"
               "--full"
-            ] ++ cfg.fullRepairOptions);
+            ]
+            ++ cfg.fullRepairOptions);
       };
     };
 
-    systemd.timers.cassandra-full-repair =
-      mkIf (cfg.fullRepairInterval != null) {
-        description = "Schedule full repairs on Cassandra";
-        wantedBy = [ "timers.target" ];
-        timerConfig = {
-          OnBootSec = cfg.fullRepairInterval;
-          OnUnitActiveSec = cfg.fullRepairInterval;
-          Persistent = true;
-        };
+    systemd.timers.cassandra-full-repair = mkIf (cfg.fullRepairInterval != null) {
+      description = "Schedule full repairs on Cassandra";
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnBootSec = cfg.fullRepairInterval;
+        OnUnitActiveSec = cfg.fullRepairInterval;
+        Persistent = true;
       };
+    };
 
     systemd.services.cassandra-incremental-repair = {
       description = "Perform an incremental repair on this cassandra node.";
-      after = [ "cassandra.service" ];
-      requires = [ "cassandra.service" ];
+      after = ["cassandra.service"];
+      requires = ["cassandra.service"];
       serviceConfig = {
         User = cfg.user;
         Group = cfg.group;
         ExecStart =
           concatStringsSep " "
-            ([
+          ([
               "${cfg.package}/bin/nodetool"
               "repair"
-            ] ++ cfg.incrementalRepairOptions);
+            ]
+            ++ cfg.incrementalRepairOptions);
       };
     };
 
-    systemd.timers.cassandra-incremental-repair =
-      mkIf (cfg.incrementalRepairInterval != null) {
-        description = "Schedule incremental repairs on Cassandra";
-        wantedBy = [ "timers.target" ];
-        timerConfig = {
-          OnBootSec = cfg.incrementalRepairInterval;
-          OnUnitActiveSec = cfg.incrementalRepairInterval;
-          Persistent = true;
-        };
+    systemd.timers.cassandra-incremental-repair = mkIf (cfg.incrementalRepairInterval != null) {
+      description = "Schedule incremental repairs on Cassandra";
+      wantedBy = ["timers.target"];
+      timerConfig = {
+        OnBootSec = cfg.incrementalRepairInterval;
+        OnUnitActiveSec = cfg.incrementalRepairInterval;
+        Persistent = true;
       };
+    };
   };
 
-  meta.maintainers = with lib.maintainers; [ roberth ];
+  meta.maintainers = with lib.maintainers; [roberth];
 }

@@ -1,19 +1,17 @@
-import ./make-test-python.nix ({ pkgs, ... }:
-
-{
+import ./make-test-python.nix ({pkgs, ...}: {
   name = "buildkite-agent";
   meta = with pkgs.lib.maintainers; {
-    maintainers = [ flokli ];
+    maintainers = [flokli];
   };
 
-  machine = { pkgs, ... }: {
+  machine = {pkgs, ...}: {
     services.buildkite-agents = {
       one = {
         privateSshKeyPath = (import ./ssh-keys.nix pkgs).snakeOilPrivateKey;
-        tokenPath = (pkgs.writeText "my-token" "5678");
+        tokenPath = pkgs.writeText "my-token" "5678";
       };
       two = {
-        tokenPath = (pkgs.writeText "my-token" "1234");
+        tokenPath = pkgs.writeText "my-token" "1234";
       };
     };
   };

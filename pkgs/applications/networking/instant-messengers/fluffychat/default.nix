@@ -1,11 +1,11 @@
-{ lib
-, fetchFromGitLab
-, flutter
-, olm
-, imagemagick
-, makeDesktopItem
+{
+  lib,
+  fetchFromGitLab,
+  flutter,
+  olm,
+  imagemagick,
+  makeDesktopItem,
 }:
-
 flutter.mkFlutterApp rec {
   pname = "fluffychat";
   version = "1.2.0";
@@ -75,7 +75,7 @@ flutter.mkFlutterApp rec {
     description = "Chat with your friends (matrix client)";
     homepage = "https://fluffychat.im/";
     license = licenses.agpl3Plus;
-    maintainers = with maintainers; [ mkg20001 ];
+    maintainers = with maintainers; [mkg20001];
     platforms = platforms.linux;
   };
 }

@@ -1,21 +1,21 @@
-{ lib
-, stdenv
-, toPythonModule
-, fetchFromGitHub
-, cmake
-, boost
-, eigen
-, ipopt
-, nlopt
-, pagmo2
-, python
-, cloudpickle
-, ipyparallel
-, numba
-, numpy
-, pybind11
+{
+  lib,
+  stdenv,
+  toPythonModule,
+  fetchFromGitHub,
+  cmake,
+  boost,
+  eigen,
+  ipopt,
+  nlopt,
+  pagmo2,
+  python,
+  cloudpickle,
+  ipyparallel,
+  numba,
+  numpy,
+  pybind11,
 }:
-
 toPythonModule (stdenv.mkDerivation rec {
   pname = "pygmo";
   version = "2.18.0";
@@ -58,6 +58,6 @@ toPythonModule (stdenv.mkDerivation rec {
     description = "Parallel optimisation for Python";
     homepage = "https://github.com/esa/pygmo2";
     license = licenses.gpl3Plus;
-    maintainers = [ maintainers.costrouc ];
+    maintainers = [maintainers.costrouc];
   };
 })

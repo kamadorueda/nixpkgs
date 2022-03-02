@@ -1,5 +1,12 @@
-{ stdenv, lib, fetchurl, fetchpatch, ocaml, findlib, ocaml_pcre }:
-
+{
+  stdenv,
+  lib,
+  fetchurl,
+  fetchpatch,
+  ocaml,
+  findlib,
+  ocaml_pcre,
+}:
 stdenv.mkDerivation rec {
   pname = "ocaml${ocaml.version}-inifiles";
   version = "1.2";
@@ -16,12 +23,12 @@ stdenv.mkDerivation rec {
     })
   ];
 
-  nativeBuildInputs = [ ocaml findlib ];
-  propagatedBuildInputs = [ ocaml_pcre ];
+  nativeBuildInputs = [ocaml findlib];
+  propagatedBuildInputs = [ocaml_pcre];
 
   strictDeps = true;
 
-  buildFlags = [ "all" "opt" ];
+  buildFlags = ["all" "opt"];
 
   createFindlibDestdir = true;
 

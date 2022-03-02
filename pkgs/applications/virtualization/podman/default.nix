@@ -1,20 +1,20 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, pkg-config
-, installShellFiles
-, buildGoModule
-, gpgme
-, lvm2
-, btrfs-progs
-, libapparmor
-, libseccomp
-, libselinux
-, systemd
-, go-md2man
-, nixosTests
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  pkg-config,
+  installShellFiles,
+  buildGoModule,
+  gpgme,
+  lvm2,
+  btrfs-progs,
+  libapparmor,
+  libseccomp,
+  libselinux,
+  systemd,
+  go-md2man,
+  nixosTests,
 }:
-
 buildGoModule rec {
   pname = "podman";
   version = "4.0.1";
@@ -30,9 +30,9 @@ buildGoModule rec {
 
   doCheck = false;
 
-  outputs = [ "out" "man" ] ++ lib.optionals stdenv.isLinux [ "rootlessport" ];
+  outputs = ["out" "man"] ++ lib.optionals stdenv.isLinux ["rootlessport"];
 
-  nativeBuildInputs = [ pkg-config go-md2man installShellFiles ];
+  nativeBuildInputs = [pkg-config go-md2man installShellFiles];
 
   buildInputs = lib.optionals stdenv.isLinux [
     btrfs-progs
@@ -47,28 +47,36 @@ buildGoModule rec {
   buildPhase = ''
     runHook preBuild
     patchShebangs .
-    ${if stdenv.isDarwin then ''
-      make podman-remote # podman-mac-helper uses FHS paths
-    '' else ''
-      make bin/podman bin/rootlessport
-    ''}
+    ${
+      if stdenv.isDarwin
+      then ''
+        make podman-remote # podman-mac-helper uses FHS paths
+      ''
+      else ''
+        make bin/podman bin/rootlessport
+      ''
+    }
     make docs
     runHook postBuild
   '';
 
   installPhase = ''
     runHook preInstall
-    ${if stdenv.isDarwin then ''
-      mv bin/{darwin/podman,podman}
-    '' else ''
-      install -Dm644 cni/87-podman-bridge.conflist -t $out/etc/cni/net.d
-      install -Dm644 contrib/tmpfile/podman.conf -t $out/lib/tmpfiles.d
-      for s in contrib/systemd/**/*.in; do
-        substituteInPlace "$s" --replace "@@PODMAN@@" "podman" # don't use unwrapped binary
-      done
-      PREFIX=$out make install.systemd
-      install -Dm555 bin/rootlessport -t $rootlessport/bin
-    ''}
+    ${
+      if stdenv.isDarwin
+      then ''
+        mv bin/{darwin/podman,podman}
+      ''
+      else ''
+        install -Dm644 cni/87-podman-bridge.conflist -t $out/etc/cni/net.d
+        install -Dm644 contrib/tmpfile/podman.conf -t $out/lib/tmpfiles.d
+        for s in contrib/systemd/**/*.in; do
+          substituteInPlace "$s" --replace "@@PODMAN@@" "podman" # don't use unwrapped binary
+        done
+        PREFIX=$out make install.systemd
+        install -Dm555 bin/rootlessport -t $rootlessport/bin
+      ''
+    }
     install -Dm555 bin/podman -t $out/bin
     PREFIX=$out make install.completions
     MANDIR=$man/share/man make install.man
@@ -77,13 +85,14 @@ buildGoModule rec {
 
   postFixup = lib.optionalString stdenv.isLinux ''
     RPATH=$(patchelf --print-rpath $out/bin/podman)
-    patchelf --set-rpath "${lib.makeLibraryPath [ systemd ]}":$RPATH $out/bin/podman
+    patchelf --set-rpath "${lib.makeLibraryPath [systemd]}":$RPATH $out/bin/podman
   '';
 
   passthru.tests = {
     inherit (nixosTests) podman;
     # related modules
-    inherit (nixosTests)
+    inherit
+      (nixosTests)
       podman-tls-ghostunnel
       podman-dnsname
       ;
@@ -94,6 +103,6 @@ buildGoModule rec {
     description = "A program for managing pods, containers and container images";
     changelog = "https://github.com/containers/podman/blob/v${version}/RELEASE_NOTES.md";
     license = licenses.asl20;
-    maintainers = with maintainers; [ marsam ] ++ teams.podman.members;
+    maintainers = with maintainers; [marsam] ++ teams.podman.members;
   };
 }

@@ -1,6 +1,11 @@
-{ lib, stdenv, fetchzip, makeWrapper, perlPackages,
-... }:
-
+{
+  lib,
+  stdenv,
+  fetchzip,
+  makeWrapper,
+  perlPackages,
+  ...
+}:
 stdenv.mkDerivation rec {
   appname = "popfile";
   version = "1.1.3";
@@ -12,8 +17,8 @@ stdenv.mkDerivation rec {
     stripRoot = false;
   };
 
-  nativeBuildInputs = [ makeWrapper ];
-  buildInputs = (with perlPackages; [
+  nativeBuildInputs = [makeWrapper];
+  buildInputs = with perlPackages; [
     ## These are all taken from the popfile documentation as applicable to Linux
     ## https://getpopfile.org/docs/howtos:allplatformsrequireperl
     perl
@@ -27,7 +32,7 @@ stdenv.mkDerivation rec {
     IOSocketSSL
     NetSSLeay
     SOAPLite
-  ]);
+  ];
 
   installPhase = ''
     mkdir -p $out/bin

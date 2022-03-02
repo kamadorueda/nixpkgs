@@ -1,5 +1,9 @@
-{ lib, buildGoModule, fetchFromGitHub, nixosTests }:
-
+{
+  lib,
+  buildGoModule,
+  fetchFromGitHub,
+  nixosTests,
+}:
 buildGoModule rec {
   pname = "shiori";
   version = "1.5.2";
@@ -23,6 +27,6 @@ buildGoModule rec {
     description = "Simple bookmark manager built with Go";
     homepage = "https://github.com/go-shiori/shiori";
     license = licenses.mit;
-    maintainers = with maintainers; [ minijackson ];
+    maintainers = with maintainers; [minijackson];
   };
 }

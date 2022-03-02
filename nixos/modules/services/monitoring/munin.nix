@@ -1,23 +1,23 @@
-{ config, lib, pkgs, ... }:
-
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 # TODO: support munin-async
 # TODO: LWP/Pg perl libs aren't recognized
-
 # TODO: support fastcgi
 # http://guide.munin-monitoring.org/en/latest/example/webserver/apache-cgi.html
 # spawn-fcgi -s /run/munin/fastcgi-graph.sock -U www-data   -u munin -g munin /usr/lib/munin/cgi/munin-cgi-graph
 # spawn-fcgi -s /run/munin/fastcgi-html.sock  -U www-data   -u munin -g munin /usr/lib/munin/cgi/munin-cgi-html
 # https://paste.sh/vofcctHP#-KbDSXVeWoifYncZmLfZzgum
 # nginx https://munin.readthedocs.org/en/latest/example/webserver/nginx.html
-
-
-with lib;
-
-let
+with lib; let
   nodeCfg = config.services.munin-node;
   cronCfg = config.services.munin-cron;
 
-  muninConf = pkgs.writeText "munin.conf"
+  muninConf =
+    pkgs.writeText "munin.conf"
     ''
       dbdir     /var/lib/munin
       htmldir   /var/www/munin
@@ -31,7 +31,8 @@ let
       ${cronCfg.hosts}
     '';
 
-  nodeConf = pkgs.writeText "munin-node.conf"
+  nodeConf =
+    pkgs.writeText "munin-node.conf"
     ''
       log_level 3
       log_file Sys::Syslog
@@ -52,7 +53,8 @@ let
       ${nodeCfg.extraConfig}
     '';
 
-  pluginConf = pkgs.writeText "munin-plugin-conf"
+  pluginConf =
+    pkgs.writeText "munin-plugin-conf"
     ''
       [hddtemp_smartctl]
       user root
@@ -83,15 +85,13 @@ let
   # Copy one Munin plugin into the Nix store with a specific name.
   # This is suitable for use with plugins going directly into /etc/munin/plugins,
   # i.e. munin.extraPlugins.
-  internOnePlugin = name: path:
-    "cp -a '${path}' '${name}'";
+  internOnePlugin = name: path: "cp -a '${path}' '${name}'";
 
   # Copy an entire tree of Munin plugins into a single directory in the Nix
   # store, with no renaming.
   # This is suitable for use with munin-node-configure --suggest, i.e.
   # munin.extraAutoPlugins.
-  internManyPlugins = name: path:
-    "find '${path}' -type f -perm /a+x -exec cp -a -t . '{}' '+'";
+  internManyPlugins = name: path: "find '${path}' -type f -perm /a+x -exec cp -a -t . '{}' '+'";
 
   # Use the appropriate intern-fn to copy the plugins into the store and patch
   # them afterwards in an attempt to get them to run on NixOS.
@@ -99,8 +99,10 @@ let
     pkgs.runCommand name {} ''
       mkdir -p "$out"
       cd "$out"
-      ${lib.concatStringsSep "\n"
-          (lib.attrsets.mapAttrsToList intern-fn paths)}
+      ${
+        lib.concatStringsSep "\n"
+        (lib.attrsets.mapAttrsToList intern-fn paths)
+      }
       chmod -R u+w .
       find . -type f -exec sed -E -i '
         s,(/usr)?/s?bin/,/run/current-system/sw/bin/,g
@@ -111,13 +113,18 @@ let
   # you can just refer to them by name rather than needing to include a copy
   # of munin-contrib in your nixos configuration.
   extraPluginDir = internAndFixPlugins "munin-extra-plugins.d"
-    internOnePlugin nodeCfg.extraPlugins;
+  internOnePlugin
+  nodeCfg.extraPlugins;
 
-  extraAutoPluginDir = internAndFixPlugins "munin-extra-auto-plugins.d"
+  extraAutoPluginDir =
+    internAndFixPlugins "munin-extra-auto-plugins.d"
     internManyPlugins
     (builtins.listToAttrs
       (map
-        (path: { name = baseNameOf path; value = path; })
+        (path: {
+          name = baseNameOf path;
+          value = path;
+        })
         nodeCfg.extraAutoPlugins));
 
   customStaticDir = pkgs.runCommand "munin-custom-static-data" {} ''
@@ -127,14 +134,9 @@ let
     echo "${cronCfg.extraCSS}" >> style.css
     echo "${cronCfg.extraCSS}" >> style-new.css
   '';
-in
-
-{
-
+in {
   options = {
-
     services.munin-node = {
-
       enable = mkOption {
         default = false;
         type = types.bool;
@@ -232,7 +234,7 @@ in
         # TODO: figure out why Munin isn't writing the log file and fix it.
         # In the meantime this at least suppresses a useless graph full of
         # NaNs in the output.
-        default = [ "munin_stats" ];
+        default = ["munin_stats"];
         type = with types; listOf str;
         description = ''
           Munin plugins to disable, even if
@@ -244,12 +246,11 @@ in
           <literal>/var/log/munin/munin-update.log</literal> for timing
           information, and the NixOS build of Munin does not write this file.
         '';
-        example = [ "diskstats" "zfs_usage_*" ];
+        example = ["diskstats" "zfs_usage_*"];
       };
     };
 
     services.munin-cron = {
-
       enable = mkOption {
         default = false;
         type = types.bool;
@@ -310,95 +311,96 @@ in
           }
         '';
       };
-
     };
-
   };
 
-  config = mkMerge [ (mkIf (nodeCfg.enable || cronCfg.enable)  {
+  config = mkMerge [
+    (mkIf (nodeCfg.enable || cronCfg.enable) {
+      environment.systemPackages = [pkgs.munin];
 
-    environment.systemPackages = [ pkgs.munin ];
-
-    users.users.munin = {
-      description = "Munin monitoring user";
-      group = "munin";
-      uid = config.ids.uids.munin;
-      home = "/var/lib/munin";
-    };
-
-    users.groups.munin = {
-      gid = config.ids.gids.munin;
-    };
-
-  }) (mkIf nodeCfg.enable {
-
-    systemd.services.munin-node = {
-      description = "Munin Node";
-      after = [ "network.target" ];
-      wantedBy = [ "multi-user.target" ];
-      path = with pkgs; [ munin smartmontools "/run/current-system/sw" "/run/wrappers" ];
-      environment.MUNIN_LIBDIR = "${pkgs.munin}/lib";
-      environment.MUNIN_PLUGSTATE = "/run/munin";
-      environment.MUNIN_LOGDIR = "/var/log/munin";
-      preStart = ''
-        echo "Updating munin plugins..."
-
-        mkdir -p /etc/munin/plugins
-        rm -rf /etc/munin/plugins/*
-
-        # Autoconfigure builtin plugins
-        ${pkgs.munin}/bin/munin-node-configure --suggest --shell --families contrib,auto,manual --config ${nodeConf} --libdir=${pkgs.munin}/lib/plugins --servicedir=/etc/munin/plugins --sconfdir=${pluginConfDir} 2>/dev/null | ${pkgs.bash}/bin/bash
-
-        # Autoconfigure extra plugins
-        ${pkgs.munin}/bin/munin-node-configure --suggest --shell --families contrib,auto,manual --config ${nodeConf} --libdir=${extraAutoPluginDir} --servicedir=/etc/munin/plugins --sconfdir=${pluginConfDir} 2>/dev/null | ${pkgs.bash}/bin/bash
-
-        ${lib.optionalString (nodeCfg.extraPlugins != {}) ''
-            # Link in manually enabled plugins
-            ln -f -s -t /etc/munin/plugins ${extraPluginDir}/*
-          ''}
-
-        ${lib.optionalString (nodeCfg.disabledPlugins != []) ''
-            # Disable plugins
-            cd /etc/munin/plugins
-            rm -f ${toString nodeCfg.disabledPlugins}
-          ''}
-      '';
-      serviceConfig = {
-        ExecStart = "${pkgs.munin}/sbin/munin-node --config ${nodeConf} --servicedir /etc/munin/plugins/ --sconfdir=${pluginConfDir}";
+      users.users.munin = {
+        description = "Munin monitoring user";
+        group = "munin";
+        uid = config.ids.uids.munin;
+        home = "/var/lib/munin";
       };
-    };
 
-    # munin_stats plugin breaks as of 2.0.33 when this doesn't exist
-    systemd.tmpfiles.rules = [ "d /run/munin 0755 munin munin -" ];
-
-  }) (mkIf cronCfg.enable {
-
-    # Munin is hardcoded to use DejaVu Mono and the graphs come out wrong if
-    # it's not available.
-    fonts.fonts = [ pkgs.dejavu_fonts ];
-
-    systemd.timers.munin-cron = {
-      description = "batch Munin master programs";
-      wantedBy = [ "timers.target" ];
-      timerConfig.OnCalendar = "*:0/5";
-    };
-
-    systemd.services.munin-cron = {
-      description = "batch Munin master programs";
-      unitConfig.Documentation = "man:munin-cron(8)";
-
-      serviceConfig = {
-        Type = "oneshot";
-        User = "munin";
-        ExecStart = "${pkgs.munin}/bin/munin-cron --config ${muninConf}";
+      users.groups.munin = {
+        gid = config.ids.gids.munin;
       };
-    };
+    })
+    (mkIf nodeCfg.enable {
+      systemd.services.munin-node = {
+        description = "Munin Node";
+        after = ["network.target"];
+        wantedBy = ["multi-user.target"];
+        path = with pkgs; [munin smartmontools "/run/current-system/sw" "/run/wrappers"];
+        environment.MUNIN_LIBDIR = "${pkgs.munin}/lib";
+        environment.MUNIN_PLUGSTATE = "/run/munin";
+        environment.MUNIN_LOGDIR = "/var/log/munin";
+        preStart = ''
+          echo "Updating munin plugins..."
 
-    systemd.tmpfiles.rules = [
-      "d /run/munin 0755 munin munin -"
-      "d /var/log/munin 0755 munin munin -"
-      "d /var/www/munin 0755 munin munin -"
-      "d /var/lib/munin 0755 munin munin -"
-    ];
-  })];
+          mkdir -p /etc/munin/plugins
+          rm -rf /etc/munin/plugins/*
+
+          # Autoconfigure builtin plugins
+          ${pkgs.munin}/bin/munin-node-configure --suggest --shell --families contrib,auto,manual --config ${nodeConf} --libdir=${pkgs.munin}/lib/plugins --servicedir=/etc/munin/plugins --sconfdir=${pluginConfDir} 2>/dev/null | ${pkgs.bash}/bin/bash
+
+          # Autoconfigure extra plugins
+          ${pkgs.munin}/bin/munin-node-configure --suggest --shell --families contrib,auto,manual --config ${nodeConf} --libdir=${extraAutoPluginDir} --servicedir=/etc/munin/plugins --sconfdir=${pluginConfDir} 2>/dev/null | ${pkgs.bash}/bin/bash
+
+          ${
+            lib.optionalString (nodeCfg.extraPlugins != {}) ''
+              # Link in manually enabled plugins
+              ln -f -s -t /etc/munin/plugins ${extraPluginDir}/*
+            ''
+          }
+
+          ${
+            lib.optionalString (nodeCfg.disabledPlugins != []) ''
+              # Disable plugins
+              cd /etc/munin/plugins
+              rm -f ${toString nodeCfg.disabledPlugins}
+            ''
+          }
+        '';
+        serviceConfig = {
+          ExecStart = "${pkgs.munin}/sbin/munin-node --config ${nodeConf} --servicedir /etc/munin/plugins/ --sconfdir=${pluginConfDir}";
+        };
+      };
+
+      # munin_stats plugin breaks as of 2.0.33 when this doesn't exist
+      systemd.tmpfiles.rules = ["d /run/munin 0755 munin munin -"];
+    })
+    (mkIf cronCfg.enable {
+      # Munin is hardcoded to use DejaVu Mono and the graphs come out wrong if
+      # it's not available.
+      fonts.fonts = [pkgs.dejavu_fonts];
+
+      systemd.timers.munin-cron = {
+        description = "batch Munin master programs";
+        wantedBy = ["timers.target"];
+        timerConfig.OnCalendar = "*:0/5";
+      };
+
+      systemd.services.munin-cron = {
+        description = "batch Munin master programs";
+        unitConfig.Documentation = "man:munin-cron(8)";
+
+        serviceConfig = {
+          Type = "oneshot";
+          User = "munin";
+          ExecStart = "${pkgs.munin}/bin/munin-cron --config ${muninConf}";
+        };
+      };
+
+      systemd.tmpfiles.rules = [
+        "d /run/munin 0755 munin munin -"
+        "d /var/log/munin 0755 munin munin -"
+        "d /var/www/munin 0755 munin munin -"
+        "d /var/lib/munin 0755 munin munin -"
+      ];
+    })
+  ];
 }

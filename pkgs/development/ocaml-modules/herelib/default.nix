@@ -1,5 +1,9 @@
-{ lib, buildOcaml, fetchFromGitHub, camlp4 }:
-
+{
+  lib,
+  buildOcaml,
+  fetchFromGitHub,
+  camlp4,
+}:
 buildOcaml rec {
   version = "112.35.00";
   pname = "herelib";
@@ -15,12 +19,12 @@ buildOcaml rec {
 
   strictDeps = true;
 
-  buildInputs = [ camlp4 ];
+  buildInputs = [camlp4];
 
   meta = with lib; {
     homepage = "https://github.com/janestreet/herelib";
     description = "Syntax extension for inserting the current location";
     license = licenses.asl20;
-    maintainers = [ maintainers.ericbmerritt ];
+    maintainers = [maintainers.ericbmerritt];
   };
 }

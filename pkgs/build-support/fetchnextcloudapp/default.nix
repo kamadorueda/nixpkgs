@@ -1,9 +1,15 @@
-{ stdenv, gnutar, findutils, fetchurl, ... }:
-{ name
-, url
-, version
-, sha256
-, patches ? [ ]
+{
+  stdenv,
+  gnutar,
+  findutils,
+  fetchurl,
+  ...
+}: {
+  name,
+  url,
+  version,
+  sha256,
+  patches ? [],
 }:
 stdenv.mkDerivation {
   name = "nc-app-${name}";

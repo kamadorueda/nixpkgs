@@ -1,31 +1,36 @@
-{ config, lib, options, pkgs, ... }:
-
-with lib;
-
-let
+{
+  config,
+  lib,
+  options,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.syncthing;
   opt = options.services.syncthing;
   defaultUser = "syncthing";
   defaultGroup = defaultUser;
 
-  devices = mapAttrsToList (name: device: {
-    deviceID = device.id;
-    inherit (device) name addresses introducer autoAcceptFolders;
-  }) cfg.devices;
+  devices =
+    mapAttrsToList (name: device: {
+      deviceID = device.id;
+      inherit (device) name addresses introducer autoAcceptFolders;
+    })
+    cfg.devices;
 
-  folders = mapAttrsToList ( _: folder: {
-    inherit (folder) path id label type;
-    devices = map (device: { deviceId = cfg.devices.${device}.id; }) folder.devices;
-    rescanIntervalS = folder.rescanInterval;
-    fsWatcherEnabled = folder.watch;
-    fsWatcherDelayS = folder.watchDelay;
-    ignorePerms = folder.ignorePerms;
-    ignoreDelete = folder.ignoreDelete;
-    versioning = folder.versioning;
-  }) (filterAttrs (
-    _: folder:
-    folder.enable
-  ) cfg.folders);
+  folders =
+    mapAttrsToList (_: folder: {
+      inherit (folder) path id label type;
+      devices = map (device: {deviceId = cfg.devices.${device}.id;}) folder.devices;
+      rescanIntervalS = folder.rescanInterval;
+      fsWatcherEnabled = folder.watch;
+      fsWatcherDelayS = folder.watchDelay;
+      ignorePerms = folder.ignorePerms;
+      ignoreDelete = folder.ignoreDelete;
+      versioning = folder.versioning;
+    }) (filterAttrs (_: folder:
+      folder.enable)
+    cfg.folders);
 
   updateConfig = pkgs.writers.writeDash "merge-syncthing-config" ''
     set -efu
@@ -65,8 +70,8 @@ in {
   ###### interface
   options = {
     services.syncthing = {
-
-      enable = mkEnableOption
+      enable =
+        mkEnableOption
         "Syncthing, a self-hosted open-source alternative to Dropbox and Bittorrent Sync";
 
       cert = mkOption {
@@ -110,12 +115,11 @@ in {
         example = {
           bigbox = {
             id = "7CFNTQM-IMTJBHJ-3UWRDIU-ZGQJFR6-VCXZ3NB-XUH3KZO-N52ITXR-LAIYUAU";
-            addresses = [ "tcp://192.168.0.10:51820" ];
+            addresses = ["tcp://192.168.0.10:51820"];
           };
         };
-        type = types.attrsOf (types.submodule ({ name, ... }: {
+        type = types.attrsOf (types.submodule ({name, ...}: {
           options = {
-
             name = mkOption {
               type = types.str;
               default = name;
@@ -158,7 +162,6 @@ in {
                 See <link xlink:href="https://docs.syncthing.net/users/config.html?highlight=autoaccept#config-file-format"/>.
               '';
             };
-
           };
         }));
       };
@@ -191,9 +194,8 @@ in {
             };
           }
         '';
-        type = types.attrsOf (types.submodule ({ name, ... }: {
+        type = types.attrsOf (types.submodule ({name, ...}: {
           options = {
-
             enable = mkOption {
               type = types.bool;
               default = true;
@@ -280,25 +282,26 @@ in {
                   }
                 ]
               '';
-              type = with types; nullOr (submodule {
-                options = {
-                  type = mkOption {
-                    type = enum [ "external" "simple" "staggered" "trashcan" ];
-                    description = ''
-                      The type of versioning.
-                      See <link xlink:href="https://docs.syncthing.net/users/versioning.html"/>.
-                    '';
+              type = with types;
+                nullOr (submodule {
+                  options = {
+                    type = mkOption {
+                      type = enum ["external" "simple" "staggered" "trashcan"];
+                      description = ''
+                        The type of versioning.
+                        See <link xlink:href="https://docs.syncthing.net/users/versioning.html"/>.
+                      '';
+                    };
+                    params = mkOption {
+                      type = attrsOf (either str path);
+                      description = ''
+                        The parameters for versioning. Structure depends on
+                        <link linkend="opt-services.syncthing.folders._name_.versioning.type">versioning.type</link>.
+                        See <link xlink:href="https://docs.syncthing.net/users/versioning.html"/>.
+                      '';
+                    };
                   };
-                  params = mkOption {
-                    type = attrsOf (either str path);
-                    description = ''
-                      The parameters for versioning. Structure depends on
-                      <link linkend="opt-services.syncthing.folders._name_.versioning.type">versioning.type</link>.
-                      See <link xlink:href="https://docs.syncthing.net/users/versioning.html"/>.
-                    '';
-                  };
-                };
-              });
+                });
             };
 
             rescanInterval = mkOption {
@@ -310,7 +313,7 @@ in {
             };
 
             type = mkOption {
-              type = types.enum [ "sendreceive" "sendonly" "receiveonly" ];
+              type = types.enum ["sendreceive" "sendonly" "receiveonly"];
               default = "sendreceive";
               description = ''
                 Whether to only send changes for this folder, only receive them
@@ -426,38 +429,39 @@ in {
 
       configDir = let
         cond = versionAtLeast config.system.stateVersion "19.03";
-      in mkOption {
-        type = types.path;
-        description = ''
-          The path where the settings and keys will exist.
-        '';
-        default = cfg.dataDir + optionalString cond "/.config/syncthing";
-        defaultText = literalDocBook ''
-          <variablelist>
-            <varlistentry>
-              <term><literal>stateVersion >= 19.03</literal></term>
-              <listitem>
-                <programlisting>
-                  config.${opt.dataDir} + "/.config/syncthing"
-                </programlisting>
-              </listitem>
-            </varlistentry>
-            <varlistentry>
-              <term>otherwise</term>
-              <listitem>
-                <programlisting>
-                  config.${opt.dataDir}
-                </programlisting>
-              </listitem>
-            </varlistentry>
-          </variablelist>
-        '';
-      };
+      in
+        mkOption {
+          type = types.path;
+          description = ''
+            The path where the settings and keys will exist.
+          '';
+          default = cfg.dataDir + optionalString cond "/.config/syncthing";
+          defaultText = literalDocBook ''
+            <variablelist>
+              <varlistentry>
+                <term><literal>stateVersion >= 19.03</literal></term>
+                <listitem>
+                  <programlisting>
+                    config.${opt.dataDir} + "/.config/syncthing"
+                  </programlisting>
+                </listitem>
+              </varlistentry>
+              <varlistentry>
+                <term>otherwise</term>
+                <listitem>
+                  <programlisting>
+                    config.${opt.dataDir}
+                  </programlisting>
+                </listitem>
+              </varlistentry>
+            </variablelist>
+          '';
+        };
 
       extraFlags = mkOption {
         type = types.listOf types.str;
         default = [];
-        example = [ "--reset-deltas" ];
+        example = ["--reset-deltas"];
         description = ''
           Extra flags passed to the syncthing command in the service definition.
         '';
@@ -489,34 +493,34 @@ in {
     };
   };
 
-  imports = [
-    (mkRemovedOptionModule [ "services" "syncthing" "useInotify" ] ''
-      This option was removed because Syncthing now has the inotify functionality included under the name "fswatcher".
-      It can be enabled on a per-folder basis through the web interface.
-    '')
-  ] ++ map (o:
-    mkRenamedOptionModule [ "services" "syncthing" "declarative" o ] [ "services" "syncthing" o ]
-  ) [ "cert" "key" "devices" "folders" "overrideDevices" "overrideFolders" "extraOptions"];
+  imports =
+    [
+      (mkRemovedOptionModule ["services" "syncthing" "useInotify"] ''
+        This option was removed because Syncthing now has the inotify functionality included under the name "fswatcher".
+        It can be enabled on a per-folder basis through the web interface.
+      '')
+    ]
+    ++ map (o:
+      mkRenamedOptionModule ["services" "syncthing" "declarative" o] ["services" "syncthing" o]) ["cert" "key" "devices" "folders" "overrideDevices" "overrideFolders" "extraOptions"];
 
   ###### implementation
 
   config = mkIf cfg.enable {
-
     networking.firewall = mkIf cfg.openDefaultPorts {
-      allowedTCPPorts = [ 22000 ];
-      allowedUDPPorts = [ 21027 22000 ];
+      allowedTCPPorts = [22000];
+      allowedUDPPorts = [21027 22000];
     };
 
-    systemd.packages = [ pkgs.syncthing ];
+    systemd.packages = [pkgs.syncthing];
 
     users.users = mkIf (cfg.systemService && cfg.user == defaultUser) {
-      ${defaultUser} =
-        { group = cfg.group;
-          home  = cfg.dataDir;
-          createHome = true;
-          uid = config.ids.uids.syncthing;
-          description = "Syncthing daemon user";
-        };
+      ${defaultUser} = {
+        group = cfg.group;
+        home = cfg.dataDir;
+        createHome = true;
+        uid = config.ids.uids.syncthing;
+        description = "Syncthing daemon user";
+      };
     };
 
     users.groups = mkIf (cfg.systemService && cfg.group == defaultGroup) {
@@ -527,30 +531,38 @@ in {
     systemd.services = {
       syncthing = mkIf cfg.systemService {
         description = "Syncthing service";
-        after = [ "network.target" ];
-        environment = {
-          STNORESTART = "yes";
-          STNOUPGRADE = "yes";
-          inherit (cfg) all_proxy;
-        } // config.networking.proxy.envVars;
-        wantedBy = [ "multi-user.target" ];
+        after = ["network.target"];
+        environment =
+          {
+            STNORESTART = "yes";
+            STNOUPGRADE = "yes";
+            inherit (cfg) all_proxy;
+          }
+          // config.networking.proxy.envVars;
+        wantedBy = ["multi-user.target"];
         serviceConfig = {
           Restart = "on-failure";
           SuccessExitStatus = "2 3 4";
-          RestartForceExitStatus="3 4";
+          RestartForceExitStatus = "3 4";
           User = cfg.user;
           Group = cfg.group;
-          ExecStartPre = mkIf (cfg.cert != null || cfg.key != null)
-            "+${pkgs.writers.writeBash "syncthing-copy-keys" ''
-              install -dm700 -o ${cfg.user} -g ${cfg.group} ${cfg.configDir}
-              ${optionalString (cfg.cert != null) ''
-                install -Dm400 -o ${cfg.user} -g ${cfg.group} ${toString cfg.cert} ${cfg.configDir}/cert.pem
-              ''}
-              ${optionalString (cfg.key != null) ''
-                install -Dm400 -o ${cfg.user} -g ${cfg.group} ${toString cfg.key} ${cfg.configDir}/key.pem
-              ''}
-            ''}"
-          ;
+          ExecStartPre =
+            mkIf (cfg.cert != null || cfg.key != null)
+            "+${
+              pkgs.writers.writeBash "syncthing-copy-keys" ''
+                install -dm700 -o ${cfg.user} -g ${cfg.group} ${cfg.configDir}
+                ${
+                  optionalString (cfg.cert != null) ''
+                    install -Dm400 -o ${cfg.user} -g ${cfg.group} ${toString cfg.cert} ${cfg.configDir}/cert.pem
+                  ''
+                }
+                ${
+                  optionalString (cfg.key != null) ''
+                    install -Dm400 -o ${cfg.user} -g ${cfg.group} ${toString cfg.key} ${cfg.configDir}/key.pem
+                  ''
+                }
+              ''
+            }";
           ExecStart = ''
             ${cfg.package}/bin/syncthing \
               -no-browser \
@@ -571,19 +583,21 @@ in {
           RestrictRealtime = true;
           RestrictSUIDSGID = true;
           CapabilityBoundingSet = [
-            "~CAP_SYS_PTRACE" "~CAP_SYS_ADMIN"
-            "~CAP_SETGID" "~CAP_SETUID" "~CAP_SETPCAP"
-            "~CAP_SYS_TIME" "~CAP_KILL"
+            "~CAP_SYS_PTRACE"
+            "~CAP_SYS_ADMIN"
+            "~CAP_SETGID"
+            "~CAP_SETUID"
+            "~CAP_SETPCAP"
+            "~CAP_SYS_TIME"
+            "~CAP_KILL"
           ];
         };
       };
-      syncthing-init = mkIf (
-        cfg.devices != {} || cfg.folders != {} || cfg.extraOptions != {}
-      ) {
+      syncthing-init = mkIf (cfg.devices != {} || cfg.folders != {} || cfg.extraOptions != {}) {
         description = "Syncthing configuration updater";
-        requisite = [ "syncthing.service" ];
-        after = [ "syncthing.service" ];
-        wantedBy = [ "multi-user.target" ];
+        requisite = ["syncthing.service"];
+        after = ["syncthing.service"];
+        wantedBy = ["multi-user.target"];
 
         serviceConfig = {
           User = cfg.user;
@@ -594,7 +608,7 @@ in {
       };
 
       syncthing-resume = {
-        wantedBy = [ "suspend.target" ];
+        wantedBy = ["suspend.target"];
       };
     };
   };

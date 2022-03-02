@@ -1,5 +1,8 @@
-{ lib, buildPythonPackage, fetchPypi }:
-
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+}:
 buildPythonPackage rec {
   pname = "orderedset";
   version = "2.0.3";
@@ -13,7 +16,7 @@ buildPythonPackage rec {
     description = "An Ordered Set implementation in Cython";
     homepage = "https://pypi.python.org/pypi/orderedset";
     license = licenses.bsd3;
-    maintainers = [ maintainers.jtojnar ];
+    maintainers = [maintainers.jtojnar];
     # No support for Python 3.9/3.10
     # https://github.com/simonpercivall/orderedset/issues/36
     broken = true;

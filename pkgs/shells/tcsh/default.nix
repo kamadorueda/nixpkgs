@@ -1,10 +1,10 @@
-{ lib
-, stdenv
-, fetchurl
-, fetchpatch
-, ncurses
+{
+  lib,
+  stdenv,
+  fetchurl,
+  fetchpatch,
+  ncurses,
 }:
-
 stdenv.mkDerivation rec {
   pname = "tcsh";
   version = "6.23.02";
@@ -27,7 +27,8 @@ stdenv.mkDerivation rec {
     ncurses
   ];
 
-  patches = lib.optional stdenv.hostPlatform.isMusl
+  patches =
+    lib.optional stdenv.hostPlatform.isMusl
     (fetchpatch {
       name = "sysmalloc.patch";
       url = "https://git.alpinelinux.org/aports/plain/community/tcsh/001-sysmalloc.patch?id=184585c046cdd56512f1a76e426dd799b368f8cf";
@@ -50,7 +51,7 @@ stdenv.mkDerivation rec {
       - job control
     '';
     license = licenses.bsd2;
-    maintainers = with maintainers; [ AndersonTorres ];
+    maintainers = with maintainers; [AndersonTorres];
     platforms = platforms.unix;
   };
 

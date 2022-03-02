@@ -1,11 +1,11 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, scipy
-, numba
-, pytestCheckHook
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  scipy,
+  numba,
+  pytestCheckHook,
 }:
-
 buildPythonPackage rec {
   pname = "numba-scipy";
   version = "0.3.0";
@@ -28,13 +28,13 @@ buildPythonPackage rec {
     pytestCheckHook
   ];
 
-  pythonImportsCheck = [ "numba" ];
+  pythonImportsCheck = ["numba"];
 
   meta = with lib; {
     description = "Extends Numba to make it aware of SciPy";
     homepage = "https://github.com/numba/numba-scipy";
     changelog = "https://github.com/numba/numba-scipy/blob/master/CHANGE_LOG";
     license = licenses.bsd2;
-    maintainers = with maintainers; [ Etjean ];
+    maintainers = with maintainers; [Etjean];
   };
 }

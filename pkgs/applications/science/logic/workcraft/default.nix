@@ -1,5 +1,10 @@
-{ lib, stdenv, fetchurl, jre, makeWrapper }:
-
+{
+  lib,
+  stdenv,
+  fetchurl,
+  jre,
+  makeWrapper,
+}:
 stdenv.mkDerivation rec {
   pname = "workcraft";
   version = "3.3.6";
@@ -9,17 +14,17 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-5J4HOTz92ALUcZZr15jJ6vplc3KDwbFCXqjEhlOV4kE=";
   };
 
-  nativeBuildInputs = [ makeWrapper ];
+  nativeBuildInputs = [makeWrapper];
 
   dontConfigure = true;
 
   installPhase = ''
-  mkdir -p $out/share
-  cp -r * $out/share
-  mkdir $out/bin
-  makeWrapper $out/share/workcraft $out/bin/workcraft \
-    --set JAVA_HOME "${jre}" \
-    --set _JAVA_OPTIONS '-Dawt.useSystemAAFontSettings=gasp';
+    mkdir -p $out/share
+    cp -r * $out/share
+    mkdir $out/bin
+    makeWrapper $out/share/workcraft $out/bin/workcraft \
+      --set JAVA_HOME "${jre}" \
+      --set _JAVA_OPTIONS '-Dawt.useSystemAAFontSettings=gasp';
   '';
 
   meta = {
@@ -27,6 +32,6 @@ stdenv.mkDerivation rec {
     description = "Framework for interpreted graph modeling, verification and synthesis";
     platforms = lib.platforms.linux;
     license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [ timor ];
+    maintainers = with lib.maintainers; [timor];
   };
 }

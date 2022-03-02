@@ -1,11 +1,11 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, pyutil
-, setuptoolsTrial
-, twisted
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  pyutil,
+  setuptoolsTrial,
+  twisted,
 }:
-
 buildPythonPackage rec {
   pname = "zfec";
   version = "1.5.7.2";
@@ -15,16 +15,16 @@ buildPythonPackage rec {
     sha256 = "sha256-TuUZvg3MfaLohIK8/Av5d6Ql4dfoJ4z1u7uNAPiir7Y=";
   };
 
-  propagatedBuildInputs = [ pyutil ];
+  propagatedBuildInputs = [pyutil];
 
-  checkInputs = [ setuptoolsTrial twisted ];
+  checkInputs = [setuptoolsTrial twisted];
 
   # argparse is in the stdlib but zfec doesn't know that.
   postPatch = ''
     sed -i -e '/argparse/d' setup.py
   '';
 
-  pythonImportsCheck = [ "zfec" ];
+  pythonImportsCheck = ["zfec"];
 
   meta = with lib; {
     homepage = "https://github.com/tahoe-lafs/zfec";
@@ -38,7 +38,6 @@ buildPythonPackage rec {
       and Haskell API.
     '';
     license = licenses.gpl2Plus;
-    maintainers = with maintainers; [ prusnak ];
+    maintainers = with maintainers; [prusnak];
   };
-
 }

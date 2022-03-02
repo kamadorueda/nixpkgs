@@ -1,13 +1,13 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, pytestCheckHook
-, python
-, mock
-, setuptools-scm
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  pytestCheckHook,
+  python,
+  mock,
+  setuptools-scm,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "pytest-console-scripts";
   version = "1.3";
@@ -49,6 +49,6 @@ buildPythonPackage rec {
     '';
     homepage = "https://github.com/kvas-it/pytest-console-scripts";
     license = licenses.mit;
-    maintainers = with maintainers; [ AluisioASG ];
+    maintainers = with maintainers; [AluisioASG];
   };
 }

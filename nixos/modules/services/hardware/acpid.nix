@@ -1,8 +1,10 @@
-{ config, lib, pkgs, ... }:
-
-with lib;
-
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+with lib; let
   cfg = config.services.acpid;
 
   canonicalHandlers = {
@@ -22,32 +24,28 @@ let
     };
   };
 
-  acpiConfDir = pkgs.runCommand "acpi-events" { preferLocalBuild = true; }
+  acpiConfDir =
+    pkgs.runCommand "acpi-events" {preferLocalBuild = true;}
     ''
       mkdir -p $out
       ${
         # Generate a configuration file for each event. (You can't have
         # multiple events in one config file...)
-        let f = name: handler:
-          ''
+        let
+          f = name: handler: ''
             fn=$out/${name}
             echo "event=${handler.event}" > $fn
-            echo "action=${pkgs.writeShellScriptBin "${name}.sh" handler.action }/bin/${name}.sh '%e'" >> $fn
+            echo "action=${pkgs.writeShellScriptBin "${name}.sh" handler.action}/bin/${name}.sh '%e'" >> $fn
           '';
-        in concatStringsSep "\n" (mapAttrsToList f (canonicalHandlers // cfg.handlers))
+        in
+          concatStringsSep "\n" (mapAttrsToList f (canonicalHandlers // cfg.handlers))
       }
     '';
-
-in
-
-{
-
+in {
   ###### interface
 
   options = {
-
     services.acpid = {
-
       enable = mkEnableOption "the ACPI daemon";
 
       logEvents = mkOption {
@@ -118,38 +116,34 @@ in
         default = "";
         description = "Shell commands to execute on an ac_adapter.* event.";
       };
-
     };
-
   };
-
 
   ###### implementation
 
   config = mkIf cfg.enable {
-
     systemd.services.acpid = {
       description = "ACPI Daemon";
-      documentation = [ "man:acpid(8)" ];
+      documentation = ["man:acpid(8)"];
 
-      wantedBy = [ "multi-user.target" ];
+      wantedBy = ["multi-user.target"];
 
       serviceConfig = {
-        ExecStart = escapeShellArgs
-          ([ "${pkgs.acpid}/bin/acpid"
-             "--foreground"
-             "--netlink"
-             "--confdir" "${acpiConfDir}"
-           ] ++ optional cfg.logEvents "--logevents"
-          );
+        ExecStart =
+          escapeShellArgs
+          ([
+              "${pkgs.acpid}/bin/acpid"
+              "--foreground"
+              "--netlink"
+              "--confdir"
+              "${acpiConfDir}"
+            ]
+            ++ optional cfg.logEvents "--logevents");
       };
       unitConfig = {
         ConditionVirtualization = "!systemd-nspawn";
-        ConditionPathExists = [ "/proc/acpi" ];
+        ConditionPathExists = ["/proc/acpi"];
       };
-
     };
-
   };
-
 }

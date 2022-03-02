@@ -1,4 +1,4 @@
-import ./generic.nix (rec {
+import ./generic.nix rec {
   version = "27.2";
   sha256 = "sha256-tKfMTnjmPzeGJOCRkhW5EK9bsqCvyBn60pgnLp9Awbk=";
   patches = fetchpatch: [
@@ -8,4 +8,4 @@ import ./generic.nix (rec {
       sha256 = "sha256-RF9b5PojFUAjh2TDUW4+HaWveV30Spy1iAXhaWf1ZVg=";
     })
   ];
-})
+}

@@ -1,15 +1,15 @@
-{ mkDerivation
-, lib
-, cmake
-, extra-cmake-modules
-, pkg-config
-, SDL2
-, qttools
-, xorg
-, fetchFromGitHub
-, itstool
+{
+  mkDerivation,
+  lib,
+  cmake,
+  extra-cmake-modules,
+  pkg-config,
+  SDL2,
+  qttools,
+  xorg,
+  fetchFromGitHub,
+  itstool,
 }:
-
 mkDerivation rec {
   pname = "antimicrox";
   version = "3.2.2";
@@ -21,7 +21,7 @@ mkDerivation rec {
     sha256 = "sha256-8DCQAgwXaJxRl6NxzSCow9XpP4HhHw3hlPXvmqpq/nc=";
   };
 
-  nativeBuildInputs = [ cmake extra-cmake-modules pkg-config itstool ];
+  nativeBuildInputs = [cmake extra-cmake-modules pkg-config itstool];
   buildInputs = [
     SDL2
     qttools
@@ -36,7 +36,7 @@ mkDerivation rec {
   meta = with lib; {
     description = "GUI for mapping keyboard and mouse controls to a gamepad";
     inherit (src.meta) homepage;
-    maintainers = with maintainers; [ jb55 sbruder ];
+    maintainers = with maintainers; [jb55 sbruder];
     license = licenses.gpl3Plus;
     platforms = with platforms; linux;
   };

@@ -1,13 +1,23 @@
-{ config, lib, pkgs, ... }:
-
-let
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: let
   cfg = config.services.packagekit;
 
-  inherit (lib)
-    mkEnableOption mkOption mkIf mkRemovedOptionModule types
-    listToAttrs recursiveUpdate;
+  inherit
+    (lib)
+    mkEnableOption
+    mkOption
+    mkIf
+    mkRemovedOptionModule
+    types
+    listToAttrs
+    recursiveUpdate
+    ;
 
-  iniFmt = pkgs.formats.ini { };
+  iniFmt = pkgs.formats.ini {};
 
   confFiles = [
     (iniFmt.generate "PackageKit.conf" (recursiveUpdate
@@ -31,11 +41,9 @@ let
       }
       cfg.vendorSettings))
   ];
-
-in
-{
+in {
   imports = [
-    (mkRemovedOptionModule [ "services" "packagekit" "backend" ] "Always set to Nix.")
+    (mkRemovedOptionModule ["services" "packagekit" "backend"] "Always set to Nix.")
   ];
 
   options.services.packagekit = {
@@ -47,28 +55,27 @@ in
 
     settings = mkOption {
       type = iniFmt.type;
-      default = { };
+      default = {};
       description = "Additional settings passed straight through to PackageKit.conf";
     };
 
     vendorSettings = mkOption {
       type = iniFmt.type;
-      default = { };
+      default = {};
       description = "Additional settings passed straight through to Vendor.conf";
     };
   };
 
   config = mkIf cfg.enable {
+    services.dbus.packages = with pkgs; [packagekit];
 
-    services.dbus.packages = with pkgs; [ packagekit ];
+    environment.systemPackages = with pkgs; [packagekit];
 
-    environment.systemPackages = with pkgs; [ packagekit ];
-
-    systemd.packages = with pkgs; [ packagekit ];
+    systemd.packages = with pkgs; [packagekit];
 
     environment.etc = listToAttrs (map
       (e:
-        lib.nameValuePair "PackageKit/${e.name}" { source = e; })
+        lib.nameValuePair "PackageKit/${e.name}" {source = e;})
       confFiles);
   };
 }

@@ -1,76 +1,79 @@
-{ version
-, javaVersion
-, platforms
-, hashes ? import ./hashes.nix
-, useMusl ? false
-}:
-
-{ stdenv
-, lib
-, autoPatchelfHook
-, fetchurl
-, makeWrapper
-, setJavaClassPath
-, writeShellScriptBin
+{
+  version,
+  javaVersion,
+  platforms,
+  hashes ? import ./hashes.nix,
+  useMusl ? false,
+}: {
+  stdenv,
+  lib,
+  autoPatchelfHook,
+  fetchurl,
+  makeWrapper,
+  setJavaClassPath,
+  writeShellScriptBin,
   # minimum dependencies
-, alsa-lib
-, fontconfig
-, Foundation
-, freetype
-, glibc
-, openssl
-, perl
-, unzip
-, xorg
-, zlib
+  alsa-lib,
+  fontconfig,
+  Foundation,
+  freetype,
+  glibc,
+  openssl,
+  perl,
+  unzip,
+  xorg,
+  zlib,
   # runtime dependencies
-, binutils
-, cups
-, gcc
-, musl
+  binutils,
+  cups,
+  gcc,
+  musl,
   # runtime dependencies for GTK+ Look and Feel
-, gtkSupport ? stdenv.isLinux
-, cairo
-, glib
-, gtk3
+  gtkSupport ? stdenv.isLinux,
+  cairo,
+  glib,
+  gtk3,
 }:
+assert useMusl -> stdenv.isLinux; let
+  platform =
+    {
+      aarch64-linux = "linux-aarch64";
+      x86_64-linux = "linux-amd64";
+      x86_64-darwin = "darwin-amd64";
+    }
+    .${stdenv.system}
+    or (throw "Unsupported system: ${stdenv.system}");
 
-assert useMusl -> stdenv.isLinux;
-
-let
-  platform = {
-    aarch64-linux = "linux-aarch64";
-    x86_64-linux = "linux-amd64";
-    x86_64-darwin = "darwin-amd64";
-  }.${stdenv.system} or (throw "Unsupported system: ${stdenv.system}");
-
-  runtimeLibraryPath = lib.makeLibraryPath
-    ([ cups ] ++ lib.optionals gtkSupport [ cairo glib gtk3 ]);
+  runtimeLibraryPath =
+    lib.makeLibraryPath
+    ([cups] ++ lib.optionals gtkSupport [cairo glib gtk3]);
 
   runtimeDependencies = lib.makeBinPath ([
-    binutils
-    stdenv.cc
-  ] ++ lib.optionals useMusl [
-    (lib.getDev musl)
-    # GraalVM 21.3.0+ expects musl-gcc as <system>-musl-gcc
-    (writeShellScriptBin "${stdenv.system}-musl-gcc" ''${lib.getDev musl}/bin/musl-gcc "$@"'')
-  ]);
+      binutils
+      stdenv.cc
+    ]
+    ++ lib.optionals useMusl [
+      (lib.getDev musl)
+      # GraalVM 21.3.0+ expects musl-gcc as <system>-musl-gcc
+      (writeShellScriptBin "${stdenv.system}-musl-gcc" ''${lib.getDev musl}/bin/musl-gcc "$@"'')
+    ]);
 
   javaVersionPlatform = "${javaVersion}-${platform}";
 
   graalvmXXX-ce = stdenv.mkDerivation rec {
     inherit version;
     name = "graalvm${javaVersion}-ce";
-    srcs =
-      let
-        # Some platforms doesn't have all GraalVM features
-        # e.g.: GraalPython on aarch64-linux
-        # When the platform doesn't have a feature, sha256 is null on hashes.nix
-        # To update hashes.nix file, run `./update.sh <graalvm-ce-version>`
-        maybeFetchUrl = url: if url.sha256 != null then (fetchurl url) else null;
-      in
-      (lib.remove null
-        (map maybeFetchUrl (hashes { inherit javaVersionPlatform; })));
+    srcs = let
+      # Some platforms doesn't have all GraalVM features
+      # e.g.: GraalPython on aarch64-linux
+      # When the platform doesn't have a feature, sha256 is null on hashes.nix
+      # To update hashes.nix file, run `./update.sh <graalvm-ce-version>`
+      maybeFetchUrl = url:
+        if url.sha256 != null
+        then (fetchurl url)
+        else null;
+    in (lib.remove null
+      (map maybeFetchUrl (hashes {inherit javaVersionPlatform;})));
 
     buildInputs = lib.optionals stdenv.isLinux [
       alsa-lib # libasound.so wanted by lib/libjsound.so
@@ -86,7 +89,7 @@ let
       zlib
     ];
 
-    nativeBuildInputs = [ unzip perl autoPatchelfHook makeWrapper ];
+    nativeBuildInputs = [unzip perl autoPatchelfHook makeWrapper];
 
     unpackPhase = ''
       unpack_jar() {
@@ -120,7 +123,9 @@ let
       #
       # We therefor use --strip-components=1 vs 3 depending on the platform.
       tar xf ''${arr[0]} -C $out --strip-components=${
-        if stdenv.isLinux then "1" else "3"
+        if stdenv.isLinux
+        then "1"
+        else "3"
       }
 
       # Sanity check
@@ -137,31 +142,29 @@ let
       done
     '';
 
-    outputs = [ "out" "lib" ];
+    outputs = ["out" "lib"];
 
-    installPhase =
-      let
-        copyClibrariesToOut = basepath: ''
-          # provide libraries needed for static compilation
-          ${
-            if useMusl then
-              "for f in ${musl.stdenv.cc.cc}/lib/* ${musl}/lib/* ${zlib.static}/lib/*; do"
-            else
-              "for f in ${glibc}/lib/* ${glibc.static}/lib/* ${zlib.static}/lib/*; do"
-          }
-            ln -s $f ${basepath}/${platform}/$(basename $f)
-          done
-        '';
-        copyClibrariesToLib = ''
-          # add those libraries to $lib output too, so we can use them with
-          # `native-image -H:CLibraryPath=''${lib.getLib graalvm11-ce}/lib ...` and reduce
-          # closure size by not depending on GraalVM $out (that is much bigger)
-          mkdir -p $lib/lib
-          for f in ${glibc}/lib/*; do
-            ln -s $f $lib/lib/$(basename $f)
-          done
-        '';
-      in
+    installPhase = let
+      copyClibrariesToOut = basepath: ''
+        # provide libraries needed for static compilation
+        ${
+          if useMusl
+          then "for f in ${musl.stdenv.cc.cc}/lib/* ${musl}/lib/* ${zlib.static}/lib/*; do"
+          else "for f in ${glibc}/lib/* ${glibc.static}/lib/* ${zlib.static}/lib/*; do"
+        }
+          ln -s $f ${basepath}/${platform}/$(basename $f)
+        done
+      '';
+      copyClibrariesToLib = ''
+        # add those libraries to $lib output too, so we can use them with
+        # `native-image -H:CLibraryPath=''${lib.getLib graalvm11-ce}/lib ...` and reduce
+        # closure size by not depending on GraalVM $out (that is much bigger)
+        mkdir -p $lib/lib
+        for f in ${glibc}/lib/*; do
+          ln -s $f $lib/lib/$(basename $f)
+        done
+      '';
+    in
       {
         "11-linux-amd64" = ''
           ${copyClibrariesToOut "$out/lib/svm/clibraries"}
@@ -185,7 +188,9 @@ let
         '';
         "11-darwin-amd64" = "";
         "17-darwin-amd64" = "";
-      }.${javaVersionPlatform} + ''
+      }
+      .${javaVersionPlatform}
+      + ''
         # ensure that $lib/lib exists to avoid breaking builds
         mkdir -p $lib/lib
         # jni.h expects jni_md.h to be in the header search path.
@@ -229,12 +234,14 @@ let
     '';
 
     # $out/bin/native-image needs zlib to build native executables.
-    propagatedBuildInputs = [ setJavaClassPath zlib ] ++
+    propagatedBuildInputs =
+      [setJavaClassPath zlib]
+      ++
       # On Darwin native-image calls clang and it
       # tries to include <Foundation/Foundation.h>,
       # and Interactive Ruby (irb) requires OpenSSL
       # headers.
-      lib.optionals stdenv.hostPlatform.isDarwin [ Foundation openssl ];
+      lib.optionals stdenv.hostPlatform.isDarwin [Foundation openssl];
 
     doInstallCheck = true;
     installCheckPhase = ''
@@ -252,7 +259,8 @@ let
       # run on JVM with Graal Compiler
       $out/bin/java -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI -XX:+UseJVMCICompiler HelloWorld | fgrep 'Hello World'
 
-      ${# --static flag doesn't work for darwin
+      ${
+        # --static flag doesn't work for darwin
         lib.optionalString (stdenv.isLinux && !useMusl) ''
           echo "Ahead-Of-Time compilation"
           $out/bin/native-image -H:-CheckToolchain -H:+ReportExceptionStackTraces --no-server HelloWorld
@@ -264,7 +272,8 @@ let
         ''
       }
 
-      ${# --static flag doesn't work for darwin
+      ${
+        # --static flag doesn't work for darwin
         lib.optionalString (stdenv.isLinux && useMusl) ''
           echo "Ahead-Of-Time compilation with --static and --libc=musl"
           $out/bin/native-image --no-server --libc=musl --static HelloWorld
@@ -272,7 +281,8 @@ let
         ''
       }
 
-      ${# TODO: Doesn't work on MacOS, we have this error:
+      ${
+        # TODO: Doesn't work on MacOS, we have this error:
         # "Launching JShell execution engine threw: Operation not permitted (Bind failed)"
         lib.optionalString (stdenv.isLinux) ''
           echo "Testing Jshell"
@@ -293,7 +303,8 @@ let
       export LANG=C
       export LC_ALL=C
       $out/bin/ruby -e 'puts(1 + 1)'
-      ${# FIXME: irb is broken in all platforms
+      ${
+        # FIXME: irb is broken in all platforms
         # TODO: `irb` on MacOS gives an error saying "Could not find OpenSSL
         # headers, install via Homebrew or MacPorts or set OPENSSL_PREFIX", even
         # though `openssl` is in `propagatedBuildInputs`. For more details see:
@@ -318,7 +329,7 @@ let
       inherit platforms;
       homepage = "https://www.graalvm.org/";
       description = "High-Performance Polyglot VM";
-      license = with licenses; [ upl gpl2Classpath bsd3 ];
+      license = with licenses; [upl gpl2Classpath bsd3];
       maintainers = with maintainers; [
         bandresen
         volth
@@ -331,4 +342,4 @@ let
     };
   };
 in
-graalvmXXX-ce
+  graalvmXXX-ce

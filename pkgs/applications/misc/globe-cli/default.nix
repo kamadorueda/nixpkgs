@@ -1,5 +1,9 @@
-{ lib, stdenv, rustPlatform, fetchCrate }:
-
+{
+  lib,
+  stdenv,
+  rustPlatform,
+  fetchCrate,
+}:
 rustPlatform.buildRustPackage rec {
   pname = "globe-cli";
   version = "0.2.0";
@@ -15,6 +19,6 @@ rustPlatform.buildRustPackage rec {
     description = "Display an interactive ASCII globe in your terminal";
     homepage = "https://github.com/adamsky/globe";
     license = licenses.gpl3Only;
-    maintainers = with maintainers; [ devhell ];
+    maintainers = with maintainers; [devhell];
   };
 }

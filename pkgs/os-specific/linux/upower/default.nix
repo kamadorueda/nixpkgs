@@ -1,30 +1,30 @@
-{ lib
-, stdenv
-, fetchFromGitLab
-, pkg-config
-, rsync
-, libxslt
-, meson
-, ninja
-, python3
-, gtk-doc
-, docbook_xsl
-, udev
-, libgudev
-, libusb1
-, glib
-, gobject-introspection
-, gettext
-, systemd
-, useIMobileDevice ? true
-, libimobiledevice
+{
+  lib,
+  stdenv,
+  fetchFromGitLab,
+  pkg-config,
+  rsync,
+  libxslt,
+  meson,
+  ninja,
+  python3,
+  gtk-doc,
+  docbook_xsl,
+  udev,
+  libgudev,
+  libusb1,
+  glib,
+  gobject-introspection,
+  gettext,
+  systemd,
+  useIMobileDevice ? true,
+  libimobiledevice,
 }:
-
 stdenv.mkDerivation rec {
   pname = "upower";
   version = "0.99.15";
 
-  outputs = [ "out" "dev" "devdoc" ];
+  outputs = ["out" "dev" "devdoc"];
 
   src = fetchFromGitLab {
     domain = "gitlab.freedesktop.org";
@@ -47,14 +47,16 @@ stdenv.mkDerivation rec {
     rsync
   ];
 
-  buildInputs = [
-    libgudev
-    libusb1
-    udev
-    systemd
-  ] ++ lib.optionals useIMobileDevice [
-    libimobiledevice
-  ];
+  buildInputs =
+    [
+      libgudev
+      libusb1
+      udev
+      systemd
+    ]
+    ++ lib.optionals useIMobileDevice [
+      libimobiledevice
+    ];
 
   propagatedBuildInputs = [
     glib

@@ -1,17 +1,17 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, bleach
-, bokeh
-, param
-, pyviz-comms
-, markdown
-, pyct
-, testpath
-, tqdm
-, nodejs
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  bleach,
+  bokeh,
+  param,
+  pyviz-comms,
+  markdown,
+  pyct,
+  testpath,
+  tqdm,
+  nodejs,
 }:
-
 buildPythonPackage rec {
   pname = "panel";
   version = "0.12.6";
@@ -48,6 +48,6 @@ buildPythonPackage rec {
     description = "A high level dashboarding library for python visualization libraries";
     homepage = "https://pyviz.org";
     license = licenses.bsd3;
-    maintainers = [ maintainers.costrouc ];
+    maintainers = [maintainers.costrouc];
   };
 }

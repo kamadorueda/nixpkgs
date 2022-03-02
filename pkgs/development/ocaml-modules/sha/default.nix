@@ -1,5 +1,11 @@
-{ lib, fetchurl, buildDunePackage, stdlib-shims, dune-configurator, ounit }:
-
+{
+  lib,
+  fetchurl,
+  buildDunePackage,
+  stdlib-shims,
+  dune-configurator,
+  ounit,
+}:
 buildDunePackage rec {
   pname = "sha";
   version = "1.15.1";
@@ -11,7 +17,7 @@ buildDunePackage rec {
 
   useDune2 = true;
 
-  buildInputs = [ dune-configurator ];
+  buildInputs = [dune-configurator];
 
   propagatedBuildInputs = [
     stdlib-shims
@@ -26,6 +32,6 @@ buildDunePackage rec {
     description = "Binding for SHA interface code in OCaml";
     homepage = "https://github.com/djs55/ocaml-sha/";
     license = licenses.isc;
-    maintainers = with maintainers; [ arthurteisseire ];
+    maintainers = with maintainers; [arthurteisseire];
   };
 }

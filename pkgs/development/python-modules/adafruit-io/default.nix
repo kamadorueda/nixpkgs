@@ -1,13 +1,13 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, paho-mqtt
-, pytestCheckHook
-, pythonOlder
-, requests
-, setuptools-scm
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  paho-mqtt,
+  pytestCheckHook,
+  pythonOlder,
+  requests,
+  setuptools-scm,
 }:
-
 buildPythonPackage rec {
   pname = "adafruit-io";
   version = "2.6.0";
@@ -52,6 +52,6 @@ buildPythonPackage rec {
     description = "Module for interacting with Adafruit IO";
     homepage = "https://github.com/adafruit/Adafruit_IO_Python";
     license = licenses.mit;
-    maintainers = with maintainers; [ fab ];
+    maintainers = with maintainers; [fab];
   };
 }

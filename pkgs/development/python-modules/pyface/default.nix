@@ -1,12 +1,12 @@
-{ lib
-, fetchPypi
-, buildPythonPackage
-, importlib-metadata
-, importlib-resources
-, traits
-, pythonOlder
+{
+  lib,
+  fetchPypi,
+  buildPythonPackage,
+  importlib-metadata,
+  importlib-resources,
+  traits,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "pyface";
   version = "7.4.1";
@@ -34,7 +34,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Traits-capable windowing framework";
     homepage = "https://github.com/enthought/pyface";
-    maintainers = with maintainers; [ knedlsepp ];
+    maintainers = with maintainers; [knedlsepp];
     license = licenses.bsdOriginal;
   };
 }

@@ -1,5 +1,12 @@
-{ lib, stdenv, fetchFromGitHub, qmake4Hook , qt4, libX11, libXext }:
-
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  qmake4Hook,
+  qt4,
+  libX11,
+  libXext,
+}:
 stdenv.mkDerivation rec {
   pname = "qtstyleplugin-kvantum-qt4";
   version = "1.0.1";
@@ -11,8 +18,8 @@ stdenv.mkDerivation rec {
     hash = "sha256-Faex1NF5bJa0GdC+Sz4p6kHaGUtAkqZlNGi0TSc5ckw=";
   };
 
-  nativeBuildInputs = [ qmake4Hook ];
-  buildInputs = [ qt4 libX11 libXext ];
+  nativeBuildInputs = [qmake4Hook];
+  buildInputs = [qt4 libX11 libXext];
 
   sourceRoot = "source/Kvantum";
 
@@ -37,6 +44,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/tsujan/Kvantum";
     license = licenses.gpl3Plus;
     platforms = platforms.linux;
-    maintainers = [ maintainers.bugworm ];
+    maintainers = [maintainers.bugworm];
   };
 }

@@ -1,17 +1,17 @@
-{ lib
-, buildPythonPackage
-, fetchPypi
-, pytestCheckHook
-, google-api-core
-, google-cloud-core
-, google-cloud-testutils
-, libcst
-, mock
-, proto-plus
-, pytest-asyncio
-, pythonOlder
+{
+  lib,
+  buildPythonPackage,
+  fetchPypi,
+  pytestCheckHook,
+  google-api-core,
+  google-cloud-core,
+  google-cloud-testutils,
+  libcst,
+  mock,
+  proto-plus,
+  pytest-asyncio,
+  pythonOlder,
 }:
-
 buildPythonPackage rec {
   pname = "google-cloud-translate";
   version = "3.7.1";
@@ -54,6 +54,6 @@ buildPythonPackage rec {
     description = "Google Cloud Translation API client library";
     homepage = "https://github.com/googleapis/python-translate";
     license = licenses.asl20;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [SuperSandro2000];
   };
 }

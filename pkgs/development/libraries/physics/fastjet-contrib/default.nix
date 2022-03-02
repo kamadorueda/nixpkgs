@@ -1,5 +1,9 @@
-{ lib, stdenv, fetchurl, fastjet }:
-
+{
+  lib,
+  stdenv,
+  fetchurl,
+  fastjet,
+}:
 stdenv.mkDerivation rec {
   pname = "fastjet-contrib";
   version = "1.048";
@@ -9,7 +13,7 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-+ZidO2rrIoSLz5EJXDBgfwJ9PvJ3pPD3BKjw/C52aYE=";
   };
 
-  buildInputs = [ fastjet ];
+  buildInputs = [fastjet];
 
   postPatch = ''
     for f in Makefile.in */Makefile; do
@@ -35,7 +39,7 @@ stdenv.mkDerivation rec {
     homepage = "http://fastjet.fr/";
     changelog = "https://phab.hepforge.org/source/fastjetsvn/browse/contrib/tags/${version}/NEWS?as=source&blame=off";
     license = licenses.gpl2Plus;
-    maintainers = with maintainers; [ veprbl ];
+    maintainers = with maintainers; [veprbl];
     platforms = platforms.unix;
   };
 }

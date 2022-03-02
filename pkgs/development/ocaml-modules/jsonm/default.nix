@@ -1,5 +1,13 @@
-{ stdenv, lib, fetchurl, ocaml, findlib, ocamlbuild, topkg, uutf }:
-
+{
+  stdenv,
+  lib,
+  fetchurl,
+  ocaml,
+  findlib,
+  ocamlbuild,
+  topkg,
+  uutf,
+}:
 stdenv.mkDerivation rec {
   pname = "ocaml${ocaml.version}-jsonm";
   version = "1.0.1";
@@ -9,9 +17,9 @@ stdenv.mkDerivation rec {
     sha256 = "1176dcmxb11fnw49b7yysvkjh0kpzx4s48lmdn5psq9vshp5c29w";
   };
 
-  nativeBuildInputs = [ ocaml findlib ocamlbuild topkg ];
-  buildInputs = [ topkg ];
-  propagatedBuildInputs = [ uutf ];
+  nativeBuildInputs = [ocaml findlib ocamlbuild topkg];
+  buildInputs = [topkg];
+  propagatedBuildInputs = [uutf];
 
   strictDeps = true;
 
@@ -21,7 +29,7 @@ stdenv.mkDerivation rec {
     description = "An OCaml non-blocking streaming codec to decode and encode the JSON data format";
     homepage = "https://erratique.ch/software/jsonm";
     license = lib.licenses.bsd3;
-    maintainers = with lib.maintainers; [ vbgl ];
+    maintainers = with lib.maintainers; [vbgl];
     platforms = ocaml.meta.platforms or [];
   };
 }

@@ -1,7 +1,21 @@
-{ lib, stdenv, fetchFromGitHub, pkg-config, intltool, python3, imagemagick, libwnck, libxfce4ui, xfce4-panel, xfconf, xfce4-dev-tools, xfce, gitUpdater }:
-
+{
+  lib,
+  stdenv,
+  fetchFromGitHub,
+  pkg-config,
+  intltool,
+  python3,
+  imagemagick,
+  libwnck,
+  libxfce4ui,
+  xfce4-panel,
+  xfconf,
+  xfce4-dev-tools,
+  xfce,
+  gitUpdater,
+}:
 stdenv.mkDerivation rec {
-  pname  = "xfce4-windowck-plugin";
+  pname = "xfce4-windowck-plugin";
   version = "0.4.10";
 
   src = fetchFromGitHub {
@@ -44,6 +58,6 @@ stdenv.mkDerivation rec {
     description = "Xfce plugins which allows to put the maximized window title and buttons on the panel";
     license = licenses.gpl2Plus;
     platforms = platforms.unix;
-    maintainers = with maintainers; [ volth ] ++ teams.xfce.members;
+    maintainers = with maintainers; [volth] ++ teams.xfce.members;
   };
 }

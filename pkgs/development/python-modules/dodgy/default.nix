@@ -1,13 +1,12 @@
-{ buildPythonPackage
-, fetchFromGitHub
-, isPy3k
-, lib
-
-# pythonPackages
-, mock
-, nose
+{
+  buildPythonPackage,
+  fetchFromGitHub,
+  isPy3k,
+  lib,
+  # pythonPackages
+  mock,
+  nose,
 }:
-
 buildPythonPackage rec {
   pname = "dodgy";
   version = "0.2.1";
