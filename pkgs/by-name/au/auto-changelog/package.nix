@@ -1,52 +1,38 @@
 {
   lib,
-  stdenv,
-  fetchYarnDeps,
+  buildNpmPackage,
   fetchFromGitHub,
-  yarnConfigHook,
-  npmHooks,
-  nodejs,
-  git,
-  nix-update-script,
+  jq,
 }:
-stdenv.mkDerivation (finalAttrs: {
+buildNpmPackage (finalAttrs: {
   pname = "auto-changelog";
-  version = "2.5.0";
+  version = "2.7.0";
 
   src = fetchFromGitHub {
     owner = "cookpete";
     repo = "auto-changelog";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-ticQpDOQieLaWXfavDKIH0jSenRimp5QYeJy42BjpKw=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-STW2iYn2/yJDU0lLDgvaNV/GM8+BzyYCt8bHYUc3AnM=";
   };
 
-  yarnOfflineCache = fetchYarnDeps {
-    yarnLock = "${finalAttrs.src}/yarn.lock";
-    hash = "sha256-NGQbzogQi0XbeGd7fYNyw0i9Yo9j91CfeTdO7nhq4Yw=";
-  };
-
-  nativeBuildInputs = [
-    yarnConfigHook
-    npmHooks.npmInstallHook
-    nodejs
-  ];
-
-  doCheck = true;
-
-  nativeCheckInputs = [ git ];
-
-  checkPhase = ''
-    runHook preCheck
-    yarn --offline run test -i -g 'compileTemplate'
-    runHook postCheck
+  # Upstream does not ship a lockfile (`package-lock=false`): this one is
+  # generated from the production dependencies only, and the lifecycle scripts
+  # (which need the development dependencies) are removed
+  postPatch = ''
+    ${lib.getExe jq} 'del(.devDependencies, .scripts)' package.json > package.json.new
+    mv package.json.new package.json
+    cp ${./package-lock.json} package-lock.json
   '';
 
-  passthru.updateScript = nix-update-script { };
+  npmDepsHash = "sha256-McMDjN+O5ds2XelNP3m8nBfu7ffJGXJmc5Omv280TWY=";
+
+  dontNpmBuild = true;
+  dontNpmPrune = true;
 
   meta = {
     description = "Command line tool for generating a changelog from git tags and commit history";
     homepage = "https://github.com/cookpete/auto-changelog";
-    changelog = "https://github.com/cookpete/auto-changelog/blob/master/CHANGELOG.md";
+    changelog = "https://github.com/cookpete/auto-changelog/blob/v${finalAttrs.version}/CHANGELOG.md";
     license = lib.licenses.mit;
     mainProgram = "auto-changelog";
     maintainers = [ ];
