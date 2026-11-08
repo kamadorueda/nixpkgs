@@ -52,6 +52,6 @@ buildGoModule (finalAttrs: {
     homepage = "https://github.com/maaslalani/gambit";
     changelog = "https://github.com/maaslalani/gambit/releases/tag/${finalAttrs.src.rev}";
     license = lib.licenses.mit;
-    maintainers = [ ];
+    maintainers = with lib.maintainers; [ kamadorueda ];
   };
 })
