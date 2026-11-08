@@ -25,7 +25,7 @@ buildNpmPackage (finalAttrs: {
     homepage = "https://github.com/broofa/runmd";
     changelog = "https://github.com/broofa/runmd/blob/${finalAttrs.src.tag}/CHANGELOG.md";
     license = lib.licenses.mit;
-    maintainers = [ ];
+    maintainers = with lib.maintainers; [ kamadorueda ];
     mainProgram = "runmd";
     platforms = lib.platforms.all;
   };
