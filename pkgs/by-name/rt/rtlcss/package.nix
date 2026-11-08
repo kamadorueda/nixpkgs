@@ -6,16 +6,16 @@
 
 buildNpmPackage rec {
   pname = "rtlcss";
-  version = "4.1.0";
+  version = "4.3.0";
 
   src = fetchFromGitHub {
     owner = "MohammadYounes";
     repo = "rtlcss";
     rev = "v${version}";
-    hash = "sha256-KdAf7jzt8o/YEzT/bLCXj546HX0oC90kr44u3p3qv/k=";
+    hash = "sha256-BIRjy/3yXlvH3z5q0fmVXD7lrbZGVU0SVJaG4uZMZd0=";
   };
 
-  npmDepsHash = "sha256-ghVgvw55w7T9WxokYtlFSgCfGvcOxFzm2wQIFi+6uBY=";
+  npmDepsHash = "sha256-6zZdnogCLXgl1gt6aYMyofIVMaQR3cQRa4z6HoI+CrI=";
 
   dontNpmBuild = true;
 
