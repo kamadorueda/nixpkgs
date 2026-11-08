@@ -34,7 +34,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     homepage = "https://github.com/glicol/glicol-cli";
     changelog = "https://github.com/glicol/glicol-cli/releases/tag/${finalAttrs.src.rev}";
     license = lib.licenses.mit;
-    maintainers = [ ];
+    maintainers = with lib.maintainers; [ kamadorueda ];
     mainProgram = "glicol-cli";
     # The last successful Darwin Hydra build was in 2023
     broken = stdenv.hostPlatform.isDarwin;
