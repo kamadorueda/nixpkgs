@@ -63,7 +63,7 @@ stdenv.mkDerivation (finalAttrs: {
         mit
       ];
     platforms = lib.platforms.unix;
-    maintainers = [ ];
+    maintainers = with lib.maintainers; [ kamadorueda ];
     mainProgram = "chuck";
   };
 })
