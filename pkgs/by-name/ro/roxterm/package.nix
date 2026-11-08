@@ -101,7 +101,7 @@ stdenv.mkDerivation (finalAttrs: {
       lgpl3Plus
     ];
     mainProgram = "roxterm";
-    maintainers = [ ];
+    maintainers = with lib.maintainers; [ kamadorueda ];
     platforms = lib.platforms.linux;
   };
 })
