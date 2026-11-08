@@ -24,6 +24,6 @@ buildNpmPackage rec {
     mainProgram = "rtlcss";
     homepage = "https://rtlcss.com";
     license = lib.licenses.mit;
-    maintainers = [ ];
+    maintainers = with lib.maintainers; [ kamadorueda ];
   };
 }
