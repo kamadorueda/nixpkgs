@@ -29,6 +29,6 @@ buildNpmPackage (finalAttrs: {
     description = "Html language server extension for coc.nvim";
     homepage = "https://github.com/neoclide/coc-html";
     license = lib.licenses.mit;
-    maintainers = [ ];
+    maintainers = with lib.maintainers; [ kamadorueda ];
   };
 })
