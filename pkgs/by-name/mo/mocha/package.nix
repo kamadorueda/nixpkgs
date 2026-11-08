@@ -25,7 +25,7 @@ buildNpmPackage (finalAttrs: {
     description = "Simple, flexible, fun Javascript test framework for Node.js & the browser";
     homepage = "https://mochajs.org";
     license = lib.licenses.mit;
-    maintainers = [ ];
+    maintainers = with lib.maintainers; [ kamadorueda ];
     mainProgram = "mocha";
   };
 })
