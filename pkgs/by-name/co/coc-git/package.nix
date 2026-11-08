@@ -7,20 +7,20 @@
 
 buildNpmPackage (finalAttrs: {
   pname = "coc-git";
-  version = "2.7.7";
+  version = "2.7.15";
 
   src = fetchFromGitHub {
     owner = "neoclide";
     repo = "coc-git";
     tag = finalAttrs.version;
-    hash = "sha256-5AN5G9u4ZGDrP1dfQal9KpOyMZrVqXnxDslnuMwJ9SU=";
+    hash = "sha256-kHJkUvB2DOurELnY72AGvfd+UGlWbRCh55Hyk/RZoAg=";
   };
 
   patches = [
     ./fix-package-lock.patch
   ];
 
-  npmDepsHash = "sha256-vkAATI0vs1oeMr0/iQ8YDt3r+aJo6ND/x4mY/TlRwpg=";
+  npmDepsHash = "sha256-DZL7x0buv9acrqikoo7T04e3USVL5kgTUCBRznAoKA0=";
 
   npmBuildScript = "prepare";
 
