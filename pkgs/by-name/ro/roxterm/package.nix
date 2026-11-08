@@ -31,13 +31,13 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "roxterm";
-  version = "3.18.2";
+  version = "3.99.4";
 
   src = fetchFromGitHub {
     owner = "realh";
     repo = "roxterm";
     rev = finalAttrs.version;
-    hash = "sha256-6izxSEGPu3svO3uRb2oPUm1Mcky9EogIrnadt6czyEk=";
+    hash = "sha256-dXm7eHG4EI8ZEcnBNXHogoI5x5z96KYR39HJw3VqFmE=";
   };
 
   nativeBuildInputs = [
@@ -68,6 +68,11 @@ stdenv.mkDerivation (finalAttrs: {
     util-linuxMinimal
     vte
     xmlto
+  ];
+
+  cmakeFlags = [
+    # CMake 4 dropped compatibility with cmake_minimum_required < 3.5
+    (lib.cmakeFeature "CMAKE_POLICY_VERSION_MINIMUM" "3.5")
   ];
 
   passthru.tests.test = nixosTests.terminal-emulators.roxterm;
