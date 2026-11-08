@@ -6,18 +6,19 @@
 
 buildNpmPackage (finalAttrs: {
   pname = "runmd";
-  version = "1.4.1";
+  version = "2.1.1";
 
   src = fetchFromGitHub {
     owner = "broofa";
     repo = "runmd";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-NaHBoRp6VuQwobpew7b1us8t2vbVPR4OLe3p3suykOw=";
+    hash = "sha256-9sCqcq9LcG3S7RqfJIkKOb4mAvAQC1UpekzN9Ag4K7k=";
   };
 
-  npmDepsHash = "sha256-0djcoEq1O6zubD8OTFNE0BrOebSiw4JAXxa6flbHLb0=";
+  npmDepsHash = "sha256-mraTpg/dT+SCz8o7d5g2U6mA1iKpjF3TiZQVCU1NUeo=";
 
-  dontNpmBuild = true;
+  # `prepare` runs `lefthook install`, which needs git
+  npmPackFlags = [ "--ignore-scripts" ];
 
   meta = {
     description = "Executable markdown files";
