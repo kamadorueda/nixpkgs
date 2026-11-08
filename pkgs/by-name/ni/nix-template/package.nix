@@ -50,7 +50,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     homepage = "https://github.com/jonringer/nix-template/";
     changelog = "https://github.com/jonringer/nix-template/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.cc0;
-    maintainers = [ ];
+    maintainers = with lib.maintainers; [ kamadorueda ];
     mainProgram = "nix-template";
   };
 })
