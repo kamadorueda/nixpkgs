@@ -14,18 +14,18 @@ let
   # This is because the script must go through the network and will not work under the Nix sandbox environment.
   vscodeSpectral = stdenv.mkDerivation (finalAttrs: {
     pname = "vscode-spectral";
-    version = "1.1.2";
+    version = "1.1.4";
 
     src = fetchFromGitHub {
       owner = "stoplightio";
       repo = "vscode-spectral";
       rev = "v${finalAttrs.version}";
-      hash = "sha256-TWy+bC6qhTKDY874ORTBbvCIH8ycpmBiU8GLYxBIiAs=";
+      hash = "sha256-0p5aFzaddgSKM62R5Y0K10eCNo9CJkGuJZBhJ2cUF/w=";
     };
 
     offlineCache = fetchYarnDeps {
       yarnLock = finalAttrs.src + "/yarn.lock";
-      hash = "sha256-am27A9VyFoXuOlgG9mnvNqV3Q7Bi7GJzDqqVFGDVWIA=";
+      hash = "sha256-WEVv6dwblEUWWbopmIqsIMSt1r4QSm9nECxZgWN/vws=";
     };
 
     nativeBuildInputs = [
