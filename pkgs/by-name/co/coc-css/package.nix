@@ -1,36 +1,27 @@
 {
   lib,
-  stdenv,
+  buildNpmPackage,
   fetchFromGitHub,
-  fetchYarnDeps,
-  yarnConfigHook,
-  yarnBuildHook,
-  yarnInstallHook,
-  nodejs,
   nix-update-script,
 }:
-stdenv.mkDerivation (finalAttrs: {
+
+buildNpmPackage (finalAttrs: {
   pname = "coc-css";
-  version = "2.1.0";
+  version = "2.2.4";
 
   src = fetchFromGitHub {
     owner = "neoclide";
     repo = "coc-css";
-    rev = finalAttrs.version;
-    hash = "sha256-ASFg5LM1NbpK+Df1TPs+O13WmZktw+BtfsCJagF5nUc=";
+    tag = finalAttrs.version;
+    hash = "sha256-kZavbTt3WhsJb/xhgtX/f5UjBcTJP+pJ4wVZwF6PaVE=";
   };
 
-  yarnOfflineCache = fetchYarnDeps {
-    yarnLock = "${finalAttrs.src}/yarn.lock";
-    hash = "sha256-JJXpsccO9MZ0D15JUZtTebX1zUMgwGEzSOm7auw5pQo=";
-  };
-
-  nativeBuildInputs = [
-    yarnConfigHook
-    yarnBuildHook
-    nodejs
-    yarnInstallHook
+  patches = [
+    # the upstream lockfile has no `resolved` URL and `integrity` for most dependencies
+    ./fix-package-lock.patch
   ];
+
+  npmDepsHash = "sha256-KHBvQcpTfADQR+2DGgdiz8R9dJj3JF6t/+RMEcS3Xyo=";
 
   passthru.updateScript = nix-update-script { };
 
