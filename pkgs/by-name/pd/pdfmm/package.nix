@@ -12,13 +12,13 @@
 
 resholve.mkDerivation (finalAttrs: {
   pname = "pdfmm";
-  version = "1.1.0";
+  version = "1.1.1";
 
   src = fetchFromGitHub {
     owner = "jpfleury";
     repo = "pdfmm";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-DX/czFumKN8flrYMf1wXZRFj09rDBJtzQkHZSglghUY=";
+    hash = "sha256-vOt/8CX6/pSVK2hp5sbvxD1pdS+bhn+8TRoF87EEgXE=";
   };
 
   dontBuild = true;
