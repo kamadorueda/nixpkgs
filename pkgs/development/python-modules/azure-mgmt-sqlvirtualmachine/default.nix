@@ -11,13 +11,13 @@
 
 buildPythonPackage rec {
   pname = "azure-mgmt-sqlvirtualmachine";
-  version = "1.0.0b5";
+  version = "1.0.0";
   pyproject = true;
 
   src = fetchPypi {
-    inherit pname version;
-    hash = "sha256-ZFgJflgynRSxo+B+Vso4eX1JheWlDQjfJ9QmupXypMc=";
-    extension = "zip";
+    pname = "azure_mgmt_sqlvirtualmachine";
+    inherit version;
+    hash = "sha256-oYMLN0Z96G5733OeqFUPXSAw69R+O0CNYhojl8x02RU=";
   };
 
   build-system = [ setuptools ];
