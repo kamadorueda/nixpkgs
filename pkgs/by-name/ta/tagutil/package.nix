@@ -2,6 +2,7 @@
   stdenv,
   lib,
   fetchFromGitHub,
+  nix-update-script,
   pkg-config,
   cmake,
   libyaml,
@@ -41,6 +42,8 @@ stdenv.mkDerivation (finalAttrs: {
     substituteInPlace CMakeLists.txt \
       --replace "-o aslr" ""
   '';
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     description = "Scriptable music files tags tool and editor";
