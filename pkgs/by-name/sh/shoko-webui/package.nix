@@ -14,13 +14,13 @@ let
 in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "shoko-webui";
-  version = "2.5.9";
+  version = "2.5.13";
 
   src = fetchFromGitHub {
     owner = "ShokoAnime";
     repo = "Shoko-WebUI";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-mHBflHehCnwCkh4K271vo30rfoQa+3xLos0d7P/kKvE=";
+    hash = "sha256-fc7Za2yrmobBrthO48d2pYw54gdd5sRqin40lT9YNtA=";
   };
 
   # Avoid requiring git as a build time dependency. It's used for version
@@ -53,7 +53,7 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     runHook postInstall
   '';
 
-  passthru.updateSript = nix-update-script {
+  passthru.updateScript = nix-update-script {
     extraArgs = [
       "--version-regex"
       ''v([0-9]+\.[0-9]+\.[0-9]+).*''
