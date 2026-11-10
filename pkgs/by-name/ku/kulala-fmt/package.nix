@@ -12,7 +12,7 @@
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "kulala-fmt";
-  version = "4.3.4";
+  version = "4.6.1";
 
   strictDeps = true;
   __structuredAttrs = true;
@@ -21,14 +21,14 @@ stdenv.mkDerivation (finalAttrs: {
     owner = "dont-be-evil-company";
     repo = "kulala-fmt";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-sARZDtrF8JihVuE2Ix/f4h/OWIbdGW48xpVJlVmTdYY=";
+    hash = "sha256-m960zIcIY8tDk40qu2cr2dNyJapxYpgcb7q/DOKviZw=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     pnpm = pnpm_11;
     fetcherVersion = 4;
-    hash = "sha256-wPMWFYRd3R570oAMORHTKamE0qcmIT+LFRuTiXFX97M=";
+    hash = "sha256-UQA6uy4URImcV9HHMjstU8scWeJ0kNfa4tQdwcYxsG0=";
   };
 
   nativeBuildInputs = [
