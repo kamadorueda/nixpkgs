@@ -1,20 +1,22 @@
 {
   lib,
   mkPulumiPackage,
+  nix-update-script,
 }:
 mkPulumiPackage rec {
   owner = "pulumi";
   repo = "pulumi-hcloud";
-  version = "1.20.4";
+  version = "1.43.4";
   rev = "v${version}";
-  hash = "sha256-m9MRXDTSC0K1raoH9gKPuxdwvUEnZ/ulp32xlY1Hsdo=";
-  vendorHash = "sha256-u3mxaOEXQod1MDFxo85YdOb6Bx/9G5uaa3ykhnmcqCg=";
+  hash = "sha256-1E02fkvgPQaHHwJQkRGxge8PqHlPWkbcMiFnnlKSCWo=";
+  vendorHash = "sha256-KtFC5eRnkEST44Sj7QnYM0k1nHCurDVkJ+xMrQuuttE=";
   cmdGen = "pulumi-tfgen-hcloud";
   cmdRes = "pulumi-resource-hcloud";
   extraLdflags = [
     "-X=github.com/pulumi/${repo}/provider/pkg/version.Version=v${version}"
   ];
   __darwinAllowLocalNetworking = true;
+  passthru.updateScript = nix-update-script { };
   meta = {
     description = "Hetzner Cloud Pulumi resource package, providing multi-language access to Hetzner Cloud";
     mainProgram = "pulumi-resource-hcloud";
