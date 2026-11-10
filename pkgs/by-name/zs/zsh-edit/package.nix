@@ -2,6 +2,7 @@
   stdenv,
   lib,
   fetchFromGitHub,
+  nix-update-script,
 }:
 
 stdenv.mkDerivation rec {
@@ -26,6 +27,8 @@ stdenv.mkDerivation rec {
     install -d $outdir/functions
     install -D functions/{,.edit}* $outdir/functions
   '';
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     homepage = "https://github.com/marlonrichert/zsh-edit";
