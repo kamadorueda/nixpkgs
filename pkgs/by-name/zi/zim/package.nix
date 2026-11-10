@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchurl,
+  nix-update-script,
   python3Packages,
   gtk3,
   gobject-introspection,
@@ -82,6 +83,10 @@ python3Packages.buildPythonApplication (finalAttrs: {
     makeWrapperArgs+=(--argv0 $out/bin/.zim-wrapped)
     makeWrapperArgs+=("''${gappsWrapperArgs[@]}")
   '';
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--url=https://github.com/zim-desktop-wiki/zim-desktop-wiki" ];
+  };
 
   meta = {
     description = "Desktop wiki";
