@@ -2,6 +2,7 @@
   lib,
   buildPythonPackage,
   fetchFromGitHub,
+  nix-update-script,
   setuptools,
   dpkt,
   pyyaml,
@@ -31,6 +32,8 @@ buildPythonPackage {
   disabledTests = [
     "test_nghttpd_log_parsing" # Attempts to load things from logs/ which it cannot find for some reason.
   ];
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     description = "TLS and HTTP signature and fingerprint library";
