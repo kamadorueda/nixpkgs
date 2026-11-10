@@ -21,6 +21,7 @@
   desktop-file-utils,
   appstream,
   python3Packages,
+  nix-update-script,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "packet";
@@ -70,6 +71,8 @@ stdenv.mkDerivation (finalAttrs: {
     mkdir -p $out/share/nautilus-python
     ln -s $out/share/packet/plugins $out/share/nautilus-python/extensions
   '';
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Quick Share client for Linux";
