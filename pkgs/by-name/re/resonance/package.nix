@@ -81,7 +81,9 @@ stdenv.mkDerivation (finalAttrs: {
     })
   '';
 
-  passthru.updateScript = nix-update-script { };
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version=branch" ];
+  };
 
   meta = {
     description = "Intuitive GTK4/LibAdwaita music player";
