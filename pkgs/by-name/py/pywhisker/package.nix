@@ -1,6 +1,7 @@
 {
   lib,
   fetchFromGitHub,
+  nix-update-script,
   python3,
 }:
 
@@ -33,6 +34,8 @@ python3.pkgs.buildPythonApplication {
 
   # Project has no tests
   doCheck = false;
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     description = "Tool for Shadow Credentials attacks";
