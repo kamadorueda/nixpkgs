@@ -6,29 +6,32 @@
   yarnConfigHook,
   yarnInstallHook,
   nodejs,
+  nix-update-script,
   testers,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "codefresh";
-  version = "1.0.6";
+  version = "1.3.1";
 
   src = fetchFromGitHub {
     owner = "codefresh-io";
     repo = "cli";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-8jSLZ9aWgQmQ0DYqKVaTi9JNQVbG7htLoLzkew8TLwo=";
+    hash = "sha256-Z11Ly4x9ev/zNuJXQi4g9UZ457O7pYhurGwSslCXjNw=";
   };
 
   offlineCache = fetchYarnDeps {
     yarnLock = "${finalAttrs.src}/yarn.lock";
-    hash = "sha256-FZd/dSvb69YU41djXdGg7KI5ocgYfpOHXOjfKAg36/w=";
+    hash = "sha256-0zC3qjxEPkbTA3e9tfUam0SpUiMYJGW2AhWezAodeCw=";
   };
   nativeBuildInputs = [
     yarnConfigHook
     yarnInstallHook
     nodejs
   ];
+
+  passthru.updateScript = nix-update-script { };
 
   passthru.tests.version = testers.testVersion {
     package = finalAttrs.finalPackage;
