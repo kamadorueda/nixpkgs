@@ -2,6 +2,7 @@
   lib,
   buildGoModule,
   fetchFromGitHub,
+  nix-update-script,
 }:
 
 buildGoModule {
@@ -21,6 +22,8 @@ buildGoModule {
     "-s"
     "-w"
   ];
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     description = "Tool designed to help identify WAF bypasses using passive techniques";
