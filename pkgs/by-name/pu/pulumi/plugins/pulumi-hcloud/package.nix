@@ -5,10 +5,10 @@
 mkPulumiPackage rec {
   owner = "pulumi";
   repo = "pulumi-hcloud";
-  version = "1.20.4";
+  version = "1.43.4";
   rev = "v${version}";
-  hash = "sha256-m9MRXDTSC0K1raoH9gKPuxdwvUEnZ/ulp32xlY1Hsdo=";
-  vendorHash = "sha256-u3mxaOEXQod1MDFxo85YdOb6Bx/9G5uaa3ykhnmcqCg=";
+  hash = "sha256-1E02fkvgPQaHHwJQkRGxge8PqHlPWkbcMiFnnlKSCWo=";
+  vendorHash = "sha256-KtFC5eRnkEST44Sj7QnYM0k1nHCurDVkJ+xMrQuuttE=";
   cmdGen = "pulumi-tfgen-hcloud";
   cmdRes = "pulumi-resource-hcloud";
   extraLdflags = [
