@@ -1,6 +1,7 @@
 {
   lib,
   fetchFromGitHub,
+  nix-update-script,
   python3Packages,
 }:
 
@@ -20,6 +21,8 @@ python3Packages.buildPythonApplication {
   build-system = [ python3Packages.setuptools ];
 
   nativeCheckInputs = [ python3Packages.pytestCheckHook ];
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     homepage = "https://github.com/matthew-brett/grin";
