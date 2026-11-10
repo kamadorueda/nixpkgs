@@ -1,6 +1,7 @@
 {
   lib,
   fetchFromGitHub,
+  nix-update-script,
   python3Packages,
 }:
 
@@ -24,6 +25,10 @@ python3Packages.buildPythonApplication {
   ];
 
   pythonImportsCheck = [ "xdxf2slob" ];
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version=branch" ];
+  };
 
   meta = {
     description = "Tool to convert XDXF dictionary files to slob format";
