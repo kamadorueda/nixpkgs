@@ -43,5 +43,7 @@ stdenv.mkDerivation {
     maintainers = [ lib.maintainers._9999years ];
   };
 
-  passthru.updateScript = nix-update-script { };
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version=branch" ];
+  };
 }
