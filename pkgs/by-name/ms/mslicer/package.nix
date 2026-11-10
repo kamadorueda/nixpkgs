@@ -20,7 +20,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   src = fetchFromGitHub {
     owner = "connorslade";
     repo = "mslicer";
-    rev = finalAttrs.version;
+    tag = "v${finalAttrs.version}";
     hash = "sha256-kDpV9UlqiqV+/h0PWk6fsOWumCHben4gkQk1mEXE5wk=";
   };
 
@@ -66,7 +66,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   meta = {
     description = "Experimental open source slicer for masked stereolithography (resin) printers";
     homepage = "https://connorcode.com/projects/mslicer";
-    changelog = "https://github.com/connorslade/mslicer/releases/tag/${finalAttrs.version}";
+    changelog = "https://github.com/connorslade/mslicer/releases/tag/${finalAttrs.src.tag}";
     license = lib.licenses.gpl3Plus;
     maintainers = with lib.maintainers; [ colinsane ];
     platforms = lib.platforms.linux;
