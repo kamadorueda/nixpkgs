@@ -8,19 +8,19 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "termirs";
-  version = "0.3.3";
+  version = "0.3.4";
 
   src = fetchFromGitHub {
     owner = "caelansar";
     repo = "termirs";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-K8SDC/pH+PcY67qo/2F8zLKafzdKbxSC5IcVVRYMkHE=";
+    hash = "sha256-UE5RRXP3YUPyot62r2TIPyY6cnb13V5pugRLiUvyJS0=";
   };
 
-  cargoHash = "sha256-z0TgeDALtpDoR3YEHi+udRgTLwDhWQcGVejNBjuzY4c=";
+  cargoHash = "sha256-I68boX0yiKAwPAd0DGxoSoRKnmcnygywrpmVeJLCkHs=";
 
   postPatch = ''
-    substituteInPlace ../termirs-0.3.3-vendor/source-git-0/wezterm-term-0.1.0/src/terminalstate/mod.rs \
+    substituteInPlace ../${finalAttrs.cargoDeps.name}/source-git-0/wezterm-term-0.1.0/src/terminalstate/mod.rs \
       --replace-fail 'include_bytes!("../../../termwiz/data/wezterm")' 'include_bytes!("../../../termwiz-0.24.0/data/wezterm")'
   '';
 
