@@ -2,6 +2,7 @@
   lib,
   buildGoModule,
   fetchFromGitHub,
+  nix-update-script,
   makeBinaryWrapper,
   installShellFiles,
   git,
@@ -32,6 +33,8 @@ buildGoModule (finalAttrs: {
     # Install man page, not installed by default
     installManPage assets/doc/fac.1
   '';
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     changelog = "https://github.com/mkchoi212/fac/releases/tag/v${finalAttrs.version}";
