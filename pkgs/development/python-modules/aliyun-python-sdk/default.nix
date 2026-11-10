@@ -821,8 +821,16 @@ in
       "sha256-+/JyCEGZsfnfKrSyjh7JXIJM5ssIgZyf5orGrEHoPec=";
 
   aliyun-python-sdk-quotas =
-    buildAliyunSdkPackage "quotas" "1.0.4"
-      "sha256-oidX8n7QZXxlEqGySwEeIl5nI1bL0tcb1CSduXMO3Jk=";
+    (buildAliyunSdkPackage "quotas" "1.0.5" "sha256-fZCDplmz+SWAq4i/kzFJR7nrAwownQOmcCdRlzg1tmw=")
+    .overridePythonAttrs
+      (old: {
+        # PyPI names new sdists with underscores
+        src = fetchPypi {
+          pname = "aliyun_python_sdk_quotas";
+          inherit (old) version;
+          hash = "sha256-fZCDplmz+SWAq4i/kzFJR7nrAwownQOmcCdRlzg1tmw=";
+        };
+      });
 
   aliyun-python-sdk-ram =
     buildAliyunSdkPackage "ram" "3.3.1"
