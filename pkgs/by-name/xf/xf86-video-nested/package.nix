@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitLab,
+  nix-update-script,
   autoreconfHook,
   pkg-config,
   util-macros,
@@ -42,6 +43,10 @@ stdenv.mkDerivation {
     libx11
     libxext
   ];
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version=branch" ];
+  };
 
   meta = {
     homepage = "https://gitlab.freedesktop.org/xorg/driver/xf86-video-nested";
