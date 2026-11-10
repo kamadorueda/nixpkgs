@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  nix-update-script,
   gsasl,
   gnutls,
   pkg-config,
@@ -42,6 +43,10 @@ stdenv.mkDerivation {
   cmakeFlags = [
     "-DVMIME_SENDMAIL_PATH=${sendmailPath}"
   ];
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version=branch" ];
+  };
 
   meta = {
     homepage = "https://www.vmime.org/";
