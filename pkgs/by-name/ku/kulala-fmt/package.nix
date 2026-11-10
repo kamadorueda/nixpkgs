@@ -5,6 +5,7 @@
   fetchPnpmDeps,
   kulala-core,
   makeBinaryWrapper,
+  nix-update-script,
   nodejs,
   pnpm_11,
   pnpmConfigHook,
@@ -66,6 +67,8 @@ stdenv.mkDerivation (finalAttrs: {
 
     runHook postInstallCheck
   '';
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Opinionated .http and .rest files linter and formatter";
