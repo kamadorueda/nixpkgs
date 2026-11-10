@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromCodeberg,
+  nix-update-script,
 
   # nativeBuildInputs
   pkg-config,
@@ -51,6 +52,10 @@ stdenv.mkDerivation {
         'path | mew -e "$@"' \
         'path | ${placeholder "out"}/bin/mew -e "$@"'
   '';
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version=branch" ];
+  };
 
   meta = {
     description = "Efficient dynamic menu for Wayland, an effective port of dmenu to Wayland";
