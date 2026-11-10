@@ -20,7 +20,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
   cargoHash = "sha256-z0TgeDALtpDoR3YEHi+udRgTLwDhWQcGVejNBjuzY4c=";
 
   postPatch = ''
-    substituteInPlace ../termirs-0.3.3-vendor/source-git-0/wezterm-term-0.1.0/src/terminalstate/mod.rs \
+    substituteInPlace ../${finalAttrs.cargoDeps.name}/source-git-0/wezterm-term-0.1.0/src/terminalstate/mod.rs \
       --replace-fail 'include_bytes!("../../../termwiz/data/wezterm")' 'include_bytes!("../../../termwiz-0.24.0/data/wezterm")'
   '';
 
