@@ -2,7 +2,7 @@
   lib,
   fetchFromGitHub,
   python3Packages,
-  unstableGitUpdater,
+  nix-update-script,
 }:
 
 python3Packages.buildPythonApplication (finalAttrs: {
@@ -35,7 +35,7 @@ python3Packages.buildPythonApplication (finalAttrs: {
     "urwid-readline"
   ];
 
-  passthru.updateScript = unstableGitUpdater { };
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Progress Quest: the CLI edition";
