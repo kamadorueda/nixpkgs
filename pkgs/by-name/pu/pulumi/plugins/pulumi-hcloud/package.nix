@@ -1,6 +1,7 @@
 {
   lib,
   mkPulumiPackage,
+  nix-update-script,
 }:
 mkPulumiPackage rec {
   owner = "pulumi";
@@ -15,6 +16,7 @@ mkPulumiPackage rec {
     "-X=github.com/pulumi/${repo}/provider/pkg/version.Version=v${version}"
   ];
   __darwinAllowLocalNetworking = true;
+  passthru.updateScript = nix-update-script { };
   meta = {
     description = "Hetzner Cloud Pulumi resource package, providing multi-language access to Hetzner Cloud";
     mainProgram = "pulumi-resource-hcloud";
