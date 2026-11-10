@@ -1,6 +1,7 @@
 {
   lib,
   fetchFromGitHub,
+  nix-update-script,
   python3,
 }:
 
@@ -33,6 +34,10 @@ python3.pkgs.buildPythonApplication {
 
   # Only script available
   doCheck = false;
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version=branch" ];
+  };
 
   meta = {
     description = "Tool to enumerate an Active Directory Domain";
