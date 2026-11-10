@@ -2,6 +2,7 @@
   lib,
   python3,
   fetchFromGitHub,
+  nix-update-script,
 }:
 
 python3.pkgs.buildPythonApplication {
@@ -37,6 +38,8 @@ python3.pkgs.buildPythonApplication {
 
   # Project has no tests
   doCheck = false;
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     description = "LDAP enumeration tool";
