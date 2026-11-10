@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  nix-update-script,
 }:
 
 stdenv.mkDerivation {
@@ -22,6 +23,8 @@ stdenv.mkDerivation {
     mkdir -p $out/share/zsh-defer
     cp zsh-defer* $out/share/zsh-defer
   '';
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     description = "Deferred execution of zsh commands";
