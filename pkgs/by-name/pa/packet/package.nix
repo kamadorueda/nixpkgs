@@ -21,21 +21,22 @@
   desktop-file-utils,
   appstream,
   python3Packages,
+  nix-update-script,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "packet";
-  version = "0.5.3";
+  version = "0.7.3";
 
   src = fetchFromGitHub {
     owner = "nozwock";
     repo = "packet";
     tag = finalAttrs.version;
-    hash = "sha256-zR2WZER49xsxaiZbFGFOukHE3w0odxVi9WJTI4FSWJ0=";
+    hash = "sha256-1dSdvWScywpNlZZ+ZNK/5KH+uCfFgo/PuAf7T1yvdQA=";
   };
 
   cargoDeps = rustPlatform.fetchCargoVendor {
     inherit (finalAttrs) pname version src;
-    hash = "sha256-ODrM8oGQpi+DpG4YQYibtVHbicuHOjZAlZ1wW2Gulec=";
+    hash = "sha256-jseOUOEykYBOYldY1YeuCMyB4cQSlCNthRez3rBOcy0=";
   };
 
   nativeBuildInputs = [
@@ -70,6 +71,8 @@ stdenv.mkDerivation (finalAttrs: {
     mkdir -p $out/share/nautilus-python
     ln -s $out/share/packet/plugins $out/share/nautilus-python/extensions
   '';
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Quick Share client for Linux";
