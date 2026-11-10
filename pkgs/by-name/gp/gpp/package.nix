@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  nix-update-script,
   autoreconfHook,
 }:
 
@@ -20,6 +21,10 @@ stdenv.mkDerivation {
 
   installCheckPhase = "$out/bin/gpp --help";
   doInstallCheck = true;
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version=branch" ];
+  };
 
   meta = {
     description = "General-purpose preprocessor with customizable syntax";
