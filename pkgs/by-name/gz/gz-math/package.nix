@@ -64,7 +64,7 @@ stdenv.mkDerivation (finalAttrs: {
     # bulk updater selects wrong tag
     skipBulkUpdates = true;
     updateScript = nix-update-script {
-      extraArgs = [ "--version-regex=gz-math(.*)" ];
+      extraArgs = [ "--version-regex=gz-math[0-9]+_([0-9.]+)$" ];
     };
   };
 
