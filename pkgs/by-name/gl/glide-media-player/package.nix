@@ -14,6 +14,7 @@
   graphene,
   gst_all_1,
   glib-networking,
+  nix-update-script,
 }:
 
 stdenv.mkDerivation rec {
@@ -62,6 +63,8 @@ stdenv.mkDerivation rec {
     gst_all_1.gst-plugins-good
     glib-networking
   ];
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Linux/macOS media player based on GStreamer and GTK";
