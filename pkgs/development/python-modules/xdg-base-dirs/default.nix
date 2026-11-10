@@ -2,40 +2,35 @@
   lib,
   buildPythonPackage,
   fetchFromGitHub,
-  poetry-core,
+  uv-build,
   pytestCheckHook,
   nix-update-script,
 }:
 
 buildPythonPackage (finalAttrs: {
   pname = "xdg-base-dirs";
-  version = "6.0.2";
+  version = "6.1.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "srstevenson";
     repo = "xdg-base-dirs";
-    tag = finalAttrs.version;
-    hash = "sha256-iXK9WURTfmpl5vd7RsT0ptwfrb5UQQFqMMCu3+vL+EY=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-YAJWFP+I0jH23hK64qv9zAQYAiaLTFIhvgmPrKhvoOs=";
   };
 
-  nativeBuildInputs = [ poetry-core ];
+  build-system = [ uv-build ];
 
   nativeCheckInputs = [ pytestCheckHook ];
 
   pythonImportsCheck = [ "xdg_base_dirs" ];
-
-  # remove coverage flags from pytest config
-  postPatch = ''
-    sed -i /addopts/d pyproject.toml
-  '';
 
   passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Implementation of the XDG Base Directory Specification in Python";
     homepage = "https://github.com/srstevenson/xdg-base-dirs";
-    changelog = "https://github.com/srstevenson/xdg-base-dirs/releases/tag/${finalAttrs.version}";
+    changelog = "https://github.com/srstevenson/xdg-base-dirs/releases/tag/${finalAttrs.src.tag}";
     license = lib.licenses.isc;
     maintainers = with lib.maintainers; [ sandarukasa ];
   };
