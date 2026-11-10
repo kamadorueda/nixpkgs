@@ -2,6 +2,7 @@
   lib,
   python3,
   fetchFromGitHub,
+  nix-update-script,
 }:
 
 python3.pkgs.buildPythonApplication {
@@ -41,6 +42,8 @@ python3.pkgs.buildPythonApplication {
   pythonImportsCheck = [
     "holehe"
   ];
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     description = "CLI to check if the mail is used on different sites";
