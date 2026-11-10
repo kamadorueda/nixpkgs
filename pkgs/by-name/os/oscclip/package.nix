@@ -6,7 +6,7 @@
 
 python3Packages.buildPythonApplication (finalAttrs: {
   pname = "oscclip";
-  version = "0.4.1";
+  version = "0.6.2";
 
   pyproject = true;
 
@@ -14,10 +14,10 @@ python3Packages.buildPythonApplication (finalAttrs: {
     owner = "rumpelsepp";
     repo = "oscclip";
     rev = "v${finalAttrs.version}";
-    sha256 = "sha256-WQvZn+SWamEqEXPutIZVDZTIczybtHUG9QsN8XxUeg8=";
+    hash = "sha256-tNBODVfCJoRjjLMJdbg9XMf3DLn7yRLX+RM+LXcHkYM=";
   };
 
-  nativeBuildInputs = with python3Packages; [ poetry-core ];
+  build-system = with python3Packages; [ uv-build ];
 
   meta = {
     description = "Program that allows to copy/paste from a terminal using osc-52 control sequences";
@@ -27,7 +27,7 @@ python3Packages.buildPythonApplication (finalAttrs: {
     '';
     homepage = "https://github.com/rumpelsepp/oscclip";
 
-    license = lib.licenses.gpl3Only;
+    license = lib.licenses.eupl12;
     maintainers = with lib.maintainers; [
       rumpelsepp
       traxys
