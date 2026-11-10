@@ -7,13 +7,13 @@
 
 postgresqlBuildExtension (finalAttrs: {
   pname = "pg_relusage";
-  version = "0.0.1";
+  version = "1.0.2";
 
   src = fetchFromGitHub {
     owner = "adept";
     repo = "pg_relusage";
-    tag = finalAttrs.version;
-    hash = "sha256-8hJNjQ9MaBk3J9a73l+yQMwMW/F2N8vr5PO2o+5GvYs=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-WaLSrJOU2SFdLZu0X3uJnYMh7ZP/JUsTGijOVQtY0oA=";
   };
 
   meta = {
