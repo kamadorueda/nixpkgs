@@ -1,6 +1,7 @@
 {
   lib,
   fetchFromGitHub,
+  nix-update-script,
   python3,
 }:
 
@@ -38,6 +39,8 @@ python3.pkgs.buildPythonApplication {
   pythonImportsCheck = [
     "rdwatool"
   ];
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     description = "Tool to extract information from a Microsoft Remote Desktop Web Access (RDWA) application";
