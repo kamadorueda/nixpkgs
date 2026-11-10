@@ -2,6 +2,7 @@
   lib,
   stdenvNoCC,
   fetchFromGitHub,
+  nix-update-script,
 }:
 stdenvNoCC.mkDerivation {
   pname = "bemoji";
@@ -20,6 +21,8 @@ stdenvNoCC.mkDerivation {
   postInstall = ''
     install -Dm555 bemoji -t $out/bin
   '';
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     homepage = "https://github.com/marty-oehme/bemoji/";
