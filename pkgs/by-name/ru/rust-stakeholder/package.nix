@@ -17,7 +17,9 @@ rustPlatform.buildRustPackage {
 
   cargoHash = "sha256-NxO+7Wh8Ff6RPFtmbEa3EJszfDaZDXGWZDAoXPEAnpI=";
 
-  passthru.updateScript = nix-update-script { };
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version=branch" ];
+  };
 
   meta = {
     description = "Generate impressive-looking terminal output to look busy when stakeholders walk by";
