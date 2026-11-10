@@ -1,6 +1,7 @@
 {
   lib,
   fetchFromGitHub,
+  nix-update-script,
   installShellFiles,
   stdenvNoCC,
 }:
@@ -25,6 +26,10 @@ stdenvNoCC.mkDerivation {
     installManPage docs/man/zi.1
     installShellCompletion --zsh lib/_zi
   '';
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version=branch" ];
+  };
 
   meta = {
     homepage = "https://github.com/z-shell/zi";
