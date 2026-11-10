@@ -4,6 +4,7 @@
   fetchFromGitHub,
   iproute2,
   networkmanager,
+  nix-update-script,
   python3,
   tshark,
   wirelesstools,
@@ -48,6 +49,10 @@ python3.pkgs.buildPythonApplication {
 
   # Only script available
   doCheck = false;
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version=branch" ];
+  };
 
   meta = {
     description = "Tool to track WiFi devices by signal strength";
