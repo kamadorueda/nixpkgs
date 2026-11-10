@@ -1,6 +1,7 @@
 {
   lib,
   fetchFromGitHub,
+  nix-update-script,
   python3,
 }:
 
@@ -27,6 +28,8 @@ python3.pkgs.buildPythonApplication {
   doCheck = false;
 
   pythonImportsCheck = [ "nix_bisect" ];
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     description = "Bisect nix builds";
