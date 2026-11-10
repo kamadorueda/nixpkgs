@@ -7,6 +7,7 @@
   yarnBuildHook,
   yarnInstallHook,
   nodejs,
+  nix-update-script,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -31,6 +32,8 @@ stdenv.mkDerivation (finalAttrs: {
     yarnLock = finalAttrs.src + "/yarn.lock";
     hash = "sha256-jZZUrpi3Bg4qQ/NyUDPW7zNuUz/399wAf+gdeZHp+B0=";
   };
+
+  passthru.updateScript = nix-update-script { };
 
   meta = {
     description = "Toml extension for coc.nvim";
