@@ -2,6 +2,7 @@
   lib,
   stdenvNoCC,
   fetchFromGitHub,
+  nix-update-script,
   python3,
 }:
 
@@ -40,6 +41,8 @@ stdenvNoCC.mkDerivation {
 
     runHook postFixup
   '';
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     description = "LDAP based Active Directory user and group enumeration tool";
