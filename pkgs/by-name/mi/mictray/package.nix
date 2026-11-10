@@ -6,6 +6,7 @@
   libnotify,
   meson,
   ninja,
+  nix-update-script,
   pkg-config,
   pulseaudio,
   stdenv,
@@ -40,6 +41,10 @@ stdenv.mkDerivation {
   ];
 
   doCheck = true;
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version=branch" ];
+  };
 
   meta = {
     homepage = "https://github.com/Junker/mictray";
