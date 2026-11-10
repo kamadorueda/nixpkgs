@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  nix-update-script,
   autoreconfHook,
 }:
 
@@ -23,6 +24,10 @@ stdenv.mkDerivation (finalAttrs: {
   preConfigure = ''
     ./bootstrap.sh
   '';
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version=branch" ];
+  };
 
   meta = {
     description = "Tiny mp4 time code editor";
