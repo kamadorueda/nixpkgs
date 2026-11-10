@@ -35,7 +35,12 @@ stdenv.mkDerivation (finalAttrs: {
     cp brandy $out/bin
   '';
 
-  passthru.updateScript = nix-update-script { };
+  passthru.updateScript = nix-update-script {
+    extraArgs = [
+      "--version-regex"
+      "^V(.*)$"
+    ];
+  };
 
   meta = {
     homepage = "https://brandy.matrixnetwork.co.uk/";
