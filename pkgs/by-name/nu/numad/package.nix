@@ -23,6 +23,7 @@ stdenv.mkDerivation {
   makeFlags = [ "prefix=$(out)" ];
 
   passthru.updateScript = unstableGitUpdater {
+    shallowClone = false;
     tagConverter = writeShellScript "tagConverter" ''
       read tag
       test "$tag" = "0" \
