@@ -4,6 +4,7 @@
   fetchFromGitHub,
   lib,
   libGLU,
+  nix-update-script,
   makeDesktopItem,
   copyDesktopItems,
   qt5,
@@ -47,6 +48,8 @@ stdenv.mkDerivation rec {
   postInstall = ''
     install -D $src/gui/img/plater.png -t $out/share/icons/hicolor/128x128/apps
   '';
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     description = "3D-printer parts placer and plate generator";
