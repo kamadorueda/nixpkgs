@@ -1,6 +1,7 @@
 {
   lib,
   fetchFromGitHub,
+  nix-update-script,
   python3,
 }:
 
@@ -26,6 +27,10 @@ python3.pkgs.buildPythonApplication (finalAttrs: {
   ];
 
   pythonImportsCheck = [ "btrpa_scan" ];
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version=branch" ];
+  };
 
   meta = {
     description = "Bluetooth Low Energy (BLE) scanner";
