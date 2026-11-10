@@ -21,7 +21,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "dbus-python";
-  version = "1.4.0";
+  version = "1.5.1";
   pyproject = true;
 
   disabled = isPyPy;
@@ -32,9 +32,9 @@ buildPythonPackage (finalAttrs: {
   ];
 
   src = fetchPypi {
-    pname = "dbus-python";
+    pname = "dbus_python";
     inherit (finalAttrs) version;
-    hash = "sha256-mRZm5Jj2Db8+Sbi3Z49VWbimUDT99hquYs3s232Jx3A=";
+    hash = "sha256-V0I8+H0Jt9CE9CC1W3N/5lTDMzmwbfd5RWINl3lcasQ=";
   };
 
   patches = [
@@ -43,14 +43,6 @@ buildPythonPackage (finalAttrs: {
     (fetchpatch {
       url = "https://gitlab.freedesktop.org/dbus/dbus-python/-/commit/d5e19698a8d6e1485f05b67a5b2daa2392819aaf.patch";
       hash = "sha256-Rmj/ByRLiLnIF3JsMBElJugxsG8IARcBdixLhoWgIYU=";
-    })
-
-    # Fix on Python 3.15, the patch did not achieve what it aimed for anyway.
-    # https://gitlab.freedesktop.org/dbus/dbus-python/-/work_items/59
-    (fetchpatch {
-      url = "https://gitlab.freedesktop.org/dbus/dbus-python/-/commit/ebecd1747c382a57ad8e47d0e32112cdbd454b40.patch";
-      hash = "sha256-Hg4o+FPJvQ1/RW9fd8UJg/YEeVOvbJCov7SS7bT0vvs=";
-      revert = true;
     })
   ];
 
