@@ -6,6 +6,7 @@
   yarnConfigHook,
   yarnInstallHook,
   nodejs,
+  nix-update-script,
   testers,
 }:
 
@@ -29,6 +30,8 @@ stdenv.mkDerivation (finalAttrs: {
     yarnInstallHook
     nodejs
   ];
+
+  passthru.updateScript = nix-update-script { };
 
   passthru.tests.version = testers.testVersion {
     package = finalAttrs.finalPackage;
