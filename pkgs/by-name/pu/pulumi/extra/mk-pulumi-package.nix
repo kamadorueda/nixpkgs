@@ -128,6 +128,7 @@ in
   meta,
   fetchSubmodules ? false,
   pythonArgs ? { },
+  passthru ? { },
   postPatch ? "",
   ...
 }@args:
@@ -179,14 +180,20 @@ mkBasePackage (
       VERSION=v${version} go generate cmd/${cmdRes}/main.go
     '';
 
-    passthru.sdks.python = mkPythonPackage (
-      {
-        inherit meta src version;
+    passthru = {
+      sdks.python = mkPythonPackage (
+        {
+          inherit meta src version;
 
-        pname = repo;
-      }
-      // pythonArgs
-    );
+          pname = repo;
+        }
+        // pythonArgs
+      );
+    }
+    // passthru;
   }
-  // (lib.removeAttrs args [ "pythonArgs" ])
+  // (lib.removeAttrs args [
+    "pythonArgs"
+    "passthru"
+  ])
 )
