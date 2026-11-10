@@ -1,6 +1,7 @@
 {
   lib,
   fetchFromGitHub,
+  nix-update-script,
   python3,
 }:
 
@@ -30,6 +31,10 @@ python3.pkgs.buildPythonApplication {
   pythonImportsCheck = [
     "graphqlmap"
   ];
+
+  passthru.updateScript = nix-update-script {
+    extraArgs = [ "--version=branch" ];
+  };
 
   meta = {
     description = "Tool to interact with a GraphQL endpoint";
