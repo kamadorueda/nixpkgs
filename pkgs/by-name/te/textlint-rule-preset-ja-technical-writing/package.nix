@@ -1,64 +1,34 @@
 {
   lib,
-  stdenv,
+  buildNpmPackage,
   fetchFromGitHub,
-  fetchYarnDeps,
-  fixup-yarn-lock,
-  nodejs,
-  yarn,
+  nix-update-script,
   textlint,
   textlint-rule-preset-ja-technical-writing,
 }:
 
-stdenv.mkDerivation (finalAttrs: {
+buildNpmPackage (finalAttrs: {
   pname = "textlint-rule-preset-ja-technical-writing";
-  version = "10.0.1";
+  version = "12.0.2";
 
   src = fetchFromGitHub {
     owner = "textlint-ja";
     repo = "textlint-rule-preset-ja-technical-writing";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-8KoP/JagMf2kFxz8hr9e0hJH7yPukRURb48v0nPkC/8=";
+    hash = "sha256-W5vTAMkLYVaHnEhSL2ZhMx/dV4JzWvjw3Ofuf5kO0x4=";
   };
 
-  offlineCache = fetchYarnDeps {
-    yarnLock = "${finalAttrs.src}/yarn.lock";
-    hash = "sha256-jm+8XK1E60D1AgYBnlKL0fkAWnn68z2PhCK7T/XbUgk=";
-  };
+  npmDepsHash = "sha256-ZY4GgXrMyaQPCxPklzwPZa1OIav7FRmfscTWRQ4Tc84=";
 
-  nativeBuildInputs = [
-    nodejs
-    fixup-yarn-lock
-    yarn
-  ];
+  # lib/ is committed upstream and there is no build script
+  dontNpmBuild = true;
 
-  configurePhase = ''
-    runHook preConfigure
-
-    export HOME=$(mktemp -d)
-    yarn config --offline set yarn-offline-mirror "$offlineCache"
-    fixup-yarn-lock yarn.lock
-    yarn --offline --frozen-lockfile --ignore-platform --ignore-scripts --no-progress --non-interactive install
-    patchShebangs node_modules
-
-    runHook postConfigure
-  '';
-
-  dontBuild = true;
-
-  installPhase = ''
-    runHook preInstall
-
-    yarn --offline --production install
-    mkdir -p $out/lib/node_modules/textlint-rule-preset-ja-technical-writing
-    cp -r . $out/lib/node_modules/textlint-rule-preset-ja-technical-writing
-
-    runHook postInstall
-  '';
-
-  passthru.tests = textlint.testPackages {
-    rule = textlint-rule-preset-ja-technical-writing;
-    testFile = ./test.md;
+  passthru = {
+    updateScript = nix-update-script { };
+    tests = textlint.testPackages {
+      rule = textlint-rule-preset-ja-technical-writing;
+      testFile = ./test.md;
+    };
   };
 
   meta = {
