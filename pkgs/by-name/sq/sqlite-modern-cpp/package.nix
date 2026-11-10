@@ -5,6 +5,7 @@
 
   catch2,
   cmake,
+  nix-update-script,
   sqlite,
 }:
 
@@ -56,6 +57,8 @@ stdenv.mkDerivation (finalAttrs: {
 
     runHook postInstall
   '';
+
+  passthru.updateScript = nix-update-script { extraArgs = [ "--version=branch" ]; };
 
   meta = {
     description = "Lightweight C++ wrapper around sqlite3 C api";
