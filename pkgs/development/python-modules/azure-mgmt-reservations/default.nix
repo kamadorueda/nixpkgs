@@ -10,13 +10,13 @@
 
 buildPythonPackage rec {
   pname = "azure-mgmt-reservations";
-  version = "2.3.0";
+  version = "3.0.0";
   pyproject = true;
 
   src = fetchPypi {
-    inherit pname version;
-    extension = "zip";
-    hash = "sha256-BHCFEFst5jfyIEo0hm86belpxW7EygZCBJ8PTqzqHKc=";
+    pname = "azure_mgmt_reservations";
+    inherit version;
+    hash = "sha256-lmeYDK5Pt1U8HiiKozaVLrddlP92Ho1CYDVwaq8EyfM=";
   };
 
   build-system = [ setuptools ];
