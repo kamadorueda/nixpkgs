@@ -141,7 +141,7 @@ stdenv.mkDerivation (
 
     passthru.updateScript = gitUpdater {
       ignoredVersions = "[v0-9.]*-Windows$";
-      allowedVersions = "v[0-9]*.[0-9]*";
+      allowedVersions = "^[0-9]+\\.[0-9]+$";
       rev-prefix = "v";
     };
 
