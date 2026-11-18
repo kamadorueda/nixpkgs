@@ -2,7 +2,8 @@
   lib,
   buildPythonPackage,
   fetchPypi,
-  setuptools,
+  hatch-vcs,
+  hatchling,
   dask,
   distributed,
   mpi4py,
@@ -10,15 +11,19 @@
 
 buildPythonPackage rec {
   pname = "dask-mpi";
-  version = "2025.10.0";
+  version = "2026.3.0";
   pyproject = true;
 
   src = fetchPypi {
-    inherit pname version;
-    hash = "sha256-YxQOdPrILlB5jlfn/b3SVKUTg87lyjeqazRbGHF1g8A=";
+    pname = "dask_mpi";
+    inherit version;
+    hash = "sha256-EOvk5KHVPBJUagi0J1vHYqRnahdcxAtezGyiyR6KLn4=";
   };
 
-  build-system = [ setuptools ];
+  build-system = [
+    hatch-vcs
+    hatchling
+  ];
 
   dependencies = [
     dask
