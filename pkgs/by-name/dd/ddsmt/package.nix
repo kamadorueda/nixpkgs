@@ -5,7 +5,7 @@
 }:
 
 let
-  version = "2.0.3";
+  version = "2.0.6";
 in
 python3Packages.buildPythonApplication {
   pname = "ddsmt";
@@ -14,8 +14,8 @@ python3Packages.buildPythonApplication {
 
   src = fetchPypi {
     inherit version;
-    pname = "ddSMT";
-    hash = "sha256-nmhEG4sUmgpgRUduVTtwDLGPJVKx+dEaPb+KjFRwV2Q=";
+    pname = "ddsmt";
+    hash = "sha256-QH/FEIIEOZ87KhePXyoZ56T7pQzFgEn9gqcOJryRlZc=";
   };
 
   nativeBuildInputs = with python3Packages; [
