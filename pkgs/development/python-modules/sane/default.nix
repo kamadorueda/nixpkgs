@@ -7,13 +7,13 @@
 
 buildPythonPackage rec {
   pname = "sane";
-  version = "2.9.1";
+  version = "2.9.2";
   format = "setuptools";
 
   src = fetchPypi {
     inherit version;
-    pname = "python-sane";
-    hash = "sha256-JAmOuDxujhsBEm5q16WwR5wHsBPF0iBQm1VYkv5JJd4=";
+    pname = "python_sane";
+    hash = "sha256-UKuOCwM87OytJscjGnJU+ArY/p7GtcJa3SST1+Kge74=";
   };
 
   buildInputs = [ sane-backends ];
