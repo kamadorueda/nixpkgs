@@ -2,27 +2,39 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  meson,
+  ninja,
+  pkg-config,
   zlib,
-  net-tools,
   nixosTests,
+  versionCheckHook,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "iodine";
-  version = "0.8.0";
+  version = "0.9.1";
 
   src = fetchFromGitHub {
     owner = "yarrick";
     repo = "iodine";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-0vDl/F/57puugrEdOtdlpNPMF9ugO7TP3KLWo/7bP2k=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-vXxQqXr2qgU6eQeYjByrpG0H925yZoMfrOklqYKprXo=";
   };
+
+  nativeBuildInputs = [
+    meson
+    ninja
+    pkg-config
+  ];
 
   buildInputs = [ zlib ];
 
-  env.NIX_CFLAGS_COMPILE = ''-DIFCONFIGPATH="${net-tools}/bin/" -DROUTEPATH="${net-tools}/bin/"'';
+  # selinux, systemd and libcap-ng are optional
+  mesonAutoFeatures = "auto";
 
-  installFlags = [ "prefix=\${out}" ];
+  nativeInstallCheckInputs = [ versionCheckHook ];
+  versionCheckProgramArg = "-v";
+  doInstallCheck = true;
 
   passthru.tests = {
     inherit (nixosTests) iodine;
@@ -31,8 +43,10 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     homepage = "https://code.kryo.se/iodine/";
     description = "Tool to tunnel IPv4 data through a DNS server";
+    changelog = "https://github.com/yarrick/iodine/blob/${finalAttrs.src.tag}/CHANGELOG";
     license = lib.licenses.isc;
     platforms = lib.platforms.unix;
+    mainProgram = "iodine";
     maintainers = with lib.maintainers; [ kamadorueda ];
   };
 })
