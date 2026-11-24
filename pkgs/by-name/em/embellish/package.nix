@@ -7,26 +7,28 @@
   pkg-config,
   glib,
   blueprint-compiler,
-  gobject-introspection,
   gtk4,
   desktop-file-utils,
   gettext,
+  vala,
   wrapGAppsHook4,
   libadwaita,
-  gjs,
-  gnome-autoar,
+  libarchive,
+  libgee,
+  json-glib,
+  gtksourceview5,
   libsoup_3,
   nix-update-script,
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "embellish";
-  version = "0.6.1";
+  version = "1.2.0";
 
   src = fetchFromGitHub {
     owner = "getnf";
     repo = "embellish";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-5aAeEFB2KCyHtOqBj2q1O7A8PXSQYcP92CCqVtUNIqU=";
+    hash = "sha256-LKXeFGracEd4N+hJjwbWn/P4JTG4A9NQ+h0NX/h7ObE=";
   };
 
   nativeBuildInputs = [
@@ -35,18 +37,20 @@ stdenv.mkDerivation (finalAttrs: {
     pkg-config
     glib
     blueprint-compiler
-    gobject-introspection
     gtk4
     gettext
     desktop-file-utils
+    vala
     wrapGAppsHook4
   ];
 
   buildInputs = [
     gtk4
     libadwaita
-    gjs
-    gnome-autoar
+    libarchive
+    libgee
+    json-glib
+    gtksourceview5
     libsoup_3
   ];
 
@@ -69,7 +73,7 @@ stdenv.mkDerivation (finalAttrs: {
     changelog = "https://github.com/getnf/embellish/releases/tag/v${finalAttrs.version}";
     license = lib.licenses.gpl3Plus;
     maintainers = with lib.maintainers; [ kamadorueda ];
-    mainProgram = "io.github.getnf.embellish";
+    mainProgram = "embellish";
     platforms = lib.platforms.linux;
   };
 })
