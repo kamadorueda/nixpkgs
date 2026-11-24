@@ -5,28 +5,44 @@
   cups,
   fetchpatch,
   dos2unix,
+  rpm,
+  cpio,
 }:
 
-let
-  version = "1.8.6-1";
-in
-stdenv.mkDerivation {
+stdenv.mkDerivation (finalAttrs: {
   pname = "epson-escpr";
-  inherit version;
+  version = "1.8.10";
 
   src = fetchurl {
-    # To find new versions, visit
-    # http://download.ebz.epson.net/dsc/search/01/search/?OSC=LX and search for
-    # some printer like for instance "WF-7110" to get to the most recent
-    # version.
-    # NOTE: Don't forget to update the webarchive link too!
-    urls = [
-      "https://download3.ebz.epson.net/dsc/f/03/00/16/21/81/74d098a47c3a616713079c9cd5904b468bb33dea/epson-inkjet-printer-escpr-${version}.tar.gz"
-
-      "https://web.archive.org/web/https://download3.ebz.epson.net/dsc/f/03/00/16/21/81/74d098a47c3a616713079c9cd5904b468bb33dea/epson-inkjet-printer-escpr-${version}.tar.gz"
+    # To find new versions, go to
+    # https://support.epson.net/linux/Printer/LSB_distribution_pages/en/escpr.php
+    # and retrieve the download link of the source package: a src.rpm that
+    # contains the tarball.
+    # the server refuses curl's default user agent
+    curlOptsList = [
+      "--user-agent"
+      ""
     ];
-    sha256 = "sha256-hVbX4OXPe4y37Szju3uVdXlVdjX4DFSN/A2Emz3eCcQ=";
+    url = "https://download-center.epson.com/f/module/d3003be6-1230-4495-a683-b627604d565c/epson-inkjet-printer-escpr-${finalAttrs.version}-1.src.rpm";
+    hash = "sha256-v9WqSHy1ZfqV2PCUXVct5zUgrZc3Gq9NmI6mh9UuKfo=";
   };
+
+  nativeBuildInputs = [
+    rpm
+    cpio
+  ];
+
+  # the source package is an rpm that contains the actual tarball
+  unpackPhase = ''
+    runHook preUnpack
+
+    rpm2cpio $src | cpio -idm --quiet
+    tar xf epson-inkjet-printer-escpr-${finalAttrs.version}-1.tar.gz
+    cd epson-inkjet-printer-escpr-${finalAttrs.version}
+
+    runHook postUnpack
+  '';
+
   # the patches above are expecting unix line endings, but one of the files
   # being patched has dos line endings in the source tarball
   prePatch = ''
@@ -43,6 +59,15 @@ stdenv.mkDerivation {
       url = "https://gitweb.gentoo.org/repo/gentoo.git/plain/net-print/epson-inkjet-printer-escpr/files/1.8.6-warnings.patch";
       hash = "sha256-wSY0LZv2b+1kF7TfPolt554g79y2Ce6N/JqgjJyd3Ag=";
     })
+  ];
+
+  # the timestamps of the tarball make the build try to run automake again,
+  # but the generated files are the ones to use (configure is patched)
+  makeFlags = [
+    "ACLOCAL=:"
+    "AUTOCONF=:"
+    "AUTOHEADER=:"
+    "AUTOMAKE=:"
   ];
 
   # To suppress error (Stripping trailing CRs from patch; use --binary to disable.)
@@ -76,4 +101,4 @@ stdenv.mkDerivation {
     maintainers = with lib.maintainers; [ kamadorueda ];
     platforms = lib.platforms.linux;
   };
-}
+})
