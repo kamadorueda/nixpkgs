@@ -73,7 +73,7 @@ stdenv.mkDerivation {
           nssmdns4 = true;
         };'';
     license = lib.licenses.gpl3Plus;
-    maintainers = [ ];
+    maintainers = with lib.maintainers; [ kamadorueda ];
     platforms = lib.platforms.linux;
   };
 }
