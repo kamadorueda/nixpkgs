@@ -2,55 +2,60 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  appstream-glib,
-  autoreconfHook,
   dbus,
+  desktop-file-utils,
+  gettext,
+  glib,
+  gsettings-desktop-schemas,
+  gtk4,
+  libadwaita,
+  meson,
+  ninja,
   pango,
   pcre2,
   pkg-config,
   tmux,
-  vte,
-  wrapGAppsHook3,
+  vte-gtk4,
+  wrapGAppsHook4,
   nixosTests,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "germinal";
-  version = "26";
+  version = "31";
 
   src = fetchFromGitHub {
     owner = "Keruspe";
     repo = "Germinal";
-    rev = "v${finalAttrs.version}";
-    hash = "sha256-HUi+skF4bJj5CY2cNTOC4tl7jhvpXYKqBx2rqKzjlo0=";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-EsFBZBO7tn/de2rAT4kVGNVc5Vl4tcogMwmv0vEfWL8=";
   };
 
   nativeBuildInputs = [
-    autoreconfHook
+    desktop-file-utils
+    gettext
+    glib
+    meson
+    ninja
     pkg-config
-    wrapGAppsHook3
+    wrapGAppsHook4
   ];
 
   buildInputs = [
-    appstream-glib
     dbus
+    glib
+    gsettings-desktop-schemas
+    gtk4
+    libadwaita
     pango
     pcre2
-    vte
+    vte-gtk4
   ];
 
-  configureFlags = [
-    "--with-dbusservicesdir=${placeholder "out"}/etc/dbus-1/system-services/"
-  ];
+  env.PKG_CONFIG_DBUS_1_SESSION_BUS_SERVICES_DIR = "${placeholder "out"}/share/dbus-1/services";
 
-  dontWrapGApps = true;
-
-  fixupPhase = ''
-    runHook preFixup
-    wrapProgram $out/bin/germinal \
-     --prefix PATH ":" "${lib.makeBinPath [ tmux ]}" \
-      "''${gappsWrapperArgs[@]}"
-    runHook postFixup
+  preFixup = ''
+    gappsWrapperArgs+=(--prefix PATH : "${lib.makeBinPath [ tmux ]}")
   '';
 
   passthru.tests.test = nixosTests.terminal-emulators.germinal;
@@ -58,6 +63,7 @@ stdenv.mkDerivation (finalAttrs: {
   meta = {
     description = "Minimal terminal emulator";
     homepage = "https://github.com/Keruspe/Germinal";
+    changelog = "https://github.com/Keruspe/Germinal/blob/v${finalAttrs.version}/NEWS";
     license = lib.licenses.gpl3Plus;
     mainProgram = "germinal";
     maintainers = with lib.maintainers; [ kamadorueda ];
